@@ -179,6 +179,8 @@
     <ClInclude Include="koukku.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="r_init.hpp" />
+    <ClInclude Include="r_selectionwheel.hpp" />
+    <ClInclude Include="typedefs.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp" />
@@ -220,6 +222,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="r_selectionwheel.cpp" />
     <ClCompile Include="r_init.cpp" />
   </ItemGroup>
   <ItemGroup>

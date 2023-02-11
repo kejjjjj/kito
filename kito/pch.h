@@ -49,11 +49,14 @@ typedef vec_t vec4_t[4];
 
 #include "koukku.hpp"
 
+#include "typedefs.hpp"
+
 #include "cg_local.h"
 #include "cg_offsets.h"
 #include "cg_init.hpp"
 
 #include "r_init.hpp"
+#include "r_selectionwheel.hpp"
 
 #include "com_channel.h"
 

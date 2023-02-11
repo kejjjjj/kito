@@ -69,9 +69,6 @@
     <ClInclude Include="detours\detours.h">
       <Filter>Header Files\_lib\detours</Filter>
     </ClInclude>
-    <ClInclude Include="r_init.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGui\imgui_impl_win32.h">
       <Filter>Header Files\_lib\ImGui</Filter>
     </ClInclude>
@@ -96,6 +93,15 @@
     <ClInclude Include="ImGui\imgui_impl_dx9.h">
       <Filter>Header Files\_lib\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="r_init.hpp">
+      <Filter>Source Files\r</Filter>
+    </ClInclude>
+    <ClInclude Include="r_selectionwheel.hpp">
+      <Filter>Source Files\r</Filter>
+    </ClInclude>
+    <ClInclude Include="typedefs.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -115,9 +121,6 @@
     </ClCompile>
     <ClCompile Include="com_channel.cpp">
       <Filter>Source Files\com</Filter>
-    </ClCompile>
-    <ClCompile Include="r_init.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui_tables.cpp">
       <Filter>Header Files\_lib\ImGui</Filter>
@@ -139,6 +142,12 @@
     </ClCompile>
     <ClCompile Include="ImGui\imgui_impl_win32.cpp">
       <Filter>Header Files\_lib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="r_init.cpp">
+      <Filter>Source Files\r</Filter>
+    </ClCompile>
+    <ClCompile Include="r_selectionwheel.cpp">
+      <Filter>Source Files\r</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

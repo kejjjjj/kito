@@ -10,7 +10,7 @@ void cg::CG_Init()
 
 	R_Init();
 
-	Com_Printf(CON_CHANNEL_CONSOLEONLY, "^21_kej extension has been loaded!\n");
+	Com_Printf(CON_CHANNEL_CONSOLEONLY, "^2project extension has been loaded!\n");
 
 }
 void cg::CG_PrepareHooks()

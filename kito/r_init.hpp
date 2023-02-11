@@ -15,13 +15,13 @@ struct R
 	bool R_ImGui();
 	static HRESULT __stdcall draw_func(IDirect3DDevice9* d);
 
-	std::function<HRESULT __stdcall(IDirect3DDevice9*)> endscene_ptr;
+	
 
 	IDirect3DDevice9* device = 0;
 	HRESULT(__stdcall * endscene)(IDirect3DDevice9*);
 
-private:
-	
+	bool R_BeginFrame();
+	void R_EndFrame();
 };
 
 inline R* r_glob = 0;
