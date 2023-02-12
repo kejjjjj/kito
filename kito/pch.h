@@ -10,6 +10,8 @@
 #define ANGLE2SHORT( x )  ( (int)( ( x ) * 65536 / 360 ) & 65535 )
 #define SHORT2ANGLE( x )  ( ( x ) * ( 360.0 / 65536 ) )
 
+#define NOMINMAX
+
 typedef float vec_t;
 typedef vec_t vec2_t[2];
 typedef vec_t vec3_t[3];
@@ -50,13 +52,20 @@ typedef vec_t vec4_t[4];
 #include "koukku.hpp"
 
 #include "typedefs.hpp"
+#include "vectors.hpp"
+
+#include "in_main.hpp"
 
 #include "cg_local.h"
 #include "cg_offsets.h"
 #include "cg_init.hpp"
+#include "cg_dvar.h"
 
-#include "r_init.hpp"
+#include "game_funcs.hpp"
+
 #include "r_selectionwheel.hpp"
+#include "r_drawlist.hpp"
+#include "r_init.hpp"
 
 #include "com_channel.h"
 

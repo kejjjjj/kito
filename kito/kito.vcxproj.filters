@@ -34,6 +34,15 @@
     <Filter Include="Header Files\_lib\ImGui">
       <UniqueIdentifier>{40163b35-9417-4aa6-b897-ba4e38ed4db4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\in">
+      <UniqueIdentifier>{2a04290b-6be8-41d3-a274-deadd7266985}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cg">
+      <UniqueIdentifier>{a98502a9-5c04-4963-99bf-77222ad05ad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game">
+      <UniqueIdentifier>{410043c2-d423-4b94-a5f3-609c4a2282a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -50,12 +59,6 @@
     </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>Header Files\_lib</Filter>
-    </ClInclude>
-    <ClInclude Include="cg_local.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cg_offsets.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="com_channel.h">
       <Filter>Source Files\com</Filter>
@@ -101,6 +104,27 @@
     </ClInclude>
     <ClInclude Include="typedefs.hpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="r_drawlist.hpp">
+      <Filter>Source Files\r</Filter>
+    </ClInclude>
+    <ClInclude Include="in_main.hpp">
+      <Filter>Source Files\in</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_offsets.h">
+      <Filter>Header Files\cg</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_local.h">
+      <Filter>Header Files\cg</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_dvar.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vectors.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_funcs.hpp">
+      <Filter>Source Files\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +172,21 @@
     </ClCompile>
     <ClCompile Include="r_selectionwheel.cpp">
       <Filter>Source Files\r</Filter>
+    </ClCompile>
+    <ClCompile Include="r_drawlist.cpp">
+      <Filter>Source Files\r</Filter>
+    </ClCompile>
+    <ClCompile Include="in_main.cpp">
+      <Filter>Source Files\in</Filter>
+    </ClCompile>
+    <ClCompile Include="cg_dvar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vectors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_funcs.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

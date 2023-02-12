@@ -30,6 +30,9 @@ bool R::Init()
 	hook* a = 0;
 	a->install(&(PVOID&)endscene, draw_func);
 
+	//ALLOCATE DRAWLIST -- CLEARED IN CG_CLEANUP
+	dl = new DrawList;
+
 	return R::R_ImGui();
 
 }
@@ -66,11 +69,11 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 		return r_glob->endscene(d);
 	}
 	
+	DrawList* dl = r_glob->dl;
+
 	r_glob->R_BeginFrame();
 
-	ivec2 ok = {960,500};
-
-	ImGui::GetBackgroundDrawList()->AddCircleFilled(ok, 100, IM_COL32(255, 0, 0, 70));
+	dl->ui_wheel->Draw();
 
 
 	r_glob->R_EndFrame();
@@ -80,7 +83,24 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 
 	return r_glob->endscene(d);
 }
+LRESULT __stdcall R::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
+		return 1l;
+	}
 
+	switch (uMsg) {
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU)
+			return 0;
+		break;
+	case WM_DESTROY:
+		break;
+
+	}
+	return r_glob->oWndProc(hWnd, uMsg, wParam, lParam);
+
+}
 bool R::R_BeginFrame()
 {
 	if (!ImGui::GetCurrentContext())

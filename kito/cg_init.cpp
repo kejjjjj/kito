@@ -6,9 +6,9 @@ void cg::CG_Init()
 {
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "CG_Init() loading..\n");
 
-	CG_InitForeverHooks();
-
 	R_Init();
+	CG_InitForeverHooks();
+	
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "^2project extension has been loaded!\n");
 
@@ -21,7 +21,12 @@ void cg::CG_InitForeverHooks()
 {
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "preparing to load perma hooks\n");
 
+	r_glob->oWndProc = (HRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM))(0x596810);
 
+	hook* a = nullptr;
+
+
+	a->install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
 
 }
 void cg::CG_InitHooks()
@@ -65,7 +70,8 @@ void cg::CG_Cleanup()
 	CG_RemoveHooks();
 
 
-
+	delete r_glob->dl;
 	delete r_glob;
+	
 
 }

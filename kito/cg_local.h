@@ -784,6 +784,21 @@ struct GfxViewport
 	int width;
 	int height;
 };
+struct __declspec(align(4)) WinMouseVars_t
+{
+	int oldButtonState;
+	tagPOINT oldPos;
+	bool mouseActive;
+	bool mouseInitialized;
+};
+struct cmd_function_s
+{
+	cmd_function_s* next;
+	const char* name;
+	const char* args;			//autoCompleteDir;
+	const char* description;	// autoCompleteExt
+	void(__cdecl* function)();
+};
 
 struct refdef_s
 {

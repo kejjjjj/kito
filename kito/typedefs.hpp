@@ -40,8 +40,12 @@ struct vec2
 	vec2 operator/=(const T& v) { return { x /= v, y /= v }; }
 
 #ifdef IMGUI_API
-	operator ImVec2() { return ImVec2(x, y); };
+	operator ImVec2() { return ImVec2((float)x, (float)y); };
 #endif
+
+	operator vec2<int>() { return { (int)x, (int)y }; }
+	operator vec2<float>() { return { (float)x, (float)y }; }
+
 
 	float mag() const {
 		return sqrtf(x * x + y * y);
@@ -106,6 +110,8 @@ struct Pixel
 
 #ifdef IMGUI_API
 	operator ImColor() { return ImColor(r,g,b,a); };
+	operator ImU32() { return IM_COL32(r, g, b, a); };
+
 #endif
 
 
