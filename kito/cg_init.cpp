@@ -21,12 +21,14 @@ void cg::CG_InitForeverHooks()
 {
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "preparing to load perma hooks\n");
 
-	r_glob->oWndProc = (HRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM))(0x596810);
+	r_glob->oWndProc	= (HRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM))	(0x596810);
+	CL_MouseMove_f		= (void(*)(usercmd_s*))								(0x440040);
+	Pmove_f				= (void(*)(pmove_t*))								(0x5BD440);
 
-	hook* a = nullptr;
 
-
-	a->install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
+	hook::install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
+	hook::install(&(PVOID&)CL_MouseMove_f, CL_MouseMove);
+	hook::install(&(PVOID&)Pmove_f, Pmove);
 
 }
 void cg::CG_InitHooks()
@@ -37,9 +39,6 @@ void cg::CG_InitHooks()
 		return;
 
 	CG_PrepareHooks();
-
-	hook* a = nullptr;
-
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");
 
@@ -54,8 +53,9 @@ void cg::CG_RemoveHooks()
 	if (!mglobs.initialized)
 		return;
 
-	hook* a = nullptr;
-
+	hook::remove(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
+	hook::remove(&(PVOID&)CL_MouseMove_f, CL_MouseMove);
+	hook::remove(&(PVOID&)Pmove_f, Pmove);
 
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");

@@ -2,7 +2,6 @@
 
 void IN_ActivateMouse(bool state)
 {
-	hook* a = nullptr;
 	cg::s_wmv->mouseInitialized = state;
 	cg::s_wmv->mouseActive = state;
 

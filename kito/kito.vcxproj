@@ -159,10 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bg_pmove.hpp" />
+    <ClInclude Include="cg_angles.hpp" />
     <ClInclude Include="cg_dvar.h" />
     <ClInclude Include="cg_init.hpp" />
     <ClInclude Include="cg_local.h" />
     <ClInclude Include="cg_offsets.h" />
+    <ClInclude Include="clipping.hpp" />
+    <ClInclude Include="cl_keymove.hpp" />
     <ClInclude Include="com_channel.h" />
     <ClInclude Include="detours\detours.h" />
     <ClInclude Include="detours\detver.h" />
@@ -188,8 +192,12 @@
     <ClInclude Include="vectors.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bg_pmove.cpp" />
+    <ClCompile Include="cg_angles.cpp" />
     <ClCompile Include="cg_dvar.cpp" />
     <ClCompile Include="cg_init.cpp" />
+    <ClCompile Include="clipping.cpp" />
+    <ClCompile Include="cl_keymove.cpp" />
     <ClCompile Include="com_channel.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="entry.cpp" />

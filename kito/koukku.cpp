@@ -70,7 +70,6 @@ std::uintptr_t hook::find_pattern(std::string moduleName, std::string pattern)
 }
 std::uintptr_t hook::find_pattern(DWORD start_address, DWORD end_address, std::string pattern)
 {
-	hook* a = nullptr;
 	const char* pat = pattern.c_str();
 	//std::cout << "using pattern: [" << pat << "]\n";
 	DWORD firstMatch = 0;

@@ -27,8 +27,7 @@ bool R::Init()
 	}
 
 	endscene = (HRESULT(__stdcall *)(IDirect3DDevice9*))vTable[42];
-	hook* a = 0;
-	a->install(&(PVOID&)endscene, draw_func);
+	hook::install(&(PVOID&)endscene, draw_func);
 
 	//ALLOCATE DRAWLIST -- CLEARED IN CG_CLEANUP
 	dl = new DrawList;
@@ -74,7 +73,6 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	r_glob->R_BeginFrame();
 
 	dl->ui_wheel->Draw();
-
 
 	r_glob->R_EndFrame();
 	

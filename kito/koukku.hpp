@@ -8,7 +8,7 @@
 #define getBits( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
 #define getByte( x )    (getBits(x[0]) << 4 | getBits(x[1]))
 
-struct hook //a VERY basic structure to do the most basic things!
+namespace hook //a VERY basic namespace to do the most basic things!
 {
 
 	LONG install(PVOID* ppPointer, PVOID pDetour);

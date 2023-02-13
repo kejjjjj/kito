@@ -71,18 +71,18 @@ void SWheel::OnKeyEvent()
 		SWheel::EraseAll();
 	}
 
-	else if ((keyduration = ImGui::GetIO().KeysDownDuration[VK_OEM_PLUS]) >= 0.0f && keyduration <= ImGui::GetIO().DeltaTime)
-	{
-		static int i = 0;
-		std::string ok = std::string("what") + std::to_string(i++);
-		SWheel::Insert(ok, []() { Com_Printf(CON_CHANNEL_SUBTITLE, "lol..\n"); }, {uint8_t(rand() % 255),uint8_t(rand() % 255),uint8_t(rand() % 255),120}, nullptr);
+	//else if ((keyduration = ImGui::GetIO().KeysDownDuration[VK_OEM_PLUS]) >= 0.0f && keyduration <= ImGui::GetIO().DeltaTime)
+	//{
+	//	static int i = 0;
+	//	std::string ok = std::string("what") + std::to_string(i++);
+	//	SWheel::Insert(ok, []() { Com_Printf(CON_CHANNEL_SUBTITLE, "lol..\n"); }, {uint8_t(rand() % 255),uint8_t(rand() % 255),uint8_t(rand() % 255),120}, nullptr);
 
-	}
-	else if ((keyduration = ImGui::GetIO().KeysDownDuration[VK_OEM_MINUS]) >= 0.0f && keyduration <= ImGui::GetIO().DeltaTime)
-	{
-		if(!objects.empty())
-			objects.pop_front();
-	}
+	//}
+	//else if ((keyduration = ImGui::GetIO().KeysDownDuration[VK_OEM_MINUS]) >= 0.0f && keyduration <= ImGui::GetIO().DeltaTime)
+	//{
+	//	if(!objects.empty())
+	//		objects.pop_front();
+	//}
 }
 void SWheel::Draw()
 {
@@ -172,7 +172,6 @@ void SWheel::DrawSingularPoly(WheelObj& obj, float start_angle)
 
 	center.x -= size.x / 2;
 	center.y -= size.y / 2;
-
 
 
 	ImGui::GetBackgroundDrawList()->AddTriangleFilled(tri[0], tri[1], tri[2], obj.color);

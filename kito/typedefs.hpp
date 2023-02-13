@@ -95,6 +95,94 @@ struct vec2
 using ivec2 = vec2<int>;
 using fvec2 = vec2<float>;
 
+template <class T>
+struct vec3
+{
+
+	T x, y, z;
+
+	constexpr vec3() { x = 0; y = 0, z = 0; }
+	constexpr vec3(const T& v) { x = v; y = v, z = v; }
+	constexpr vec3(const T& a, const T& b, const T& c) { x = a; y = b, z = c; }
+	//constexpr explicit vec3(const vec3<int>& v) { x = (int)v.x, y = (int)v.y; }
+
+	vec3 operator+(const vec3& v) const { return { x + v.x, y + v.y, z + v.z }; }
+	vec3 operator-(const vec3& v) const { return { x - v.x, y - v.y, z - v.z }; }
+	vec3 operator*(const vec3& v) const { return { x * v.x, y * v.y, z * v.z }; }
+	vec3 operator/(const vec3& v) const { return { x / v.x, y / v.y, z / v.z }; }
+	void operator=(const vec3& v) { x = v.x; y = v.y, z = v.z; }
+
+	vec3 operator+(const T& v) const { return { x + v, y + v, z + v }; }
+	vec3 operator-(const T& v) const { return { x - v, y - v, z - v }; }
+	vec3 operator*(const T& v) const { return { x * v, y * v, z * v }; }
+	vec3 operator/(const T& v) const { return { x / v, y / v, z / v }; }
+
+	vec3 operator+=(const vec3& v) { return { x += v.x, y += v.y, z += v.z }; }
+	vec3 operator-=(const vec3& v) { return { x -= v.x, y -= v.y, z -= v.z }; }
+	vec3 operator*=(const vec3& v) { return { x *= v.x, y *= v.y, z *= v.z }; }
+	vec3 operator/=(const vec3& v) { return { x /= v.x, y /= v.y, z /= v.z }; }
+	bool operator==(const vec3& v) const { return  x == v.x && y == v.y && z == v.z; }
+	bool operator!=(const vec3& v) const { return  x != v.x || y != v.y || z != v.z; }
+
+	vec3 operator+=(const T& v) { return { x += v, y += v, z += v.z }; }
+	vec3 operator-=(const T& v) { return { x -= v, y -= v, z -= v.z }; }
+	vec3 operator*=(const T& v) { return { x *= v, y *= v, z *= v.z }; }
+	vec3 operator/=(const T& v) { return { x /= v, y /= v, z /= v.z }; }
+
+#ifdef IMGUI_API
+
+#endif
+	operator vec3<int>() { return { (int)x, (int)y, (int)z }; }
+	operator vec3<float>() { return { (float)x, (float)y, (float)z}; }
+
+
+	float mag() const {
+		return sqrtf(x * x + y * y + z * z);
+	}
+	float dot(const vec3& vec) const
+	{
+		return x * vec.x + y * vec.y + z * vec.z;
+	}
+	float normalize() {
+		const float length = this->mag();
+		float ilength;
+
+		if (length) {
+			ilength = 1 / length;
+			this->x *= ilength;
+			this->y *= ilength;
+			this->z *= ilength;
+		}
+
+		return length;
+	}
+	float dist(const vec3& vec) const
+	{
+		const vec3 sub = *this - vec;
+		return sub.mag();
+	}
+	vec3 inverse() const
+	{
+		return { -x, -y, -z };
+	}
+	float MagSq() const { //magnitude squared
+		return (x * x + y * y + z * z);
+	}
+	void clamp(const T min, const T max) {
+		if (x < min)		x = min;
+		else if (x > max)	x = max;
+
+		if (y < min)		y = min;
+		else if (y > max)	y = max;
+
+		if (z < min)		z = min;
+		else if (z > max)	z = max;
+	}
+
+};
+
+using ivec3 = vec3<int>;
+using fvec3 = vec3<float>;
 
 struct Pixel
 {
@@ -103,6 +191,7 @@ struct Pixel
 	constexpr Pixel() { r = 0, g = 0, b = 0, a = 255; }
 	constexpr Pixel(const uint8_t val) { r = val, g = val, b = val, a = val; };
 	constexpr Pixel(const uint8_t _r, const uint8_t _g, const uint8_t _b, const uint8_t _a) { r = _r, g = _g, b = _b, a = _a; }
+	constexpr Pixel(const Pixel& p) { r = p.r, g = p.g, b = p.b, a = p.a; }
 
 	Pixel operator=(const Pixel& px) {
 		return { px.r, px.g, px.b, px.a };

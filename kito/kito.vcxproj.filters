@@ -43,6 +43,18 @@
     <Filter Include="Source Files\game">
       <UniqueIdentifier>{410043c2-d423-4b94-a5f3-609c4a2282a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\z_misc">
+      <UniqueIdentifier>{104fe990-5b19-4b64-b5f7-105246779e5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cl">
+      <UniqueIdentifier>{10652fd9-f680-4508-9054-30dee665fa60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\recorder">
+      <UniqueIdentifier>{feb1c0e5-bdc8-4dce-b4dd-b87073fa908b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bg">
+      <UniqueIdentifier>{5cf70a8c-a754-4884-99d5-2f2d7783c969}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -102,9 +114,6 @@
     <ClInclude Include="r_selectionwheel.hpp">
       <Filter>Source Files\r</Filter>
     </ClInclude>
-    <ClInclude Include="typedefs.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="r_drawlist.hpp">
       <Filter>Source Files\r</Filter>
     </ClInclude>
@@ -117,23 +126,32 @@
     <ClInclude Include="cg_local.h">
       <Filter>Header Files\cg</Filter>
     </ClInclude>
-    <ClInclude Include="cg_dvar.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vectors.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_funcs.hpp">
       <Filter>Source Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="cg_dvar.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="vectors.hpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="typedefs.hpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="cl_keymove.hpp">
+      <Filter>Source Files\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="clipping.hpp">
+      <Filter>Source Files\recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_angles.hpp">
+      <Filter>Source Files\cg</Filter>
+    </ClInclude>
+    <ClInclude Include="bg_pmove.hpp">
+      <Filter>Source Files\bg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cg_init.cpp">
       <Filter>Source Files\cg</Filter>
     </ClCompile>
@@ -179,14 +197,32 @@
     <ClCompile Include="in_main.cpp">
       <Filter>Source Files\in</Filter>
     </ClCompile>
-    <ClCompile Include="cg_dvar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vectors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_funcs.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="cg_dvar.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="vectors.cpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_keymove.cpp">
+      <Filter>Source Files\cl</Filter>
+    </ClCompile>
+    <ClCompile Include="clipping.cpp">
+      <Filter>Source Files\recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="cg_angles.cpp">
+      <Filter>Source Files\cg</Filter>
+    </ClCompile>
+    <ClCompile Include="bg_pmove.cpp">
+      <Filter>Source Files\bg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
