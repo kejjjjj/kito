@@ -188,6 +188,7 @@
     <ClInclude Include="r_drawlist.hpp" />
     <ClInclude Include="r_init.hpp" />
     <ClInclude Include="r_selectionwheel.hpp" />
+    <ClInclude Include="r_userinterface.hpp" />
     <ClInclude Include="typedefs.hpp" />
     <ClInclude Include="vectors.hpp" />
   </ItemGroup>
@@ -241,6 +242,7 @@
     <ClCompile Include="r_drawlist.cpp" />
     <ClCompile Include="r_selectionwheel.cpp" />
     <ClCompile Include="r_init.cpp" />
+    <ClCompile Include="r_userinterface.cpp" />
     <ClCompile Include="vectors.cpp" />
   </ItemGroup>
   <ItemGroup>

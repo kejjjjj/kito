@@ -21,14 +21,18 @@ void cg::CG_InitForeverHooks()
 {
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "preparing to load perma hooks\n");
 
-	r_glob->oWndProc	= (HRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM))	(0x596810);
-	CL_MouseMove_f		= (void(*)(usercmd_s*))								(0x440040);
-	Pmove_f				= (void(*)(pmove_t*))								(0x5BD440);
-
+	r_glob->oWndProc				= (HRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM))	(0x596810);
+	CL_FinishMove_f					= (void(*)(usercmd_s*))								(0x440040);
+	Pmove_f							= (void(*)(pmove_t*))								(0x5BD440);
+	r_glob->R_RecoverLostDevice_f	= (void(*)())										(0x5DA020);
+	r_glob->CL_ShutdownRenderer_f	= (void(*)())										(0x4452E0);
 
 	hook::install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
-	hook::install(&(PVOID&)CL_MouseMove_f, CL_MouseMove);
-	hook::install(&(PVOID&)Pmove_f, Pmove);
+	hook::install(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
+	hook::install(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
+	hook::install(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
+
+	//hook::install(&(PVOID&)Pmove_f, Pmove);
 
 }
 void cg::CG_InitHooks()
@@ -54,8 +58,10 @@ void cg::CG_RemoveHooks()
 		return;
 
 	hook::remove(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
-	hook::remove(&(PVOID&)CL_MouseMove_f, CL_MouseMove);
+	hook::remove(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
 	hook::remove(&(PVOID&)Pmove_f, Pmove);
+	hook::remove(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
+	hook::remove(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
 
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");

@@ -18,6 +18,7 @@ struct DrawList
 	}
 
 	SWheel* ui_wheel = 0;
+	UI ui;
 
 };
 

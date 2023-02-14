@@ -7,8 +7,8 @@
 
 namespace cg
 {
-	inline void(*CL_MouseMove_f)(usercmd_s* cmd);
-	void CL_MouseMove(usercmd_s* cmd);
+	inline void(*CL_FinishMove_f)(usercmd_s* cmd);
+	void CL_FinishMove(usercmd_s* cmd);
 
 }
 

@@ -76,6 +76,8 @@ typedef vec_t vec4_t[4];
 #include "game_funcs.hpp"
 
 #include "r_selectionwheel.hpp"
+#include "r_userinterface.hpp"
+
 #include "r_drawlist.hpp"
 #include "r_init.hpp"
 

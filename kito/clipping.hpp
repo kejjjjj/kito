@@ -7,6 +7,7 @@
 
 struct recorder_cmd
 {
+	int serverTime;
 	int angles[3];
 	int32_t buttons;
 	char forwardmove;
@@ -33,6 +34,7 @@ private:
 	bool recording = 0;
 	bool playback = 0;
 	std::list<recorder_cmd>::iterator it;
+	int refTime = 0;
 };
 
 inline Recorder recorder;

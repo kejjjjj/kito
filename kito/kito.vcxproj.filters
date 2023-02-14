@@ -55,6 +55,9 @@
     <Filter Include="Source Files\bg">
       <UniqueIdentifier>{5cf70a8c-a754-4884-99d5-2f2d7783c969}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\r\userinterface">
+      <UniqueIdentifier>{2bb940fb-3b5a-4f59-9b66-a127cedfa332}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -150,6 +153,9 @@
     <ClInclude Include="bg_pmove.hpp">
       <Filter>Source Files\bg</Filter>
     </ClInclude>
+    <ClInclude Include="r_userinterface.hpp">
+      <Filter>Source Files\r\userinterface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -223,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="bg_pmove.cpp">
       <Filter>Source Files\bg</Filter>
+    </ClCompile>
+    <ClCompile Include="r_userinterface.cpp">
+      <Filter>Source Files\r\userinterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

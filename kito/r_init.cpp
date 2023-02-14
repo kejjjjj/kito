@@ -32,13 +32,14 @@ bool R::Init()
 	//ALLOCATE DRAWLIST -- CLEARED IN CG_CLEANUP
 	dl = new DrawList;
 
-	return R::R_ImGui();
+	return R::R_ImGui(device);
 
 }
-bool R::R_ImGui()
+bool R::R_ImGui(IDirect3DDevice9* d)
 {
 	if (ImGui::GetCurrentContext())
 		return true;
+
 
 	std::cout << "creating new imgui context!\n";
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "creating new imgui context!\n");
@@ -53,17 +54,16 @@ bool R::R_ImGui()
 		return false;
 	}
 
-	if (!ImGui_ImplDX9_Init(device)) {
+	if (!ImGui_ImplDX9_Init(d)) {
 		Com_Error(ERR_FATAL, "!ImGui_ImplDX9_Init(device)");
 		return false;
 	}
-
 	return true;
 }
 HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 {
 
-	if (!r_glob->R_ImGui() || !r_glob->R_BeginFrame()) {
+	if (!r_glob->R_ImGui(d)) {
 		Com_Error(ERR_DROP, "R::draw_func(IDirect3DDevice9* d): !r_glob->R_ImGui() || !r_glob->R_BeginFrame()");
 		return r_glob->endscene(d);
 	}
@@ -73,6 +73,8 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	r_glob->R_BeginFrame();
 
 	dl->ui_wheel->Draw();
+
+	dl->ui.UI_Draw();
 
 	r_glob->R_EndFrame();
 	
@@ -99,6 +101,37 @@ LRESULT __stdcall R::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	return r_glob->oWndProc(hWnd, uMsg, wParam, lParam);
 
 }
+void R::R_RecoverLostDevice()
+{
+	
+	if (!r_glob->device_needs_reset && ImGui::GetCurrentContext()) {
+
+		Com_Printf(CON_CHANNEL_CONSOLEONLY, "R_RecoverLostDevice(): restoring input\n");
+		IN_ActivateMouse(true);
+		ImGui_ImplDX9_InvalidateDeviceObjects();
+		std::cout << "R_RecoverLostDevice(): restoring input\n";
+		r_glob->device_needs_reset = true;
+	}
+
+	return r_glob->R_RecoverLostDevice_f();
+}
+void R::CL_ShutdownRenderer()
+{
+
+	std::cout << "shutdown renderer!\n";
+	Com_Printf(CON_CHANNEL_CONSOLEONLY, "shutting down renderer\n");
+
+	if (ImGui::GetCurrentContext()) {
+
+
+		Com_Printf(CON_CHANNEL_CONSOLEONLY, "also removing imgui context\n");
+		ImGui_ImplDX9_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+	}
+
+	return r_glob->CL_ShutdownRenderer_f();
+}
 bool R::R_BeginFrame()
 {
 	if (!ImGui::GetCurrentContext())
@@ -116,4 +149,5 @@ void R::R_EndFrame()
 	ImGui::Render();
 	ImDrawData* data = ImGui::GetDrawData();
 	ImGui_ImplDX9_RenderDrawData(data);
+	device_needs_reset = false;
 }
