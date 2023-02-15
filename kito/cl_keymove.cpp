@@ -29,15 +29,6 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 	else if (recorder.IsPlayback()) {
 		recorder.Playback(cmd);
 	}
-//	cmd->angles[1] = ANGLE2SHORT(90);
-	//static int roll = 0;
-
-	//if (GetAsyncKeyState(VK_NUMPAD7)&1 || roll && roll < 360) {
-	//	CG_SetPlayerAngles(vAngle->angles, vec3_t{ float(roll), float(roll), float(roll) });
-	//	++roll;
-	//}
-	//else
-	//	roll = 0;
 	
 
 	return;

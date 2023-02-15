@@ -12,6 +12,7 @@ struct recorder_cmd
 	int32_t buttons;
 	char forwardmove;
 	char rightmove;
+	int FPS;
 };
 
 struct Recorder

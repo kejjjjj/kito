@@ -58,6 +58,8 @@ bool R::R_ImGui(IDirect3DDevice9* d)
 		Com_Error(ERR_FATAL, "!ImGui_ImplDX9_Init(device)");
 		return false;
 	}
+
+
 	return true;
 }
 HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)

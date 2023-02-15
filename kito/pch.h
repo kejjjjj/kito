@@ -36,6 +36,10 @@ typedef vec_t vec4_t[4];
 #include <functional>
 #include <Psapi.h>
 #include <TlHelp32.h>
+#include <fstream>
+#include <filesystem>
+#include <direct.h>
+
 
 // add headers that you want to pre-compile here
 #include "framework.h"
@@ -62,6 +66,7 @@ typedef vec_t vec4_t[4];
 
 #include "typedefs.hpp"
 #include "vectors.hpp"
+#include "filetools.hpp"
 
 #include "in_main.hpp"
 
@@ -86,6 +91,11 @@ typedef vec_t vec4_t[4];
 #include "com_channel.h"
 
 #include "clipping.hpp"
+
+#include "tas_filesystem.hpp"
+#include "tas_movement.hpp"
+#include "tas_ui.hpp"
+#include "tas_main.hpp"
 
 #include "entry.hpp"
 

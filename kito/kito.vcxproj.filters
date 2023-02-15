@@ -58,6 +58,9 @@
     <Filter Include="Source Files\r\userinterface">
       <UniqueIdentifier>{2bb940fb-3b5a-4f59-9b66-a127cedfa332}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\TAS">
+      <UniqueIdentifier>{d9a1e093-d522-4401-8a7a-cf1e2bbcf6de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -156,6 +159,21 @@
     <ClInclude Include="r_userinterface.hpp">
       <Filter>Source Files\r\userinterface</Filter>
     </ClInclude>
+    <ClInclude Include="tas_main.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
+    <ClInclude Include="tas_filesystem.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
+    <ClInclude Include="filetools.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tas_movement.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
+    <ClInclude Include="tas_ui.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -232,6 +250,21 @@
     </ClCompile>
     <ClCompile Include="r_userinterface.cpp">
       <Filter>Source Files\r\userinterface</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_main.cpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_filesystem.cpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="filetools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_movement.cpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_ui.cpp">
+      <Filter>Source Files\TAS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

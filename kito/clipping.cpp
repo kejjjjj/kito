@@ -27,6 +27,8 @@ void Recorder::StartPlayback()
 }
 void Recorder::Record(usercmd_s* cmd)
 {
+	static dvar_s* com_maxfps = Dvar_FindMalleableVar("com_maxfps");
+
 	recorder_cmd _cmd;
 	_cmd.serverTime = cmd->serverTime;
 	_cmd.angles[0] = cmd->angles[0];
@@ -36,11 +38,13 @@ void Recorder::Record(usercmd_s* cmd)
 	_cmd.buttons = cmd->buttons;
 	_cmd.forwardmove = cmd->forwardmove;
 	_cmd.rightmove = cmd->rightmove;
+	_cmd.FPS = int(*(float*)0x1290F78);
 
 	Recorder::recorder_sequence.push_back(_cmd);
 }
 void Recorder::Playback(usercmd_s* cmd)
 {
+	static dvar_s* com_maxfps = Dvar_FindMalleableVar("com_maxfps");
 
 	if (Recorder::it == Recorder::recorder_sequence.end()) {
 		Recorder::playback = false;
@@ -54,6 +58,9 @@ void Recorder::Playback(usercmd_s* cmd)
 	cmd->angles[1] = it->angles[1];
 	cmd->angles[2] = it->angles[2];
 	cmd->serverTime = refTime + (it->serverTime - Recorder::recorder_sequence.front().serverTime);
+
+	com_maxfps->current.integer = it->FPS;
+
 	*(int*)(0x85BD98 + 11454) = cmd->serverTime; //clients->serverTime
 	cmd->buttons |= it->buttons;
 	cmd->forwardmove = it->forwardmove;

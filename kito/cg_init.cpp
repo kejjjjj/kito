@@ -9,6 +9,8 @@ void cg::CG_Init()
 	R_Init();
 	CG_InitForeverHooks();
 	
+	tas = new TAS;
+	tas->Init();
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "^2project extension has been loaded!\n");
 
@@ -78,6 +80,7 @@ void cg::CG_Cleanup()
 
 	delete r_glob->dl;
 	delete r_glob;
+	delete tas;
 	
 
 }

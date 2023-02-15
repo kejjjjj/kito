@@ -172,6 +172,7 @@
     <ClInclude Include="detours\detver.h" />
     <ClInclude Include="detours\syelog.h" />
     <ClInclude Include="entry.hpp" />
+    <ClInclude Include="filetools.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="game_funcs.hpp" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -189,6 +190,10 @@
     <ClInclude Include="r_init.hpp" />
     <ClInclude Include="r_selectionwheel.hpp" />
     <ClInclude Include="r_userinterface.hpp" />
+    <ClInclude Include="tas_filesystem.hpp" />
+    <ClInclude Include="tas_main.hpp" />
+    <ClInclude Include="tas_movement.hpp" />
+    <ClInclude Include="tas_ui.hpp" />
     <ClInclude Include="typedefs.hpp" />
     <ClInclude Include="vectors.hpp" />
   </ItemGroup>
@@ -202,6 +207,7 @@
     <ClCompile Include="com_channel.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="entry.cpp" />
+    <ClCompile Include="filetools.cpp" />
     <ClCompile Include="game_funcs.cpp" />
     <ClCompile Include="ImGui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -243,6 +249,10 @@
     <ClCompile Include="r_selectionwheel.cpp" />
     <ClCompile Include="r_init.cpp" />
     <ClCompile Include="r_userinterface.cpp" />
+    <ClCompile Include="tas_filesystem.cpp" />
+    <ClCompile Include="tas_main.cpp" />
+    <ClCompile Include="tas_movement.cpp" />
+    <ClCompile Include="tas_ui.cpp" />
     <ClCompile Include="vectors.cpp" />
   </ItemGroup>
   <ItemGroup>
