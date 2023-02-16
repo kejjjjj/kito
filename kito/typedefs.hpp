@@ -104,6 +104,8 @@ struct vec3
 	constexpr vec3() { x = 0; y = 0, z = 0; }
 	constexpr vec3(const T& v) { x = v; y = v, z = v; }
 	constexpr vec3(const T& a, const T& b, const T& c) { x = a; y = b, z = c; }
+	constexpr vec3(const vec3_t a) { x = a[0]; y = a[1], z = a[2]; }
+
 	//constexpr explicit vec3(const vec3<int>& v) { x = (int)v.x, y = (int)v.y; }
 
 	vec3 operator+(const vec3& v) const { return { x + v.x, y + v.y, z + v.z }; }
@@ -111,6 +113,8 @@ struct vec3
 	vec3 operator*(const vec3& v) const { return { x * v.x, y * v.y, z * v.z }; }
 	vec3 operator/(const vec3& v) const { return { x / v.x, y / v.y, z / v.z }; }
 	void operator=(const vec3& v) { x = v.x; y = v.y, z = v.z; }
+	void operator=(const vec3_t v) { x = v[0]; y = v[1], z = v[2]; }
+
 
 	vec3 operator+(const T& v) const { return { x + v, y + v, z + v }; }
 	vec3 operator-(const T& v) const { return { x - v, y - v, z - v }; }
@@ -134,7 +138,6 @@ struct vec3
 #endif
 	operator vec3<int>() { return { (int)x, (int)y, (int)z }; }
 	operator vec3<float>() { return { (float)x, (float)y, (float)z}; }
-
 
 	float mag() const {
 		return sqrtf(x * x + y * y + z * z);

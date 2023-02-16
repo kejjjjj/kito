@@ -174,6 +174,15 @@
     <ClInclude Include="tas_ui.hpp">
       <Filter>Source Files\TAS</Filter>
     </ClInclude>
+    <ClInclude Include="ImGui\imgui_stdlib.h">
+      <Filter>Header Files\_lib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="r_world.hpp">
+      <Filter>Source Files\r</Filter>
+    </ClInclude>
+    <ClInclude Include="tas_render.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -264,6 +273,15 @@
       <Filter>Source Files\TAS</Filter>
     </ClCompile>
     <ClCompile Include="tas_ui.cpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_stdlib.cpp">
+      <Filter>Header Files\_lib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="r_world.cpp">
+      <Filter>Source Files\r</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_render.cpp">
       <Filter>Source Files\TAS</Filter>
     </ClCompile>
   </ItemGroup>

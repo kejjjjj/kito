@@ -61,7 +61,7 @@ typedef vec_t vec4_t[4];
 #include "imGui/imgui_impl_dx9.h"
 #include "imGui/imgui_impl_win32.h"
 #include "imGui/imgui_internal.h"
-
+#include "imGui/imgui_stdlib.h"
 #include "koukku.hpp"
 
 #include "typedefs.hpp"
@@ -82,6 +82,7 @@ typedef vec_t vec4_t[4];
 
 #include "r_selectionwheel.hpp"
 #include "r_userinterface.hpp"
+#include "r_world.hpp"
 
 #include "r_drawlist.hpp"
 #include "r_init.hpp"
@@ -95,6 +96,7 @@ typedef vec_t vec4_t[4];
 #include "tas_filesystem.hpp"
 #include "tas_movement.hpp"
 #include "tas_ui.hpp"
+#include "tas_render.hpp"
 #include "tas_main.hpp"
 
 #include "entry.hpp"

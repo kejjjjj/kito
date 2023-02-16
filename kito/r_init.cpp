@@ -77,6 +77,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	dl->ui_wheel->Draw();
 
 	dl->ui.UI_Draw();
+	tas->render.R_Render();
 
 	r_glob->R_EndFrame();
 	

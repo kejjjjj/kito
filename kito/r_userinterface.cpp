@@ -32,6 +32,7 @@ void UI::UI_ColorTheme(const float transparency)
 	const ImVec4 widget_color = ImVec4(127.f / 255, 21.f / 255, 60.f / 255, transparency);
 	const ImVec4 main_color = ImVec4(30.f / 255, 30.f / 255, 41.f / 255, transparency);
 	const ImVec4 window_color = ImVec4(33.f / 255, 34.f / 255, 51.f / 255, transparency);
+	const ImVec4 widget_active = ImVec4(40.f / 255, 40.f / 255, 40.f / 255, transparency);
 
 	auto &style = ImGui::GetStyle();
 	auto color = style.Colors;
@@ -57,8 +58,8 @@ void UI::UI_ColorTheme(const float transparency)
 	color[ImGuiCol_ResizeGrip] = main_color;
 	color[ImGuiCol_ResizeGripActive] = main_color;
 	color[ImGuiCol_Button] = main_color;
-	color[ImGuiCol_ButtonActive] = main_color;
-	color[ImGuiCol_ButtonHovered] = main_color;
+	color[ImGuiCol_ButtonActive] = widget_active;
+	color[ImGuiCol_ButtonHovered] = widget_active;
 
 
 }

@@ -13,6 +13,9 @@ struct recorder_cmd
 	char forwardmove;
 	char rightmove;
 	int FPS;
+	fvec3 viewangles;
+	fvec3 origin;
+	fvec3 velocity;
 };
 
 struct Recorder

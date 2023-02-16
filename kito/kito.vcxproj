@@ -180,6 +180,7 @@
     <ClInclude Include="ImGui\imgui_impl_dx9.h" />
     <ClInclude Include="ImGui\imgui_impl_win32.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\imgui_stdlib.h" />
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
@@ -190,9 +191,11 @@
     <ClInclude Include="r_init.hpp" />
     <ClInclude Include="r_selectionwheel.hpp" />
     <ClInclude Include="r_userinterface.hpp" />
+    <ClInclude Include="r_world.hpp" />
     <ClInclude Include="tas_filesystem.hpp" />
     <ClInclude Include="tas_main.hpp" />
     <ClInclude Include="tas_movement.hpp" />
+    <ClInclude Include="tas_render.hpp" />
     <ClInclude Include="tas_ui.hpp" />
     <ClInclude Include="typedefs.hpp" />
     <ClInclude Include="vectors.hpp" />
@@ -229,6 +232,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ImGui\imgui_stdlib.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="ImGui\imgui_tables.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -249,9 +256,11 @@
     <ClCompile Include="r_selectionwheel.cpp" />
     <ClCompile Include="r_init.cpp" />
     <ClCompile Include="r_userinterface.cpp" />
+    <ClCompile Include="r_world.cpp" />
     <ClCompile Include="tas_filesystem.cpp" />
     <ClCompile Include="tas_main.cpp" />
     <ClCompile Include="tas_movement.cpp" />
+    <ClCompile Include="tas_render.cpp" />
     <ClCompile Include="tas_ui.cpp" />
     <ClCompile Include="vectors.cpp" />
   </ItemGroup>

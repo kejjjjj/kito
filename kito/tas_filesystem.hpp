@@ -15,19 +15,21 @@ class TAS_FileSystem
 {
 public:
 
-	TAS_FileSystem() = default;
+	//TAS_FileSystem() = default;
+	TAS_FileSystem(const std::string& dname);
+
 	//TAS_FileSystem(const std::string_view& name, const filemode_e mode = filemode_e::FILE_EXPORT, void* data = 0);
 
 	~TAS_FileSystem() = default;
 
-	void TAS_CreateDirectory();
+	void TAS_CreateEssentialDirectories();
 	void TAS_CreateSubDirectory(const std::string& name);
 
+	bool valid = false;
+	std::string display_name;
 
-	filemode_e fm = filemode_e::FILE_EXPORT;
-
-
-
+private:
+	filemode_e fm = filemode_e::FILE_EXPORT;	
 
 };
 

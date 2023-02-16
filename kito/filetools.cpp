@@ -24,7 +24,7 @@ bool fs::F_DirectoryExists(const std::string& directory_path)
 	
 	return _fs::exists(directory_path);
 }
-bool fs::F_FileExists(std::string& directory, std::string& file_name)
+bool fs::F_FileExists(const std::string& directory, const std::string& file_name)
 {
 	if (!_fs::exists(directory)) {
 		return false;
@@ -32,9 +32,12 @@ bool fs::F_FileExists(std::string& directory, std::string& file_name)
 	for (const auto& entry : _fs::directory_iterator(directory)) {
 
 		if (entry.path().filename() == file_name) {
-			//Com_Printf(CON_CHANNEL_CONSOLEONLY, "F_FileExists: %s == %s\n", entry.path().filename().c_str(), file_name.c_str());
 			return true;
 		}
+		std::cout << "F_FileExists: " << entry.path().filename() << " = " << file_name << '\n';
+
+		//Com_Printf(CON_CHANNEL_CONSOLEONLY, "F_FileExists: %s == %s\n", entry.path().filename().c_str(), file_name.c_str());
+
 	}
 	return false;
 }

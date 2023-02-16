@@ -3139,6 +3139,7 @@ bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_dat
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
     return value_changed;
 }
+#include <string>
 bool ImGui::SliderScalar2(const char* label, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags)
 {
     ImGuiWindow* window = GetCurrentWindow();
@@ -3153,8 +3154,8 @@ bool ImGui::SliderScalar2(const char* label, ImGuiDataType data_type, void* p_da
     const ImVec2 label_size = CalcTextSize(label, NULL, true);
     const ImVec2 padding = ImVec2(0, style.FramePadding.y * 2);
    // Dummy(padding);
-    const ImRect frame_bb(window->DC.CursorPos + padding*2.1f, window->DC.CursorPos + ImVec2(w, label_size.y + style.FramePadding.y * 2.f));
-    const ImRect total_bb(ImVec2(frame_bb.Min.x , frame_bb.Min.y-style.FramePadding.y), frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x  : 0.0f, padding.y*2));
+    const ImRect frame_bb(ImVec2(window->DC.CursorPos.x, window->DC.CursorPos.y + padding.y * 2.1f + label_size.y/2), window->DC.CursorPos + ImVec2(w, label_size.y*1.25f + style.FramePadding.y * 2.f));
+    const ImRect total_bb(ImVec2(frame_bb.Min.x , frame_bb.Min.y-style.FramePadding.y), frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x  : 0.0f, padding.y*2+label_size.y/1.5f));
 
     const bool temp_input_allowed = (flags & ImGuiSliderFlags_NoInput) == 0;
     ItemSize(total_bb, -1);
@@ -3203,20 +3204,24 @@ bool ImGui::SliderScalar2(const char* label, ImGuiDataType data_type, void* p_da
     if (value_changed)
         MarkItemEdited(id);
 
-    // Render grab
-    if (grab_bb.Max.x > grab_bb.Min.x)
-        window->DrawList->AddRectFilled(frame_bb.Min, ImVec2(grab_bb.Max.x, frame_bb.Max.y), GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
-
     // Display value using user-provided display format so user can add prefix/suffix/decorations to the value.
     char value_buf[64];
     const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
+
+    // Render grab
+    if (grab_bb.Max.x > grab_bb.Min.x && std::stof(value_buf) != *(float*)p_min)
+        window->DrawList->AddRectFilled(frame_bb.Min, ImVec2(grab_bb.Max.x, frame_bb.Max.y), GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
+
+
     if (g.LogEnabled)
         LogSetNextTextDecoration("{", "}");
 
-    RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x - CalcTextSize(value_buf).x, frame_bb.Min.y - style.FramePadding.y - padding.y * 2), value_buf, value_buf_end);
+
+
+    RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x - CalcTextSize(value_buf).x, frame_bb.Min.y - style.FramePadding.y - CalcTextSize(value_buf).y), value_buf, value_buf_end);
 
     if (label_size.x > 0.0f) {
-        RenderText(ImVec2(frame_bb.Min.x, frame_bb.Min.y - style.FramePadding.y - padding.y * 2), label);
+        RenderText(ImVec2(frame_bb.Min.x, frame_bb.Min.y - style.FramePadding.y -CalcTextSize(value_buf).y), label);
     }
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
     return value_changed;

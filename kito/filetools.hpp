@@ -31,7 +31,7 @@ namespace fs
 	bool F_isValidFileName(const std::string file_name);
 
 	bool F_DirectoryExists(const std::string& directory_path);
-	bool F_FileExists(std::string& directory, std::string& file_name);
+	bool F_FileExists(const std::string& directory, const std::string& file_name);
 
 	bool F_OpenFile(std::fstream& fp, const std::string& path, fileopen type);
 	bool F_CloseFile(std::fstream& fp);

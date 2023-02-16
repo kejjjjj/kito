@@ -15,6 +15,8 @@ public:
 	void UI_SegmentEditor();
 	void UI_FrameEditor();
 
+	std::list<ivec2> SegmentToScreen(const segment_s& segment);
+
 private:
 
 };
