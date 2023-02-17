@@ -25,9 +25,11 @@ void TAS_UI::UI_Render()
 
 void TAS_UI::UI_SegmentEditor()
 {
+	static int add_or_remove_frames_count = 0;
 
-
-	ImGui::SliderInt_2("Segment", &tas->movement.segment_index, 0, tas->movement.get_segment_count());
+	if (ImGui::SliderInt_22("Segment", &tas->movement.segment_index, 0, tas->movement.get_segment_count()-1)) {
+		tas->movement.set_current_segment(tas->movement.segment_index);
+	}
 	if (ImGui::Button("Add"))
 		tas->movement.add_segment();
 		
@@ -35,28 +37,26 @@ void TAS_UI::UI_SegmentEditor()
 	ImGui::Button("Insert"); 
 	
 	ImGui::SameLine(); 
-	ImGui::Button("Delete");
+	ImGui::Button("Remove Selected");
 
 	ImGui::NewLine();
 	ImGui::Separator();
 
-	if (ImGui::ButtonCentered("try to move")) {
-		
-		fvec3 org = tas->movement.entry.pm.ps->origin;
+	ImGui::SliderInt_22("Frame", &tas->movement.frame_index, 0, tas->movement.get_frame_count());
+	ImGui::PushItemWidth(130);
+	ImGui::InputInt("Count", &add_or_remove_frames_count, 1, 100);
+	
+	ImGui::SameLine();
+	if (ImGui::Button("Add##01"))
+		tas->movement.add_frames_to_current_segment(add_or_remove_frames_count);
 
-		printf("org: { %.3f, %.3f, %.3f }\n", org.x, org.y, org.z);
+	ImGui::SameLine();
+	if (ImGui::Button("Remove##01"))
+		tas->movement.remove_frames_from_current_segment(add_or_remove_frames_count);
 
-		auto segment = tas->movement.request_current_segment();
+	ImGui::NewLine();
+	ImGui::Separator();
 
-		segment->forwardmove = 127;
-
-		tas->movement.update_movement_for_segment(*segment);
-
-		org = tas->movement.entry.pm.ps->origin;
-
-		printf("new org: { %.3f, %.3f, %.3f }\n", org.x, org.y, org.z);
-
-	}
 
 
 }
