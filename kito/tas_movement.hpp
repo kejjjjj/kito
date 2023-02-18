@@ -26,7 +26,11 @@ struct movement_data
 	pml_t pml;
 	playerState_s ps;
 };
-
+struct segment_options
+{
+	bool strafebot = false;
+	bool bhop = false;
+};
 struct segment_s
 {
 	int32_t segment_index = 0;
@@ -36,6 +40,7 @@ struct segment_s
 	char forwardmove = 0;
 	char rightmove = 0;
 	movement_data end;
+	segment_options options;
 	segment_list content;
 };
 
@@ -50,9 +55,11 @@ public:
 	size_t get_segment_count() { return segments.size(); }
 	size_t get_frame_count() { return segments.back().end_index-1; }
 	void set_current_segment(size_t i) {  if(i < segments.size()) current_segment = &segments[i]; }
-
+	segment_s* get_segment_by_index(const size_t i) { if (i < segments.size()) return &segments[i]; }
 	void update_movement_for_segment(segment_s& seg);
 	void update_movement_for_each_segment();
+	void update_all_segment_indices();
+	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg);
 	movement_data* initialize_player_data_for_segment(segment_s& seg);
 
 	void create_first_segment(pmove_t* pm, pml_t* pml);

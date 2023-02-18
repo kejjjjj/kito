@@ -193,7 +193,7 @@ struct __declspec(align(8)) DxGlobals
 
 namespace cmdEnums
 {
-	enum class Buttons
+	enum Buttons
 	{
 		fire = 1,
 		melee = 4,
@@ -215,15 +215,14 @@ namespace cmdEnums
 		no_input = 1048576 //such as menu open or chat is open
 	};
 
-	enum class Move : char
+	enum Move : char
 	{
 		noInput = 0,
 		forward = 127,
 		back = -127
 	};
-	enum class Strafe : char
+	enum Strafe : char
 	{
-		noInput = 0,
 		left = -127,
 		right = 127
 	};
@@ -296,6 +295,14 @@ struct MantleState
 	float yaw;
 	int timer;
 	int transIndex;
+	int flags;
+};
+struct MantleResults
+{
+	float dir[3];
+	float startPos[3];
+	float ledgePos[3];
+	float endPos[3];
 	int flags;
 };
 
@@ -612,6 +619,11 @@ struct pml_t
 	float impactSpeed;
 	float previous_origin[3];
 	float previous_velocity[3];
+};
+struct pmoveHandler_t
+{
+	void(__cdecl* trace)(trace_t*, const float*, const float*, const float*, const float*, int, int);
+	void(__cdecl* playerEvent)(int, int);
 };
 
 class Movement
@@ -1985,6 +1997,15 @@ enum errorParm_t
 	ERR_SCRIPT_DROP = 0x5,
 	ERR_LOCALIZATION = 0x6,
 	ERR_MAPLOADERRORSUMMARY = 0x7,
+};
+enum pmtype_t
+{
+	PM_NORMAL = 0x0,
+	PM_NORMAL_LINKED = 0x1,
+	PM_NOCLIP = 0x2,
+	PM_UFO = 0x3,
+	PM_DEAD = 0x4,
+	PM_DEAD_LINKED = 0x5,
 };
 
 #endif

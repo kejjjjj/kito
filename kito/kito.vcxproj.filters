@@ -183,6 +183,9 @@
     <ClInclude Include="tas_render.hpp">
       <Filter>Source Files\TAS</Filter>
     </ClInclude>
+    <ClInclude Include="q_math.hpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -283,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="tas_render.cpp">
       <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="q_math.cpp">
+      <Filter>Source Files\z_misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1159,7 +1159,7 @@ bool ImGui::Checkbox2(const char* label, bool* v)
     ImVec2 pad(ImMax(1.0f, IM_FLOOR(square_sz / 4.f)), ImMax(1.0f, IM_FLOOR(square_sz / 4.f)));
     check_bb.Min += pad;
     check_bb.Max -= pad;
-    RenderFrame(check_bb.Min, check_bb.Max, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), true, style.FrameRounding);
+    RenderFrame(check_bb.Min, check_bb.Max, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), true,0);
     ImU32 check_col = GetColorU32(ImGuiCol_CheckMark);
     bool mixed_value = (g.LastItemData.InFlags & ImGuiItemFlags_MixedValue) != 0;
     if (mixed_value)
@@ -1167,7 +1167,7 @@ bool ImGui::Checkbox2(const char* label, bool* v)
         // Undocumented tristate/mixed/indeterminate checkbox (#2644)
         // This may seem awkwardly designed because the aim is to make ImGuiItemFlags_MixedValue supported by all widgets (not just checkbox)
         ImVec2 pad(ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)), ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)));
-        window->DrawList->AddRectFilled(check_bb.Min + pad, check_bb.Max - pad, check_col, style.FrameRounding);
+        window->DrawList->AddRectFilled(check_bb.Min + pad, check_bb.Max - pad, check_col, 0);
     }
     else if (*v)
     {
@@ -1175,7 +1175,7 @@ bool ImGui::Checkbox2(const char* label, bool* v)
         //RenderCheckMark(window->DrawList, check_bb.Min + ImVec2(pad, pad), check_col, square_sz - pad * 2.0f);
 
         ImVec2 pad(ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)), ImMax(1.0f, IM_FLOOR(square_sz / 3.6f)));
-        window->DrawList->AddRectFilled(check_bb.Min, check_bb.Max, GetColorU32(ImGuiCol_CheckMark), style.FrameRounding);
+        window->DrawList->AddRectFilled(check_bb.Min, check_bb.Max, GetColorU32(ImGuiCol_CheckMark), 0);
 
     }
 

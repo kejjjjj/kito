@@ -14,6 +14,8 @@ public:
 	void UI_Render();
 	void UI_SegmentEditor();
 	void UI_FrameEditor();
+	void UI_OtherControls();
+	void UI_ControlsDPAD();
 
 	std::list<ivec2> SegmentToScreen(const segment_s& segment);
 

@@ -29,7 +29,6 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 	else if (recorder.IsPlayback()) {
 		recorder.Playback(cmd);
 	}
-	
 
 	return;
 }

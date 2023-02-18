@@ -15,7 +15,7 @@ namespace cg
 	static viewangles* vAngle = (viewangles*)(0x6E17BC - 4);
 	static playerState_t_origin* pOrigin = (playerState_t_origin*)(0xE0DA1C);
 	static Movement* move = (Movement*)(0x815EF8);
-	static playerState_s* ps = (playerState_s*)(0xE0DA00);
+	static playerState_s* ps_loc = (playerState_s*)(0xE0DA00);
 	static velocity* vel = (velocity*)(0xC8143C);
 	static refdef_s* refdef = (refdef_s*)(0x720080);
 	inline WinMouseVars_t* s_wmv = (WinMouseVars_t*)(0x13E06F0);

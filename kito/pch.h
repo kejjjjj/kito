@@ -28,6 +28,13 @@ typedef vec_t vec4_t[4];
 #define	VectorMA(v, s, b, o)	((o)[0]=(v)[0]+(b)[0]*(s),(o)[1]=(v)[1]+(b)[1]*(s),(o)[2]=(v)[2]+(b)[2]*(s))
 #define VectorClear( a )              ( ( a )[0] = ( a )[1] = ( a )[2] = 0 )
 
+#define DEG2RAD(a) (((a) * M_PI) / 180.0F)
+#define RAD2DEG(a) (((a) * 180.0f) / M_PI)
+#define RAD2SHORT(a) ((a) * (32768.f / (float)M_PI))
+#define SHORT2RAD(a) ((a) * ((float)M_PI / 32768.f))
+#define SHORT2DEG(a) (((a) / 32768.f) * 180.0f)
+
+
 #include <Windows.h>
 #include <vector>
 #include <string>
@@ -69,6 +76,8 @@ typedef vec_t vec4_t[4];
 #include "filetools.hpp"
 
 #include "in_main.hpp"
+
+#include "q_math.hpp"
 
 #include "cg_local.h"
 #include "cg_offsets.h"
