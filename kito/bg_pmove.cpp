@@ -51,7 +51,8 @@ void cg::PM_AirMove(pmove_t* pm, pml_t* pml)
 	if (tas->movement.waiting_for_creation) {
 		tas->movement.create_first_segment(pm, pml);
 	}
-
+	pm_ptr = pm;
+	pml_ptr = pml;
 	return PM_AirMove_f(pm, pml);
 }
 void cg::PM_WalkMove(pmove_t* pm, pml_t* pml)
@@ -61,7 +62,8 @@ void cg::PM_WalkMove(pmove_t* pm, pml_t* pml)
 	if (tas->movement.waiting_for_creation) {
 		tas->movement.create_first_segment(pm, pml);
 	}
-
+	pm_ptr = pm;
+	pml_ptr = pml;
 	return PM_WalkMove_f(pm, pml);
 
 }
@@ -72,7 +74,8 @@ void cg::PM_UFOMove(pmove_t* pm, pml_t* pml)
 	if (tas->movement.waiting_for_creation) {
 		tas->movement.create_first_segment(pm, pml);
 	}
-
+	pm_ptr = pm;
+	pml_ptr = pml;
 	return PM_UFOMove_f(pm, pml);
 
 }

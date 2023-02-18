@@ -60,6 +60,7 @@ public:
 	void update_movement_for_each_segment();
 	void update_all_segment_indices();
 	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg);
+	std::list<recorder_cmd> create_a_list_from_segments();
 	movement_data* initialize_player_data_for_segment(segment_s& seg);
 
 	void create_first_segment(pmove_t* pm, pml_t* pml);
@@ -67,6 +68,8 @@ public:
 	void add_segment();
 	void add_frames_to_current_segment(int32_t& amount);
 	void remove_frames_from_current_segment(int32_t& amount);
+
+	Recorder* recorder = 0;
 
 	int32_t segment_index = 0;
 	int32_t frame_index = 0;

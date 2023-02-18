@@ -20,26 +20,22 @@ struct recorder_cmd
 
 struct Recorder
 {
-	Recorder() = default;
+	explicit Recorder(std::list<recorder_cmd> input) : recorder_sequence(input) { 
+		Recorder::StartPlayback();
+	}
 	~Recorder() = default;
 
-	void StartRecording();
-	void StopRecording();
-	bool IsRecording() { return recording; }
+
+	std::list<recorder_cmd> recorder_sequence;
 	bool IsPlayback() { return playback; }
 
 	void StartPlayback();
-	void Record(usercmd_s* cmd);
 	void Playback(usercmd_s* cmd);
-
-	std::list<recorder_cmd> recorder_sequence;
+	recorder_cmd* CurrentCmd() { if (!playback) return 0; return &*it; }
 
 private:
-	bool recording = 0;
 	bool playback = 0;
 	std::list<recorder_cmd>::iterator it;
 	int refTime = 0;
 };
-
-inline Recorder recorder;
 #endif

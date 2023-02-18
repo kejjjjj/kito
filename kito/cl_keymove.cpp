@@ -12,22 +12,23 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 
 	CL_FinishMove_f(cmd);
 
-	if (GetAsyncKeyState(VK_NUMPAD4) & 1) {
-		if (!recorder.IsRecording())
-			recorder.StartRecording();
-		else
-			recorder.StopRecording();
-	}
-	else if (GetAsyncKeyState(VK_NUMPAD5) & 1) {
-		if (!recorder.IsPlayback())
-			recorder.StartPlayback();
+	if (GetAsyncKeyState(VK_NUMPAD4) & 1 && !tas->movement.recorder) {
+		if (tas->movement.get_segment_count() > 0) {
+
+			tas->movement.recorder = new Recorder(tas->movement.create_a_list_from_segments());
+
+		}
 	}
 
-	if (recorder.IsRecording()) {
-		recorder.Record(cmd);
-	}
-	else if (recorder.IsPlayback()) {
-		recorder.Playback(cmd);
+	if (tas->movement.recorder) {
+		if (tas->movement.recorder->IsPlayback()) {
+			tas->movement.recorder->Playback(cmd);
+		}
+		else {
+			Com_Printf(CON_CHANNEL_SUBTITLE, "goodbye\n");
+			delete tas->movement.recorder;
+			tas->movement.recorder = 0;
+		}
 	}
 
 	return;

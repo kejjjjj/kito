@@ -79,6 +79,15 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	dl->ui.UI_Draw();
 	tas->render.R_Render();
 
+	if (tas->movement.recorder) {
+		if (tas->movement.recorder->IsPlayback()) {
+
+			float dist = tas->movement.recorder->CurrentCmd()->origin.dist(cg::pm_ptr->ps->origin);
+			ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}", dist).c_str());
+
+		}
+	}
+
 	r_glob->R_EndFrame();
 	
 

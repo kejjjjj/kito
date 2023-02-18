@@ -174,7 +174,12 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		cmd.rightmove = pm->cmd.rightmove;
 		cmd.FPS = 1000 / pml->msec;
 		cmd.buttons = pm->cmd.buttons;
-			
+		cmd.serverTime = pm->cmd.serverTime;
+		cmd.angles[0] = pm->cmd.angles[0];
+		cmd.angles[1] = pm->cmd.angles[1];
+		cmd.angles[2] = pm->cmd.angles[2];
+
+
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));
 		pm->cmd.buttons = 0;
 
@@ -262,4 +267,16 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg)
 		PM_OverBounce(pm, pml);
 		//Sys_SnapVector(pm->ps->velocity); //Sys_SnapVector | not called in singleplayer
 	}
+}
+std::list<recorder_cmd> TAS_Movement::create_a_list_from_segments()
+{
+	std::list<recorder_cmd> list;
+
+	for (auto& i : segments) {
+		for (auto& content : i.content) {
+			list.push_back(content);
+		}
+	}
+
+	return list;
 }

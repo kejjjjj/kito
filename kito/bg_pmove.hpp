@@ -6,6 +6,9 @@
 
 namespace cg
 {
+	inline pmove_t* pm_ptr;
+	inline pml_t* pml_ptr;
+
 	inline void(*Pmove_f)(pmove_t*);
 	inline void(*PM_FoliageSnd_f)(pmove_t*);
 	inline void(*PM_AirMove_f)(pmove_t* pm, pml_t* pml);
