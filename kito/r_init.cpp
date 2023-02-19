@@ -82,12 +82,28 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	if (tas->movement.recorder) {
 		if (tas->movement.recorder->IsPlayback()) {
 
-			float dist = tas->movement.recorder->CurrentCmd()->origin.dist(cg::pm_ptr->ps->origin);
-			ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}", dist).c_str());
-
+			auto current = tas->movement.recorder->CurrentCmd();
+			
+			if (current) {
+				float dist = current->origin.dist(cg::coord->origin);
+				ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}", dist).c_str());
+			}
 		}
 	}
 
+	int dist = (int)fvec2(cg::temp_velocity).mag();
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 1080 / 2), IM_COL32(0,255,0,255), std::format("{}", dist).c_str());
+
+	usercmd_s* cmd = cg::input->GetUserCmd(cg::input->cmdNumber);
+
+	int anglex = cmd->forwardmove;
+	int angley = cmd->rightmove;
+	int anglez = cmd->buttons;
+
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 700), IM_COL32(0, 255, 0, 255), std::format("{}, {}, {}", anglex, angley, anglez).c_str());
+
+		
+	
 	r_glob->R_EndFrame();
 	
 

@@ -31,7 +31,12 @@ struct Recorder
 
 	void StartPlayback();
 	void Playback(usercmd_s* cmd);
-	recorder_cmd* CurrentCmd() { if (!playback) return 0; return &*it; }
+	recorder_cmd* CurrentCmd() { 
+		if (!playback) 
+			return 0; 
+
+		return &*(it); 
+	}
 
 private:
 	bool playback = 0;

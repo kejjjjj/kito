@@ -6,7 +6,7 @@ void cg::Pmove(pmove_t* pm)
 	//if (vars::et_pmove_fixed.enabled)
 	//	pm->cmd.serverTime = ((pm->cmd.serverTime + (vars::et_pmove_msec.intValue < 2 ? 2 : vars::et_pmove_msec.intValue) - 1) / vars::et_pmove_msec.intValue) * vars::et_pmove_msec.intValue;
 
-	float frametime = 1000.f / Dvar_FindMalleableVar("com_maxfps")->current.integer;
+	float frametime = 1000.f / 125;
 	int _frametime = round(frametime);
 	int pmove_msec = frametime;
 
@@ -40,6 +40,7 @@ void cg::Pmove(pmove_t* pm)
 
 		pm->cmd.serverTime = pm->ps->commandTime + msec;
 		PmoveSingle(pm);
+		VectorCopy(pm->ps->velocity, temp_velocity);
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(pm->oldcmd));
 
 	}
@@ -53,7 +54,18 @@ void cg::PM_AirMove(pmove_t* pm, pml_t* pml)
 	}
 	pm_ptr = pm;
 	pml_ptr = pml;
-	return PM_AirMove_f(pm, pml);
+
+	//float yaw = CG_GetOptYaw(pm, pml);
+
+	//if (yaw != -400) {
+	//	pm->ps->viewangles[YAW] = yaw;
+	//	AngleVectors(pm->ps->viewangles, pml->forward, pml->right, pml->up); //set viewangles
+
+	//}
+
+	PM_AirMove_f(pm, pml);
+	VectorCopy(pm->ps->velocity, temp_velocity);
+
 }
 void cg::PM_WalkMove(pmove_t* pm, pml_t* pml)
 {
@@ -64,7 +76,16 @@ void cg::PM_WalkMove(pmove_t* pm, pml_t* pml)
 	}
 	pm_ptr = pm;
 	pml_ptr = pml;
-	return PM_WalkMove_f(pm, pml);
+
+	//float yaw = CG_GetOptYaw(pm, pml);
+
+	//if (yaw != -400) {
+	//	pm->ps->viewangles[YAW] = yaw;
+	//	AngleVectors(pm->ps->viewangles, pml->forward, pml->right, pml->up); //set viewangles
+
+	//}
+	PM_WalkMove_f(pm, pml);
+	VectorCopy(pm->ps->velocity, temp_velocity);
 
 }
 void cg::PM_UFOMove(pmove_t* pm, pml_t* pml)
@@ -76,7 +97,9 @@ void cg::PM_UFOMove(pmove_t* pm, pml_t* pml)
 	}
 	pm_ptr = pm;
 	pml_ptr = pml;
+	//VectorCopy(pm->ps->velocity, temp_velocity);
 	return PM_UFOMove_f(pm, pml);
+	
 
 }
 bool Mantle_FindMantleSurface(pmove_t* pm, trace_t* trace, float* normal, float* fwd)
@@ -204,7 +227,7 @@ void cg::Mantle_Check(pmove_t* pm, pml_t* pml)
 
 	pm->ps->mantleState.flags &= 0xFFFFFFEF;
 
-	dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
+	static dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
 
 	if (mantle_enable->current.enabled) {
 
@@ -242,9 +265,9 @@ void cg::Mantle_Check(pmove_t* pm, pml_t* pml)
 						if (!result) 
 							char result = Mantle_CheckLedge(&mantle, pm, 20.f);
 					}
-					if (result) {
-						Com_Printf(CON_CHANNEL_SUBTITLE, "very good!\n");
-					}
+					//if (result) {
+					//	Com_Printf(CON_CHANNEL_SUBTITLE, "very good!\n");
+					//}
 				}
 
 			}

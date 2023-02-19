@@ -162,7 +162,7 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 			Com_Printf(CON_CHANNEL_SUBTITLE, "yo wtf!\n");
 			break;
 		}
-		pmovesingle(pm, pml, seg);
+		pmovesingle(pm, pml, seg, i);
 
 
 
@@ -170,6 +170,17 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		cmd.viewangles = ps->viewangles;
 		cmd.origin = ps->origin;
 		cmd.velocity = ps->velocity;
+
+		if (pm->cmd.forwardmove > 0)
+			pm->cmd.forwardmove = 127;
+		else if (pm->cmd.forwardmove < 0)
+			pm->cmd.forwardmove = -127;
+
+		if (pm->cmd.rightmove > 0)
+			pm->cmd.rightmove = 127;
+		else if (pm->cmd.rightmove < 0)
+			pm->cmd.rightmove = -127;
+
 		cmd.forwardmove = pm->cmd.forwardmove;
 		cmd.rightmove = pm->cmd.rightmove;
 		cmd.FPS = 1000 / pml->msec;
@@ -197,18 +208,58 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 	seg.end.pm.ps = &seg.end.ps;
 }
 using namespace cg;
-void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg)
+void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd)
 {
 	playerState_s* ps = pm->ps;
 	static dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
 
+	pm->cmd.forwardmove = seg.forwardmove;
+	pm->cmd.rightmove = seg.rightmove;
 
-	AngleVectors(pm->ps->viewangles, pml->forward, pml->right, pml->up); //set viewangles
+	if (PM_InteruptWeaponWithProneMove_(ps))
+	{
+		ps->pm_flags &= 0xFFFFFDFF;
+		PM_ExitAimDownSight_(ps);
+	}
+
+	pml->previous_origin[0] = ps->origin[0];
+	pml->previous_origin[1] = ps->origin[1];
+	pml->previous_origin[2] = ps->origin[2];
+	pml->previous_velocity[0] = ps->velocity[0];
+	pml->previous_velocity[1] = ps->velocity[1];
+	pml->previous_velocity[2] = ps->velocity[2];
+
 	pml->msec = 1000 / 125; //simulate 125fps
 	pml->frametime = (float)pml->msec / 1000.f;
 
-	pm->cmd.forwardmove = seg.forwardmove;
-	pm->cmd.rightmove = seg.rightmove;
+	pm->cmd.buttons |= cmdEnums::sprint;
+
+	if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) {
+		float yaw = CG_GetOptYaw(pm, pml);
+		if (yaw != -400) {
+			pm->ps->viewangles[YAW] = yaw;
+		}
+	}
+
+	PM_AdjustAimSpreadScale_(pm, pml);
+	PM_UpdateViewAngles(ps, pml->msec, &pm->cmd, pm->handler);
+
+	AngleVectors(pm->ps->viewangles, pml->forward, pml->right, pml->up); //set viewangles
+
+	char fwd = pm->cmd.forwardmove;
+	if (fwd >= 0)
+	{
+		if (fwd > 0 || pm->cmd.rightmove)
+			ps->pm_flags &= 0xFFFFFFDF;
+	}
+	else
+	{
+		ps->pm_flags |= PMF_BACKWARDS_RUN;
+	}
+
+
+	//if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) 
+	//	rcmd.angles[YAW] = ANGLE2SHORT(pm->ps->viewangles[YAW]);
 
 	if ((ps->pm_flags & PMF_MANTLE) == 0) {
 		PM_UpdateAimDownSightFlag_(pm, pml);
@@ -243,7 +294,8 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg)
 	}
 	else {
 
-		//other stuff
+
+		
 		PM_UpdatePronePitch_(pm, pml);
 		PM_DropTimers(ps, pml);
 		//if ( ps->pm_type >= PM_DEAD && pml.walking )
@@ -263,10 +315,22 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg)
 			PM_AirMove_f(pm, pml);
 		}
 		PM_GroundTrace_(pm, pml); //call groundtrace after 
+		PM_Footsteps_(pm, pml);
 		PM_Weapon_(pm, pml);
-		PM_OverBounce(pm, pml);
+		PM_FoliageSnd_(pm);
+		//PM_OverBounce(pm, pml);
 		//Sys_SnapVector(pm->ps->velocity); //Sys_SnapVector | not called in singleplayer
 	}
+
+	//int _yaw = ANGLE2SHORT(pm->ps->viewangles[1]);
+
+	//_yaw -= _yaw * 2 - ANGLE2SHORT(pm->ps->viewangles[YAW]);
+
+	//rcmd.angles[PITCH] = ANGLE2SHORT(pm->ps->viewangles[PITCH]);
+	//rcmd.angles[YAW] = pm->cmd.angles[1] + _yaw;
+	//rcmd.angles[ROLL] = ANGLE2SHORT(pm->ps->viewangles[ROLL]);
+
+
 }
 std::list<recorder_cmd> TAS_Movement::create_a_list_from_segments()
 {

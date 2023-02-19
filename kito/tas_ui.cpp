@@ -22,6 +22,7 @@ void TAS_UI::UI_Render()
 	TAS_UI::UI_SegmentEditor();
 	TAS_UI::UI_FrameEditor();
 	TAS_UI::UI_OtherControls();
+
 }
 
 void TAS_UI::UI_SegmentEditor()
@@ -76,11 +77,20 @@ void TAS_UI::UI_FrameEditor()
 void TAS_UI::UI_OtherControls()
 {
 	ImGui::BeginGroup();
-
 	auto options = &tas->movement.request_current_segment()->options;
+	constexpr const char* viewangle_options[] = {"Fixed turn", "Strafebot", "Aimlock"};
 
-	if (ImGui::Checkbox2("strafebot", &options->strafebot))
+	ImGui::PushItemWidth(150);
+	if (ImGui::Combo("Angles", &(int&)options->viewangle_type, viewangle_options, IM_ARRAYSIZE(viewangle_options)))
 		tas->movement.update_movement_for_each_segment();
+
+	UI_AngleControls_Fixed(options);
+	UI_AngleControls_Strafebot(options);
+	UI_AngleControls_Aimlock(options);
+
+
+	//if (ImGui::Checkbox2("strafebot", &options->strafebot))
+	//	tas->movement.update_movement_for_each_segment();
 
 	if(ImGui::Checkbox2("bunnyhop", &options->bhop))
 		tas->movement.update_movement_for_each_segment();
@@ -155,4 +165,47 @@ std::list<ivec2> TAS_UI::SegmentToScreen(const segment_s& segment)
 
 	}
 	return points;
+}
+
+
+
+
+void TAS_UI::UI_AngleControls_Fixed(segment_options* options)
+{
+	if (options->viewangle_type != viewangle_type::FIXED_TURNRATE)
+		return;
+
+	constexpr const char* dir_options[] = { "Left", "Right"};
+
+	ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("Turn Rate", &options->fixed_turn.rate, 0.f, 0.f, "%.3f")) {
+		options->fixed_turn.rate = std::clamp(options->fixed_turn.rate, 0.f, 360.f);
+		tas->movement.update_movement_for_each_segment();
+	}
+
+	ImGui::PushItemWidth(150);
+	
+	if(ImGui::Combo("Direction", &(int&)options->fixed_turn.right, dir_options, IM_ARRAYSIZE(dir_options)))
+		tas->movement.update_movement_for_each_segment();
+
+
+
+
+}
+void TAS_UI::UI_AngleControls_Strafebot(segment_options* options)
+{
+	if (options->viewangle_type != viewangle_type::STRAFEBOT)
+		return;
+
+	ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("Smoothing", &options->strafebot.smoothing, 0.f, 0.f, "%.3f")) {
+		options->fixed_turn.rate = std::clamp(options->strafebot.smoothing, 0.f, 360.f);
+		tas->movement.update_movement_for_each_segment();
+
+	}
+}
+void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
+{
+	if (options->viewangle_type != viewangle_type::AIMLOCK)
+		return;
 }

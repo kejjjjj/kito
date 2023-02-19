@@ -88,6 +88,7 @@ typedef vec_t vec4_t[4];
 #include "bg_pmove.hpp"
 
 #include "game_funcs.hpp"
+#include "sys_main.hpp"
 
 #include "r_selectionwheel.hpp"
 #include "r_userinterface.hpp"

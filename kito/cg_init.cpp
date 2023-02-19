@@ -45,7 +45,7 @@ void cg::CG_InitForeverHooks()
 	hook::install(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
 	hook::install(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
 
-	//hook::install(&(PVOID&)Pmove_f, Pmove);
+	hook::install(&(PVOID&)Pmove_f, Pmove);
 
 }
 void cg::CG_InitHooks()

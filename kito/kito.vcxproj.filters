@@ -186,6 +186,9 @@
     <ClInclude Include="q_math.hpp">
       <Filter>Source Files\z_misc</Filter>
     </ClInclude>
+    <ClInclude Include="sys_main.hpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -288,6 +291,9 @@
       <Filter>Source Files\TAS</Filter>
     </ClCompile>
     <ClCompile Include="q_math.cpp">
+      <Filter>Source Files\z_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="sys_main.cpp">
       <Filter>Source Files\z_misc</Filter>
     </ClCompile>
   </ItemGroup>

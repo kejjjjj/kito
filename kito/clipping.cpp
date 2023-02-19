@@ -49,7 +49,7 @@ void Recorder::Playback(usercmd_s* cmd)
 	com_maxfps->current.integer = it->FPS;
 
 	*(int*)(0x85BD98 + 11454) = cmd->serverTime; //clients->serverTime
-	cmd->buttons |= it->buttons;
+	cmd->buttons = it->buttons;
 	cmd->forwardmove = it->forwardmove;
 	cmd->rightmove = it->rightmove;
 	++Recorder::it;

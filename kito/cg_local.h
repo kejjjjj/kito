@@ -239,8 +239,8 @@ struct usercmd_s
 	int angles[3]; //0x00C 
 	char weapon;
 	char offHandIndex;
-	char forwardmove; //buttonsVertical |||| -127 = back | 127 = forward
-	char rightmove; //buttonsHorizontal |||| -127 = left | 127 = right
+	char forwardmove; 
+	char rightmove; 
 	char pad[0x20];
 	//float meleeChargeYaw;
 	//char meleeChargeDist;

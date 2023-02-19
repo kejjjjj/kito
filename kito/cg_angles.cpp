@@ -84,3 +84,58 @@ void cg::CG_SetServerAngles(vec3_t angles)
 	}
 
 }
+float cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
+{
+	char forwardmove = pm->cmd.forwardmove;
+	char rightmove = pm->cmd.rightmove;
+
+	float speed = fvec2(pm->ps->velocity).mag();
+
+	if (speed < 1 || forwardmove != 127 && rightmove != 0)
+		return -400;
+
+
+	forwardmove = 127;
+
+	float yaw = pm->ps->viewangles[YAW];
+	float g_speed = pm->ps->speed;
+	const float FPS = 125;
+
+	float accel = g_speed / FPS;
+
+	WeaponDef* weapon = BG_WeaponNames[pm->ps->weapon];
+
+	if (pm->ps->groundEntityNum == 2174) {
+		if( (pm->cmd.buttons & cmdEnums::sprint) == 0)
+			g_speed = (186.f * weapon->moveSpeedScale) * pml->groundTrace.normal[2];
+
+		else {
+			g_speed = (226 * weapon->moveSpeedScale) * pml->groundTrace.normal[2]; //hardcoded to g_speed 190 :new_moon_with_face:
+
+		}
+	}
+
+	const double velocitydirection = atan2(pm->ps->velocity[1], pm->ps->velocity[0]) * 180.f / PI;
+	const double accelerationAng = atan2(-rightmove, forwardmove) * 180.f / PI;
+	double diff = acos((g_speed - accel) / speed) * 180.f / PI;
+
+	if (std::isnan(diff))
+		return -400;
+
+	float delta = yaw;
+
+
+	if (rightmove > 0) {
+		delta = (velocitydirection - diff - accelerationAng);
+	}
+	else if (rightmove < 0) {
+		delta = (velocitydirection + diff - accelerationAng);
+	}
+
+	yaw = delta;
+
+
+
+	return yaw;
+
+}

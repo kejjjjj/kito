@@ -17,6 +17,11 @@ public:
 	void UI_OtherControls();
 	void UI_ControlsDPAD();
 
+	void UI_AngleControls_Fixed(segment_options* options);
+	void UI_AngleControls_Strafebot(segment_options* options);
+	void UI_AngleControls_Aimlock(segment_options* options);
+
+
 	std::list<ivec2> SegmentToScreen(const segment_s& segment);
 
 private:

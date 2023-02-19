@@ -14,7 +14,7 @@ struct vec2
 	constexpr vec2() { x = 0; y = 0; }
 	constexpr vec2(const T& v) { x = v; y = v; }
 	constexpr vec2(const T& a, const T& b) { x = a; y = b; }
-	//constexpr explicit vec2(const vec2<int>& v) { x = (int)v.x, y = (int)v.y; }
+	constexpr vec2(const vec3_t a) { x = a[0]; y = a[1];  }
 
 	vec2 operator+(const vec2& v) const { return { x + v.x, y + v.y }; }
 	vec2 operator-(const vec2& v) const { return { x - v.x, y - v.y }; }

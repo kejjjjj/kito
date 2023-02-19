@@ -26,10 +26,30 @@ struct movement_data
 	pml_t pml;
 	playerState_s ps;
 };
+enum class viewangle_type : int
+{
+	FIXED_TURNRATE,
+	STRAFEBOT,
+	AIMLOCK
+};
 struct segment_options
 {
-	bool strafebot = false;
+	struct fixed_turn_s {
+		bool right = false;
+		float rate = 0.f;
+	}fixed_turn;
+
+	struct strafebot_s {
+		float smoothing = 0.f;
+	}strafebot;
+
+	struct aimlock_s {
+		fvec3 target;
+	}aimlock;
+
 	bool bhop = false;
+	viewangle_type viewangle_type = viewangle_type::FIXED_TURNRATE;
+
 };
 struct segment_s
 {
@@ -52,6 +72,7 @@ public:
 	//void create_movement_for_segment();
 
 	segment_s* request_current_segment() { return current_segment;}
+	segment_s* get_first_segment() { return &segments.front(); }
 	size_t get_segment_count() { return segments.size(); }
 	size_t get_frame_count() { return segments.back().end_index-1; }
 	void set_current_segment(size_t i) {  if(i < segments.size()) current_segment = &segments[i]; }
@@ -59,7 +80,9 @@ public:
 	void update_movement_for_segment(segment_s& seg);
 	void update_movement_for_each_segment();
 	void update_all_segment_indices();
-	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg);
+	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
+	void pmove(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
+
 	std::list<recorder_cmd> create_a_list_from_segments();
 	movement_data* initialize_player_data_for_segment(segment_s& seg);
 
