@@ -232,19 +232,30 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	pml->msec = 1000 / 125; //simulate 125fps
 	pml->frametime = (float)pml->msec / 1000.f;
 
-	pm->cmd.buttons |= cmdEnums::sprint;
+
+	if (seg.options.bhop)
+		pm->cmd.buttons |= cmdEnums::jump;
+	else if ((pm->cmd.buttons & cmdEnums::jump) == 0)
+		pm->cmd.buttons |= cmdEnums::sprint;
+
+
+	float delta = 0;
 
 	if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) {
 		float yaw = CG_GetOptYaw(pm, pml);
 		if (yaw != -400) {
-			pm->ps->viewangles[YAW] = yaw;
+			//pm->ps->viewangles[YAW] = yaw;
+
+			delta = yaw - pm->ps->viewangles[YAW];
+			pm->ps->viewangles[YAW] += delta;
 		}
 	}
-
+	pm->cmd.angles[YAW] += ANGLE2SHORT(delta);
 	PM_AdjustAimSpreadScale_(pm, pml);
 	PM_UpdateViewAngles(ps, pml->msec, &pm->cmd, pm->handler);
 
 	AngleVectors(pm->ps->viewangles, pml->forward, pml->right, pml->up); //set viewangles
+	
 
 	char fwd = pm->cmd.forwardmove;
 	if (fwd >= 0)
@@ -268,9 +279,6 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		PM_CheckDuck_(pm, pml);
 		PM_GroundTrace_(pm, pml);
 	}
-
-	if (seg.options.bhop)
-		pm->cmd.buttons |= cmdEnums::jump;
 
 	Mantle_Check(pm, pml);
 
@@ -298,7 +306,7 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		
 		PM_UpdatePronePitch_(pm, pml);
 		PM_DropTimers(ps, pml);
-		//if ( ps->pm_type >= PM_DEAD && pml.walking )
+		//if ( ps->pm_type >= PM_DEAD && pml->walking )
 			//PM_DeadMove(ps);
 		PM_CheckLadderMove_(pm, pml);
 
@@ -318,17 +326,21 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		PM_Footsteps_(pm, pml);
 		PM_Weapon_(pm, pml);
 		PM_FoliageSnd_(pm);
-		//PM_OverBounce(pm, pml);
+		PM_OverBounce(pm, pml);
 		//Sys_SnapVector(pm->ps->velocity); //Sys_SnapVector | not called in singleplayer
 	}
 
-	//int _yaw = ANGLE2SHORT(pm->ps->viewangles[1]);
+	//int _yaw = pm->cmd.angles[1];
+	//float __yaw = ps->viewangles[YAW];
 
-	//_yaw -= _yaw * 2 - ANGLE2SHORT(pm->ps->viewangles[YAW]);
+	//if (__yaw < 0) {
+	//	__yaw += 180;
+	//	__yaw = (__yaw + 180 % 360);
+	//}
 
-	//rcmd.angles[PITCH] = ANGLE2SHORT(pm->ps->viewangles[PITCH]);
-	//rcmd.angles[YAW] = pm->cmd.angles[1] + _yaw;
-	//rcmd.angles[ROLL] = ANGLE2SHORT(pm->ps->viewangles[ROLL]);
+	//_yaw -= _yaw * 2 - ANGLE2SHORT(__yaw);
+
+	
 
 
 }

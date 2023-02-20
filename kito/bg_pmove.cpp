@@ -322,8 +322,6 @@ void Sys_SnapVector(float* v) {
 void cg::PM_OverBounce(pmove_t* pm, pml_t* pml)
 {
 
-	//Mod_A_Strafebot(pm);
-
 	vec3_t move;
 
 	move[0] = pm->ps->origin[0] - pml->previous_origin[0];
