@@ -197,6 +197,7 @@ namespace cmdEnums
 	{
 		fire = 1,
 		melee = 4,
+		activate = 8,
 		reload = 16,
 		lean_left = 64,
 		lean_right = 128,
@@ -208,7 +209,7 @@ namespace cmdEnums
 		prone_hold = 4352,
 		steady_aim = 8192,
 		sprint = 8194,
-		nade = 16384,
+		frag = 16384,
 		special_grenade = 32768,
 		ads_toggle_off = 524288,
 		ads_hold = 526336,

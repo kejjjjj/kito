@@ -35,12 +35,14 @@ enum class viewangle_type : int
 struct segment_options
 {
 	struct fixed_turn_s {
-		bool right = false;
+		float right = 0.f;
+		float up = 0.f;
 		float rate = 0.f;
 	}fixed_turn;
 
 	struct strafebot_s {
 		float smoothing = 0.f;
+		float up = 0.f;
 	}strafebot;
 
 	struct aimlock_s {
@@ -48,6 +50,7 @@ struct segment_options
 	}aimlock;
 
 	bool bhop = false;
+	int32_t hold_buttons = 0;
 	viewangle_type viewangle_type = viewangle_type::FIXED_TURNRATE;
 
 };

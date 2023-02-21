@@ -22,6 +22,7 @@ void TAS_UI::UI_Render()
 	TAS_UI::UI_SegmentEditor();
 	TAS_UI::UI_FrameEditor();
 	TAS_UI::UI_OtherControls();
+	TAS_UI::UI_HoldButtons();
 
 }
 
@@ -99,6 +100,7 @@ void TAS_UI::UI_OtherControls()
 
 	UI_ControlsDPAD();
 
+	ImGui::NewLine();
 
 }
 void TAS_UI::UI_ControlsDPAD()
@@ -178,16 +180,16 @@ void TAS_UI::UI_AngleControls_Fixed(segment_options* options)
 	constexpr const char* dir_options[] = { "Left", "Right"};
 
 	ImGui::PushItemWidth(150);
-	if (ImGui::InputFloat("Turn Rate", &options->fixed_turn.rate, 0.f, 0.f, "%.3f")) {
-		options->fixed_turn.rate = std::clamp(options->fixed_turn.rate, 0.f, 360.f);
+	if (ImGui::InputFloat("Right##01", &options->fixed_turn.right, 0.f, 0.f, "%.3f")) {
+		options->fixed_turn.right = std::clamp(options->fixed_turn.right, -180.f, 180.f);
 		tas->movement.update_movement_for_each_segment();
 	}
 
 	ImGui::PushItemWidth(150);
-	
-	if(ImGui::Combo("Direction", &(int&)options->fixed_turn.right, dir_options, IM_ARRAYSIZE(dir_options)))
+	if (ImGui::InputFloat("Up##01", &options->fixed_turn.up, 0.f, 0.f, "%.3f")) {
+		options->fixed_turn.up = std::clamp(options->fixed_turn.up, -85.f, 85.f);
 		tas->movement.update_movement_for_each_segment();
-
+	}
 
 
 
@@ -198,8 +200,14 @@ void TAS_UI::UI_AngleControls_Strafebot(segment_options* options)
 		return;
 
 	ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("Up##02", &options->strafebot.up, 0.f, 0.f, "%.3f")) {
+		options->strafebot.up = std::clamp(options->strafebot.up, -85.f, 85.f);
+		tas->movement.update_movement_for_each_segment();
+	}
+
+	ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("Smoothing", &options->strafebot.smoothing, 0.f, 0.f, "%.3f")) {
-		options->fixed_turn.rate = std::clamp(options->strafebot.smoothing, 0.f, 360.f);
+		options->strafebot.smoothing = std::clamp(options->strafebot.smoothing, 0.f, 360.f);
 		tas->movement.update_movement_for_each_segment();
 
 	}
@@ -208,4 +216,81 @@ void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 {
 	if (options->viewangle_type != viewangle_type::AIMLOCK)
 		return;
+}
+
+
+int32_t TAS_UI::UI_HoldButtons()
+{
+
+	ImGui::Text("Hold Buttons");
+
+	static bool show_actions = false;
+
+	constexpr int ITEMS_PER_LINE = 5;
+	int items = 0;
+	int32_t& hold_buttons = tas->movement.request_current_segment()->options.hold_buttons;
+	for (auto& [x, y] : cmd_buttons) {
+	
+		if ((hold_buttons & y) != 0) {
+			items++;
+			ImGui::Text(x.c_str());
+
+			if ((items % 4 == 0 && items != 0) == false)
+				ImGui::SameLine();
+		}
+	}
+	
+	if (ImGui::Button("+"))
+		show_actions = !show_actions;
+	
+	const ImVec2 location = ImGui::GetItemRectMax();
+
+	if (show_actions) {
+		static ImVec2 mins, maxs, size = ImGui::GetWindowSize(), pos = ImGui::GetWindowPos();
+
+		auto framepadding = ImGui::GetStyle().FramePadding;
+		ImGui::Begin("##01", 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+		bool clicked = ImGui::GetIO().MouseClicked[0];
+		for (auto& [x, y] : cmd_buttons) {
+
+			ImGui::Text(x.c_str());
+
+			mins = ImVec2(pos.x, ImGui::GetItemRectMin().y);
+			maxs = ImVec2(pos.x + size.x, ImGui::GetItemRectMax().y);
+
+			if (MouseHovered(mins, maxs)) {
+				ImGui::GetForegroundDrawList()->AddRectFilled(mins, maxs, IM_COL32(255, 200, 157, 157), ImGui::GetStyle().FrameRounding);
+				if (clicked) {
+
+					((hold_buttons & y) == 0) == true ? 
+						hold_buttons += y :
+						hold_buttons -= y;
+
+					show_actions = false;
+
+					tas->movement.update_movement_for_each_segment();
+				}
+			}
+
+			if ((hold_buttons & y) != 0) {
+				ImGui::GetForegroundDrawList()->AddRectFilled(mins, maxs, IM_COL32(255, 200, 157, 157), ImGui::GetStyle().FrameRounding);
+			}
+
+			if (clicked && show_actions) { //clicked out of frame
+				show_actions = false;
+			}
+
+		}
+		size = ImGui::GetWindowSize(); 
+		pos = ImGui::GetWindowPos();
+		ImGui::SetWindowPos(ImVec2(location.x + framepadding.x, location.y - framepadding.y * 3 - size.y));
+
+		ImGui::End();
+
+	}
+	return 0;
+}
+int32_t TAS_UI::UI_SpamButtons()
+{
+	return 0;
 }

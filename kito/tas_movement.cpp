@@ -211,6 +211,7 @@ using namespace cg;
 void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd)
 {
 	playerState_s* ps = pm->ps;
+	auto options = &seg.options;
 	static dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
 
 	pm->cmd.forwardmove = seg.forwardmove;
@@ -232,25 +233,36 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	pml->msec = 1000 / 125; //simulate 125fps
 	pml->frametime = (float)pml->msec / 1000.f;
 
+	pm->cmd.buttons = options->hold_buttons;
 
-	if (seg.options.bhop)
-		pm->cmd.buttons |= cmdEnums::jump;
-	else if ((pm->cmd.buttons & cmdEnums::jump) == 0)
-		pm->cmd.buttons |= cmdEnums::sprint;
+	//if (seg.options.bhop)
+	//	pm->cmd.buttons |= cmdEnums::jump;
+	//else if ((pm->cmd.buttons & cmdEnums::jump) == 0)
+	//	pm->cmd.buttons |= cmdEnums::sprint;
 
 
-	float delta = 0;
+	float deltaX = 0;
+	float deltaY = 0;
 
 	if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) {
 		float yaw = CG_GetOptYaw(pm, pml);
 		if (yaw != -400) {
-			//pm->ps->viewangles[YAW] = yaw;
-
-			delta = yaw - pm->ps->viewangles[YAW];
-			pm->ps->viewangles[YAW] += delta;
+			deltaY = yaw - pm->ps->viewangles[YAW];
 		}
+		deltaX = options->strafebot.up;
+
 	}
-	pm->cmd.angles[YAW] += ANGLE2SHORT(delta);
+	else if (seg.options.viewangle_type == viewangle_type::FIXED_TURNRATE) {
+		deltaX = options->fixed_turn.up;
+		deltaY = -options->fixed_turn.right;
+	}
+
+	pm->ps->viewangles[PITCH] += deltaX;
+	pm->ps->viewangles[YAW] += deltaY;
+
+	pm->cmd.angles[PITCH] += ANGLE2SHORT(deltaX);
+	pm->cmd.angles[YAW] += ANGLE2SHORT(deltaY);
+
 	PM_AdjustAimSpreadScale_(pm, pml);
 	PM_UpdateViewAngles(ps, pml->msec, &pm->cmd, pm->handler);
 

@@ -21,7 +21,7 @@ void UI::UI_Draw()
 		return;
 
 	ImGui::Begin("TAS", 0,  ImGuiWindowFlags_AlwaysAutoResize);
-
+	
 	tas->ui.UI_Render();
 
 	ImGui::End();
