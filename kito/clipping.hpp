@@ -16,6 +16,7 @@ struct recorder_cmd
 	fvec3 viewangles;
 	fvec3 origin;
 	fvec3 velocity;
+	fvec3 mins, maxs;
 };
 
 struct Recorder

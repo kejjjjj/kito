@@ -76,6 +76,8 @@ public:
 
 	segment_s* request_current_segment() { return current_segment;}
 	segment_s* get_first_segment() { return &segments.front(); }
+	segment_s* get_last_segment() { return &segments.back(); }
+	recorder_cmd* get_frame_data(const int32_t frame);
 	size_t get_segment_count() { return segments.size(); }
 	size_t get_frame_count() { return segments.back().end_index-1; }
 	void set_current_segment(size_t i) {  if(i < segments.size()) current_segment = &segments[i]; }
@@ -92,14 +94,20 @@ public:
 	void create_first_segment(pmove_t* pm, pml_t* pml);
 
 	void add_segment();
+	void insert_segment();
+	void delete_segment();
 	void add_frames_to_current_segment(int32_t& amount);
 	void remove_frames_from_current_segment(int32_t& amount);
+
+	void set_player_pov(usercmd_s* cmd);
 
 	Recorder* recorder = 0;
 
 	int32_t segment_index = 0;
 	int32_t frame_index = 0;
 	entry_point entry;
+
+	bool player_pov = false;
 
 	movement_data first_segment, this_segment;
 

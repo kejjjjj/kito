@@ -28,25 +28,50 @@ void TAS_UI::UI_Render()
 
 void TAS_UI::UI_SegmentEditor()
 {
+	static DWORD ms = 0;
+
 	auto cur_seg = tas->movement.request_current_segment();
 	if (!cur_seg) {
 		Com_Error(ERR_DROP, "tas->movement.request_current_segment() == nulltptr");
 		return;
 	}
 
+	ImGui::PushItemWidth(350);
 	if (ImGui::SliderInt_22("Segment", &tas->movement.segment_index, 0, tas->movement.get_segment_count()-1)) {
 		tas->movement.set_current_segment(tas->movement.segment_index);
 		tas->movement.frame_index = cur_seg->start_index;
 	}
+	ImGui::SameLine();
+	ImGui::Button("<##01", ImVec2(40, 40));
+	if (ImGui::IsItemActive()) {
+		if (tas->movement.segment_index - 1 > 0 && ms + 100 < Sys_Milliseconds()) {
+			tas->movement.segment_index--;
+			ms = Sys_Milliseconds();
+		}
+	}
+	ImGui::SameLine();
+	ImGui::Button(">##01", ImVec2(40, 40));
+	if (ImGui::IsItemActive()) {
+		if (tas->movement.segment_index + 1 < tas->movement.get_segment_count() && ms + 100 < Sys_Milliseconds()) {
+			tas->movement.segment_index++;
+			ms = Sys_Milliseconds();
+		}
+	}
+
 	if (ImGui::Button("Add"))
 		tas->movement.add_segment();
 		
 	ImGui::SameLine(); 
-	ImGui::Button("Insert"); 
+	if (ImGui::Button("Insert"))
+		tas->movement.insert_segment();
 	
 	ImGui::SameLine(); 
-	ImGui::Button("Remove Selected");
-
+	if (cur_seg->segment_index == 0)
+		ImGui::BeginDisabled();
+	if (ImGui::Button("Remove Selected"))
+		tas->movement.delete_segment();
+	if (cur_seg->segment_index == 0)
+		ImGui::EndDisabled();
 	ImGui::NewLine();
 	//ImGui::Separator();
 
@@ -56,10 +81,41 @@ void TAS_UI::UI_SegmentEditor()
 }
 void TAS_UI::UI_FrameEditor()
 {
-	static int add_or_remove_frames_count = 0;
-	auto cur_seg = tas->movement.request_current_segment();
+	static DWORD ms = 0;
 
+	static int add_or_remove_frames_count = 100;
+	auto cur_seg = tas->movement.request_current_segment();
+	
+	ImGui::PushItemWidth(325);
 	ImGui::SliderInt_22("Frame", &tas->movement.frame_index, 0, tas->movement.get_frame_count());
+
+	ImGui::SameLine();
+	ImGui::Button("<##02", ImVec2(40,40));
+	if (ImGui::IsItemActive()) {
+		if (tas->movement.frame_index > 0 && ms + 100 < Sys_Milliseconds()) {
+			tas->movement.frame_index--;
+			ms = Sys_Milliseconds();
+		}
+	}
+	ImGui::SameLine();
+	ImGui::Button(">##02", ImVec2(40, 40));
+	if (ImGui::IsItemActive()) {
+		if (tas->movement.frame_index + 1 < tas->movement.get_last_segment()->end_index && ms + 100 < Sys_Milliseconds()) {
+			tas->movement.frame_index++;
+			ms = Sys_Milliseconds();
+		}
+	}
+
+	if(tas->movement.player_pov)
+		ImGui::GetStyle().Colors[ImGuiCol_Button] = ImVec4(0.f, 0.f, 0.f, 0.7f);
+
+	ImGui::SameLine();
+	if (ImGui::Button("POV##02", ImVec2(50, 40)))
+		tas->movement.player_pov = !tas->movement.player_pov;
+
+	ImGui::GetStyle().Colors[ImGuiCol_Button] = ImVec4(30.f / 255, 30.f / 255, 41.f / 255, 1.f);
+
+
 	ImGui::PushItemWidth(130);
 	ImGui::InputInt("Count", &add_or_remove_frames_count, 1, 100);
 
@@ -93,8 +149,8 @@ void TAS_UI::UI_OtherControls()
 	//if (ImGui::Checkbox2("strafebot", &options->strafebot))
 	//	tas->movement.update_movement_for_each_segment();
 
-	if(ImGui::Checkbox2("bunnyhop", &options->bhop))
-		tas->movement.update_movement_for_each_segment();
+	//if(ImGui::Checkbox2("bunnyhop", &options->bhop))
+	//	tas->movement.update_movement_for_each_segment();
 
 	ImGui::EndGroup();
 

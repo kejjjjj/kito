@@ -3240,8 +3240,8 @@ bool ImGui::SliderScalar22(const char* label, ImGuiDataType data_type, void* p_d
     const ImVec2 label_size = CalcTextSize(label, NULL, true);
     const ImVec2 padding = ImVec2(0, style.FramePadding.y * 2);
     // Dummy(padding);
-    const ImRect frame_bb(ImVec2(window->DC.CursorPos.x, window->DC.CursorPos.y + padding.y * 2.1f + label_size.y / 2), window->DC.CursorPos + ImVec2(w, label_size.y * 1.25f + style.FramePadding.y * 2.f));
-    const ImRect total_bb(ImVec2(frame_bb.Min.x, frame_bb.Min.y - style.FramePadding.y), frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, padding.y * 2 + label_size.y / 1.5f));
+    const ImRect frame_bb(ImVec2(window->DC.CursorPos.x, window->DC.CursorPos.y + padding.y * 2.1f + label_size.y / 2), window->DC.CursorPos + ImVec2(w-label_size.x+ style.FramePadding.x, label_size.y * 1.25f + style.FramePadding.y * 2.f));
+    const ImRect total_bb(ImVec2(frame_bb.Min.x, frame_bb.Min.y - style.FramePadding.y), frame_bb.Max + ImVec2(style.FramePadding.x, padding.y * 2 + label_size.y / 1.5f));
 
     const bool temp_input_allowed = (flags & ImGuiSliderFlags_NoInput) == 0;
     ItemSize(total_bb, -1);

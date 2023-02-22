@@ -48,16 +48,41 @@ void TAS_Movement::add_segment()
 	current_segment->forwardmove = 127;
 	update_movement_for_each_segment();
 }
+void TAS_Movement::insert_segment()
+{
+	segment_s seg;
+
+	seg.frame_count = 100;
+
+	seg.start_index = current_segment->end_index + 1;
+	seg.end_index = seg.start_index + seg.frame_count;
+	seg.segment_index = current_segment->segment_index+1;
+
+	segments.insert(segments.begin() + seg.segment_index, seg);
+	current_segment = &segments[seg.segment_index];
+	current_segment->content.resize(seg.frame_count);
+	current_segment->forwardmove = 127;
+
+	update_movement_for_each_segment();
+
+
+}
+void TAS_Movement::delete_segment()
+{
+	if (segments.size() < 2)
+		return;
+
+	segments.erase(segments.begin() + current_segment->segment_index, segments.begin() + current_segment->segment_index + 1);
+	current_segment = &segments[current_segment->segment_index-1];
+	update_movement_for_each_segment();
+}
 void TAS_Movement::add_frames_to_current_segment(int32_t& amount)
 {
 
-
 	if (!(amount = std::clamp(amount, 0, INT_MAX - current_segment->frame_count))) {
-		std::cout << "NOPE\n";
 		return;
 	}
 
-	std::cout << "adding: " << amount << '\n';
 	current_segment->frame_count += amount;
 	current_segment->end_index = current_segment->start_index + current_segment->frame_count;
 
@@ -94,8 +119,10 @@ void TAS_Movement::update_all_segment_indices()
 	auto begin = segments.begin();
 	auto end = segments.end();
 
+	int i = -1;
 	for (auto& it = begin; it != end; ++it) {
-		
+		i++;
+
 		if (it == segments.begin())
 			continue;
 
@@ -103,8 +130,33 @@ void TAS_Movement::update_all_segment_indices()
 
 		it->start_index = prev->end_index + 1;
 		it->end_index = it->start_index + it->frame_count;
-
+		it->segment_index = i;
 	}
+
+}
+recorder_cmd* TAS_Movement::get_frame_data(const int32_t frame)
+{
+	if (segments.empty())
+		return 0;
+
+	const auto SegmentFromFrame = [frame](std::vector<segment_s>& seg) -> segment_s*
+	{
+		for (auto& i : seg) {
+			if (i.start_index <= frame && i.end_index >= frame)
+				return &i;
+		}
+		return nullptr;
+	};
+
+	auto seg = SegmentFromFrame(this->segments);
+	if (!seg)
+		return 0;
+
+	auto it = seg->content.begin();
+
+	std::advance(it, frame - seg->start_index);
+
+	return &*it;
 
 }
 void TAS_Movement::update_movement_for_each_segment()
@@ -189,7 +241,8 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		cmd.angles[0] = pm->cmd.angles[0];
 		cmd.angles[1] = pm->cmd.angles[1];
 		cmd.angles[2] = pm->cmd.angles[2];
-
+		cmd.mins = pm->mins;
+		cmd.maxs = pm->maxs;
 
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));
 		pm->cmd.buttons = 0;
@@ -367,4 +420,24 @@ std::list<recorder_cmd> TAS_Movement::create_a_list_from_segments()
 	}
 
 	return list;
+}
+void TAS_Movement::set_player_pov(usercmd_s* cmd)
+{
+	if (!player_pov || !tas->ui.editing)
+		return;
+	
+	auto ok = get_frame_data(frame_index);
+
+	if (!ok)
+		return;
+
+	VectorClear(ps_loc->velocity);
+	cmd->angles[0] = ok->angles[0];
+	cmd->angles[1] = ok->angles[1];
+	cmd->angles[2] = ok->angles[2];
+
+	ps_loc->origin[0] = ok->origin.x;
+	ps_loc->origin[1] = ok->origin.y;
+	ps_loc->origin[2] = ok->origin.z;
+
 }

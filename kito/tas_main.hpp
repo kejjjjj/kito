@@ -19,6 +19,7 @@ public:
 	TAS_UI ui;
 	TAS_Render render;
 
+
 private:
 	void TAS_SetupHardcodedFont();
 

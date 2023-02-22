@@ -7,17 +7,16 @@ bool UI::UI_Checkbox(bool& var)
 
 void UI::UI_Draw()
 {
-	static bool open = false;
 
 	if (GetAsyncKeyState(VK_NUMPAD2) & 1) {
-		open = !open;
-		IN_ActivateMouse(!open);
+		tas->ui.editing = !tas->ui.editing;
+		IN_ActivateMouse(!tas->ui.editing);
 		UI_SetSystemCursorPos();
-		ImGui::GetIO().MouseDrawCursor = open;
+		ImGui::GetIO().MouseDrawCursor = tas->ui.editing;
 		UI::UI_ColorTheme();
 	}
 
-	if (!open)
+	if (!tas->ui.editing)
 		return;
 
 	ImGui::Begin("TAS", 0,  ImGuiWindowFlags_AlwaysAutoResize);
