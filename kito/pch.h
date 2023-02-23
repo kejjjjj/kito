@@ -46,6 +46,7 @@ typedef vec_t vec4_t[4];
 #include <fstream>
 #include <filesystem>
 #include <direct.h>
+#include <optional>
 
 
 // add headers that you want to pre-compile here
@@ -103,8 +104,10 @@ typedef vec_t vec4_t[4];
 
 #include "clipping.hpp"
 
-#include "tas_filesystem.hpp"
+
 #include "tas_movement.hpp"
+#include "tas_fs_out.hpp"
+#include "tas_filesystem.hpp"
 #include "tas_ui.hpp"
 #include "tas_render.hpp"
 #include "tas_main.hpp"

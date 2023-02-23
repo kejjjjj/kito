@@ -189,6 +189,9 @@
     <ClInclude Include="sys_main.hpp">
       <Filter>Source Files\z_misc</Filter>
     </ClInclude>
+    <ClInclude Include="tas_fs_out.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -295,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="sys_main.cpp">
       <Filter>Source Files\z_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_fs_out.cpp">
+      <Filter>Source Files\TAS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

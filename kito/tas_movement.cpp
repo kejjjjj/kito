@@ -22,7 +22,7 @@ void TAS_Movement::create_first_segment(pmove_t* pm, pml_t* pml)
 	first_segment.pml = entry.pml;
 	first_segment.ps = entry.ps;
 
-	Com_Printf(CON_CHANNEL_SUBTITLE, "new project \"%s\" created", tas->filesystem->display_name.c_str());
+	//Com_Printf(CON_CHANNEL_SUBTITLE, "new project \"%s\" created", tas->cfile->display_name.c_str());
 
 
 }

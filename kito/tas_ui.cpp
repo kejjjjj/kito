@@ -3,17 +3,17 @@
 void TAS_UI::UI_Render()
 {
 	//no existing project
-	if (!tas->filesystem || tas->movement.waiting_for_creation) {
+	if (tas->filesystem.empty() || tas->movement.waiting_for_creation) {
 
 		if (ImGui::ButtonCentered("Create Project") && !tas->movement.waiting_for_creation) { //the 2nd condition could cause memory bugs if it wasn't there
-			tas->filesystem = new TAS_FileSystem("test");
+			TAS_FileSystem fs("test");
 
-			if (!tas->filesystem->valid) {
-				delete tas->filesystem;
-				tas->filesystem = 0;
+			if (fs.valid) {
+				tas->filesystem.push_back(fs);
+				tas->cfile = std::make_unique<TAS_FileSystem>(tas->filesystem.back());
+				Com_Printf(CON_CHANNEL_SUBTITLE, "tas->cfile->display_name = %s\n", tas->cfile->display_name.c_str());
+				tas->movement.waiting_for_creation = true;
 			}
-
-			tas->movement.waiting_for_creation = true;
 		}
 
 		return;
@@ -23,6 +23,7 @@ void TAS_UI::UI_Render()
 	TAS_UI::UI_FrameEditor();
 	TAS_UI::UI_OtherControls();
 	TAS_UI::UI_HoldButtons();
+	TAS_UI::UI_FileSystem();
 
 }
 
@@ -32,7 +33,7 @@ void TAS_UI::UI_SegmentEditor()
 
 	auto cur_seg = tas->movement.request_current_segment();
 	if (!cur_seg) {
-		Com_Error(ERR_DROP, "tas->movement.request_current_segment() == nulltptr");
+		Com_Error(ERR_DROP, "tas->movement.request_current_segment() == nullptr");
 		return;
 	}
 
@@ -42,7 +43,11 @@ void TAS_UI::UI_SegmentEditor()
 		tas->movement.frame_index = cur_seg->start_index;
 	}
 	ImGui::SameLine();
-	ImGui::Button("<##01", ImVec2(40, 40));
+
+	if (auto font = tas->FetchFont("font90"))
+		ImGui::SetCurrentFont(font.value());
+
+	ImGui::Button("]##01", ImVec2(40, 40));
 	if (ImGui::IsItemActive()) {
 		if (tas->movement.segment_index - 1 > 0 && ms + 100 < Sys_Milliseconds()) {
 			tas->movement.segment_index--;
@@ -50,13 +55,16 @@ void TAS_UI::UI_SegmentEditor()
 		}
 	}
 	ImGui::SameLine();
-	ImGui::Button(">##01", ImVec2(40, 40));
+	ImGui::Button("[##01", ImVec2(40, 40));
 	if (ImGui::IsItemActive()) {
 		if (tas->movement.segment_index + 1 < tas->movement.get_segment_count() && ms + 100 < Sys_Milliseconds()) {
 			tas->movement.segment_index++;
 			ms = Sys_Milliseconds();
 		}
 	}
+
+	if (auto font = tas->FetchFont("conduit"))
+		ImGui::SetCurrentFont(font.value());
 
 	if (ImGui::Button("Add"))
 		tas->movement.add_segment();
@@ -89,8 +97,12 @@ void TAS_UI::UI_FrameEditor()
 	ImGui::PushItemWidth(325);
 	ImGui::SliderInt_22("Frame", &tas->movement.frame_index, 0, tas->movement.get_frame_count());
 
+
+	if (auto font = tas->FetchFont("font90"))
+		ImGui::SetCurrentFont(font.value());
+
 	ImGui::SameLine();
-	ImGui::Button("<##02", ImVec2(40,40));
+	ImGui::Button("]##02", ImVec2(40,40));
 	if (ImGui::IsItemActive()) {
 		if (tas->movement.frame_index > 0 && ms + 100 < Sys_Milliseconds()) {
 			tas->movement.frame_index--;
@@ -98,13 +110,16 @@ void TAS_UI::UI_FrameEditor()
 		}
 	}
 	ImGui::SameLine();
-	ImGui::Button(">##02", ImVec2(40, 40));
+	ImGui::Button("[##02", ImVec2(40, 40));
 	if (ImGui::IsItemActive()) {
 		if (tas->movement.frame_index + 1 < tas->movement.get_last_segment()->end_index && ms + 100 < Sys_Milliseconds()) {
 			tas->movement.frame_index++;
 			ms = Sys_Milliseconds();
 		}
 	}
+
+	if (auto font = tas->FetchFont("conduit"))
+		ImGui::SetCurrentFont(font.value());
 
 	if(tas->movement.player_pov)
 		ImGui::GetStyle().Colors[ImGuiCol_Button] = ImVec4(0.f, 0.f, 0.f, 0.7f);
@@ -349,4 +364,41 @@ int32_t TAS_UI::UI_HoldButtons()
 int32_t TAS_UI::UI_SpamButtons()
 {
 	return 0;
+}
+
+void TAS_UI::UI_FileSystem()
+{
+	static std::string file_name;
+
+	ImGui::Separator();
+
+	if (auto font = tas->FetchFont("font90"))
+		ImGui::SetCurrentFont(font.value());
+
+	if (ImGui::Button("S##04", ImVec2(30, 30))) {
+
+		//auto list = tas->movement.create_a_list_from_segments();
+
+		tas->cfile->save = new TAS_FileSystem_Out(tas->movement);
+
+		if (tas->cfile->save->ok) {
+			tas->cfile->save->write();
+		}
+
+		delete tas->cfile->save;
+
+		//tas->cfile->save(list);
+
+	}
+
+	if (auto font = tas->FetchFont("conduit"))
+		ImGui::SetCurrentFont(font.value());
+
+	ImGui::SameLine();
+
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() / 1.5f);
+	ImGui::InputText("##00111", &file_name);
+
+
+
 }

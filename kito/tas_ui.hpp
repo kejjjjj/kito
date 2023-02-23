@@ -43,6 +43,8 @@ public:
 
 	std::list<ivec2> SegmentToScreen(const segment_s& segment);
 
+	void UI_FileSystem();
+
 	bool editing = false;
 
 private:
