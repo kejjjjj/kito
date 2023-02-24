@@ -49,7 +49,6 @@ struct segment_options
 		fvec3 target;
 	}aimlock;
 
-	bool bhop = false;
 	int32_t hold_buttons = 0;
 	viewangle_type viewangle_type = viewangle_type::FIXED_TURNRATE;
 
@@ -112,10 +111,10 @@ public:
 	movement_data first_segment, this_segment;
 
 	bool waiting_for_creation = false;
-	
+	std::vector<segment_s> segments;
 private:
 	segment_s* current_segment = 0;
-	std::vector<segment_s> segments;
+	
 	
 	
 

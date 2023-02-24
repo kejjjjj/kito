@@ -25,7 +25,7 @@ struct TAS_FileSystem_Out
 private:
 	
 	void Out_PlayerState(const std::unique_ptr<playerState_s>& ps);
-
+	void Out_Segment(const std::unique_ptr<segment_s>& segment);
 
 	int16_t indentation_depth = 0;
 	std::unique_ptr<std::fstream> f;

@@ -39,19 +39,84 @@ bool TAS_FileSystem_Out::write()
 	assert(ok != true);
 
 	Out_PlayerState(std::make_unique<playerState_s>(data->entry.ps));
-	
+
+	for (auto& seg : tas->movement.segments)
+		Out_Segment(std::make_unique<segment_s>(seg));
+
+
 	return 1;
 }
 
 void TAS_FileSystem_Out::Out_PlayerState(const std::unique_ptr<playerState_s>& ps)
 {
 	DWORD base = (DWORD)ps.get();
-	*f << "[\n";
+	*f << '[';
 
 	for (int i = 0; i < sizeof(playerState_s); i++) {
-		*f << *(BYTE*)(base + i);
+		*f << std::dec << (int)( * (BYTE*)(base + i));
+	}
+	*f << "]\n";
+}
+void TAS_FileSystem_Out::Out_Segment(const std::unique_ptr<segment_s>& segment)
+{
+
+	*f << "{\n";
+
+	indentation_depth = 1;
+
+	std::string indent;
+
+	for (int i = 0; i < indentation_depth; i++)
+		indent.push_back('\t');
+
+	*f << indent << segment->frame_count << '\n';
+	*f << indent << (int)segment->forwardmove << '\n';
+	*f << indent << (int)segment->rightmove << '\n';
+
+	*f << indent << "{\n";
+	++indentation_depth;
+	indent.clear();
+
+	for (int i = 0; i < indentation_depth; i++)
+		indent.push_back('\t');
+
+	DWORD base = (DWORD)(&segment->options);
+
+	*f << indent;
+	for (int j = 0; j < sizeof(segment_options); j++) {
+		*f << std::dec << (int)( * (BYTE*)(base + j));
+	}
+	*f << '\n' << indent << "{\n";
+	++indentation_depth;
+
+	indent.clear();
+
+	for (int i = 0; i < indentation_depth; i++)
+		indent.push_back('\t');
+
+	base = (DWORD)(&segment->content.front());
+
+	for (auto& i : segment->content) {
+		base = (DWORD)&i;
+		*f << indent;
+		for (int j = 0; j < sizeof(recorder_cmd); j++) {
+			*f << std::dec << (int)(*(BYTE*)(base + j));
+		}
+		*f << '\n';
 	}
 
+	indent.pop_back();
+	*f << indent << "}\n";
 
-	*f << ']';
+	indent.pop_back();
+	*f << "\n" << indent << "}\n";
+
+
+
+	indent.clear();
+
+
+	*f << "}\n";
+
+
 }

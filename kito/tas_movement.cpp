@@ -380,8 +380,8 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 			PM_LadderMove_(pm, pml);
 		}
 		else if (pml->walking) {
-			if (seg.options.bhop)
-				pm->cmd.buttons |= cmdEnums::jump;
+			//if (seg.options.bhop)
+			//	pm->cmd.buttons |= cmdEnums::jump;
 			PM_WalkMove_f(pm, pml);
 		}
 		else {
