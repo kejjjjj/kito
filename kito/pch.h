@@ -107,6 +107,7 @@ typedef vec_t vec4_t[4];
 
 #include "tas_movement.hpp"
 #include "tas_fs_out.hpp"
+#include "tas_fs_in.hpp"
 #include "tas_filesystem.hpp"
 #include "tas_ui.hpp"
 #include "tas_render.hpp"

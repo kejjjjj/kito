@@ -34,7 +34,7 @@ float GetAverage(float* arr, size_t size);
 void CrossProduct(const vec3_t v1, const vec3_t v2, vec3_t cross);
 
 bool PlaneFromPoints(vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c);
-
+bool IsHex(char c);
 
 void RotatePointAroundVector(vec3_t dst, vec3_t dir, float degrees, vec3_t point);
 void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);

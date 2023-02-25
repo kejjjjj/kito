@@ -197,6 +197,7 @@
     <ClInclude Include="r_world.hpp" />
     <ClInclude Include="sys_main.hpp" />
     <ClInclude Include="tas_filesystem.hpp" />
+    <ClInclude Include="tas_fs_in.hpp" />
     <ClInclude Include="tas_fs_out.hpp" />
     <ClInclude Include="tas_main.hpp" />
     <ClInclude Include="tas_movement.hpp" />
@@ -265,6 +266,7 @@
     <ClCompile Include="r_world.cpp" />
     <ClCompile Include="sys_main.cpp" />
     <ClCompile Include="tas_filesystem.cpp" />
+    <ClCompile Include="tas_fs_in.cpp" />
     <ClCompile Include="tas_fs_out.cpp" />
     <ClCompile Include="tas_main.cpp" />
     <ClCompile Include="tas_movement.cpp" />

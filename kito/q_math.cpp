@@ -358,3 +358,7 @@ bool WithinRange(float value, float a, float b)
 {
 	return a > value && b < value;
 }
+bool IsHex(char c)
+{
+	return (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F') || std::isdigit(c);
+}

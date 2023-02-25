@@ -3,7 +3,7 @@
 void TAS_UI::UI_Render()
 {
 	//no existing project
-	if (tas->filesystem.empty() || tas->movement.waiting_for_creation) {
+	if (!draw_save_list && (tas->filesystem.empty() || tas->movement.waiting_for_creation)) {
 
 		if (ImGui::ButtonCentered("Create Project") && !tas->movement.waiting_for_creation) { //the 2nd condition could cause memory bugs if it wasn't there
 			TAS_FileSystem fs("test");
@@ -14,11 +14,22 @@ void TAS_UI::UI_Render()
 				Com_Printf(CON_CHANNEL_SUBTITLE, "tas->cfile->display_name = %s\n", tas->cfile->display_name.c_str());
 				tas->movement.waiting_for_creation = true;
 			}
+		}ImGui::Text("or ");
+
+		if (ImGui::ButtonCentered("Load Project")) {
+			draw_save_list = true;
 		}
 
 		return;
 	}
+	if (draw_save_list) {
+		ImGui::Text("hello?");
 
+		if (ImGui::ButtonCentered("Cancel"))
+			draw_save_list = false;
+
+		return;
+	}
 	TAS_UI::UI_SegmentEditor();
 	TAS_UI::UI_FrameEditor();
 	TAS_UI::UI_OtherControls();

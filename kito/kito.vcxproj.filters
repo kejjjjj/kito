@@ -192,6 +192,9 @@
     <ClInclude Include="tas_fs_out.hpp">
       <Filter>Source Files\TAS</Filter>
     </ClInclude>
+    <ClInclude Include="tas_fs_in.hpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -300,6 +303,9 @@
       <Filter>Source Files\z_misc</Filter>
     </ClCompile>
     <ClCompile Include="tas_fs_out.cpp">
+      <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="tas_fs_in.cpp">
       <Filter>Source Files\TAS</Filter>
     </ClCompile>
   </ItemGroup>

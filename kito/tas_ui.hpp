@@ -29,6 +29,7 @@ public:
 	~TAS_UI() = default;
 
 	void UI_Render();
+	void UI_SaveList();
 	void UI_SegmentEditor();
 	void UI_FrameEditor();
 	void UI_OtherControls();
@@ -46,7 +47,7 @@ public:
 	void UI_FileSystem();
 
 	bool editing = false;
-
+	bool draw_save_list = false;
 private:
 
 };
