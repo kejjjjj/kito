@@ -168,7 +168,7 @@ std::string fs::F_FileStreamToString(std::fstream& f)
 //
 //	return directory.substr(0, pos);
 //}
-void fs::F_FilesInThisDirectory(std::string& directory, std::vector<std::string>* out)
+void fs::F_FilesInThisDirectory(const std::string& directory, std::vector<std::string>* out)
 {
 	out->clear();
 	out->resize(1);

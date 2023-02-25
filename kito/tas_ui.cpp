@@ -17,19 +17,39 @@ void TAS_UI::UI_Render()
 		}ImGui::Text("or ");
 
 		if (ImGui::ButtonCentered("Load Project")) {
+			tas->ui.savelist = std::unique_ptr<SaveList>(new SaveList);
 			draw_save_list = true;
 		}
 
 		return;
 	}
-	if (draw_save_list) {
-		ImGui::Text("hello?");
+	else if (draw_save_list) {
+		
+		if (auto file = savelist->UI_SaveList()) {
 
-		if (ImGui::ButtonCentered("Cancel"))
+			savelist->input = std::unique_ptr<TAS_FileSystem_In>(new TAS_FileSystem_In(file.value()));
+			const auto movement = savelist->input->read();
+
+			if (movement) {
+				tas->movement = *movement->get();
+				tas->movement.update_movement_for_each_segment();
+			}
+			delete savelist->input.release();
+
 			draw_save_list = false;
+			
+			delete tas->ui.savelist.release();
+
+		}
+
+		if (ImGui::ButtonCentered("Cancel")) {
+			draw_save_list = false;
+			delete tas->ui.savelist.release();
+		}
 
 		return;
 	}
+
 	TAS_UI::UI_SegmentEditor();
 	TAS_UI::UI_FrameEditor();
 	TAS_UI::UI_OtherControls();
@@ -37,7 +57,34 @@ void TAS_UI::UI_Render()
 	TAS_UI::UI_FileSystem();
 
 }
+std::optional<std::string> SaveList::UI_SaveList()
+{
+	if (!exists) {
+		ImGui::TextCentered("No files available!");
+		return std::nullopt;
+	}
 
+	ImVec2 mins, maxs, size = ImGui::GetWindowSize(), pos = ImGui::GetWindowPos();
+	bool clicked = ImGui::GetIO().MouseClicked[0];
+	int idx = 0;
+	for (const auto& i : filenames) {
+		ImGui::Text(i.c_str());
+
+		mins = ImVec2(pos.x, ImGui::GetItemRectMin().y);
+		maxs = ImVec2(pos.x + size.x, ImGui::GetItemRectMax().y);
+
+		if (MouseHovered(mins, maxs)) {
+			ImGui::GetForegroundDrawList()->AddRectFilled(mins, maxs, IM_COL32(255, 200, 157, 157), ImGui::GetStyle().FrameRounding);
+			if (clicked) {
+				return fullnames[idx];
+			}
+		}
+		idx++;
+	}
+
+	return std::nullopt;
+
+}
 void TAS_UI::UI_SegmentEditor()
 {
 	static DWORD ms = 0;
@@ -250,10 +297,6 @@ std::list<ivec2> TAS_UI::SegmentToScreen(const segment_s& segment)
 	}
 	return points;
 }
-
-
-
-
 void TAS_UI::UI_AngleControls_Fixed(segment_options* options)
 {
 	if (options->viewangle_type != viewangle_type::FIXED_TURNRATE)
@@ -299,8 +342,6 @@ void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 	if (options->viewangle_type != viewangle_type::AIMLOCK)
 		return;
 }
-
-
 int32_t TAS_UI::UI_HoldButtons()
 {
 

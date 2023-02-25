@@ -22,6 +22,43 @@ inline std::vector<std::pair<std::string, int>> cmd_buttons
 	std::make_pair("+ads_hold", cmdEnums::ads_hold)
 };
 
+struct SaveList
+{
+	SaveList()
+	{
+		dvar_s* mapname = Dvar_FindMalleableVar("mapname"); //this will always be valid so don't even check nullptr
+
+		const std::string dir = RECORDING_DIRECTORY() + "\\recordings\\" + mapname->current.string;
+
+		if (!fs::F_DirectoryExists(dir)) 
+			return;
+		
+		fs::F_FilesInThisDirectory(dir, &fullnames);
+
+		if (fullnames.empty())
+			return;
+
+		for (const auto& i : fullnames) {
+			const auto filename = fs::F_GetFileName(i);
+			const auto extension = fs::GetFileExtension(filename);			
+			filenames.push_back(filename.substr(0, filename.size() - extension.size()));
+		}
+
+		exists = true;
+
+	}
+	~SaveList() = default;
+
+	std::optional<std::string> UI_SaveList();
+	
+	bool exists = false;
+	std::vector<std::string> fullnames;
+	std::vector<std::string> filenames;
+
+	std::unique_ptr<TAS_FileSystem_In> input;
+	
+};
+
 class TAS_UI
 {
 public:
@@ -29,7 +66,7 @@ public:
 	~TAS_UI() = default;
 
 	void UI_Render();
-	void UI_SaveList();
+	std::unique_ptr<SaveList> savelist;
 	void UI_SegmentEditor();
 	void UI_FrameEditor();
 	void UI_OtherControls();

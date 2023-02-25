@@ -3,7 +3,7 @@
 
 TAS_FileSystem_Out::TAS_FileSystem_Out(const TAS_Movement& src) : 
 	data(std::make_unique<TAS_Movement>(src)), 
-	f(new std::fstream)
+	f(std::unique_ptr<std::fstream>(new std::fstream))
 {
 
 	

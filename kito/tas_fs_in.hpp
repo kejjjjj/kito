@@ -12,14 +12,13 @@ struct TAS_FileSystem_In
 
 	bool ok = false;
 
-	bool read();
+	std::optional<std::shared_ptr<TAS_Movement>> read();
 
 private:
 	
 	std::optional<playerState_s> In_PlayerState();
-
 	std::unique_ptr<std::fstream> f;
-
+	std::string name;
 };
 
 #endif
