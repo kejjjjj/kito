@@ -13,6 +13,8 @@ struct recorder_cmd
 	char forwardmove;
 	char rightmove;
 	int FPS;
+	char weapon;
+	char offhand;
 	fvec3 viewangles;
 	fvec3 origin;
 	fvec3 velocity;

@@ -31,15 +31,26 @@ void TAS_UI::UI_Render()
 			const auto movement = savelist->input->read();
 
 			if (movement) {
-				tas->movement = *movement->get();
-				tas->movement.update_movement_for_each_segment();
+
+				const auto filename = fs::F_GetFileName(file.value());
+				const auto extension = fs::GetFileExtension(filename);
+				const std::string shortname = (filename.substr(0, filename.size() - extension.size()));
+
+				TAS_FileSystem fs(shortname);
+
+				if (fs.valid) {
+					tas->filesystem.push_back(fs);
+					tas->cfile = std::make_unique<TAS_FileSystem>(tas->filesystem.back());
+					Com_Printf(CON_CHANNEL_SUBTITLE, "tas->cfile->display_name = %s\n", tas->cfile->display_name.c_str());
+
+					tas->movement = *movement->get();
+					tas->movement.update_movement_for_each_segment();
+					tas->movement.set_current_segment(0);
+				}
 			}
 			delete savelist->input.release();
-
-			draw_save_list = false;
-			
 			delete tas->ui.savelist.release();
-
+			draw_save_list = false;
 		}
 
 		if (ImGui::ButtonCentered("Cancel")) {
@@ -53,8 +64,19 @@ void TAS_UI::UI_Render()
 	TAS_UI::UI_SegmentEditor();
 	TAS_UI::UI_FrameEditor();
 	TAS_UI::UI_OtherControls();
+	TAS_UI::UI_SelectWeapon();
 	TAS_UI::UI_HoldButtons();
+
+	ImGui::NewLine();
+
+	ImGui::Text("weapon: %i", (int)tas->movement.request_current_segment()->options.weapon);
+
+	auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
+
+	ImGui::Text("velocity: %i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()) );
+
 	TAS_UI::UI_FileSystem();
+
 
 }
 std::optional<std::string> SaveList::UI_SaveList()
@@ -98,7 +120,7 @@ void TAS_UI::UI_SegmentEditor()
 	ImGui::PushItemWidth(350);
 	if (ImGui::SliderInt_22("Segment", &tas->movement.segment_index, 0, tas->movement.get_segment_count()-1)) {
 		tas->movement.set_current_segment(tas->movement.segment_index);
-		tas->movement.frame_index = cur_seg->start_index;
+		//tas->movement.frame_index = cur_seg->start_index;
 	}
 	ImGui::SameLine();
 
@@ -263,14 +285,14 @@ void TAS_UI::UI_ControlsDPAD()
 	ImGui::SameLine();
 	ImGui::Dummy(ImVec2(0.2f, 0));
 	ImGui::SameLine();
-	constructkey(cur_seg->forwardmove, 127, "W##01");
-	constructkey(cur_seg->rightmove, -127, "A##01");
+	constructkey(cur_seg->options.forwardmove, 127, "W##01");
+	constructkey(cur_seg->options.rightmove, -127, "A##01");
 
 	ImGui::SameLine();
-	constructkey(cur_seg->forwardmove, -127, "S##01");
+	constructkey(cur_seg->options.forwardmove, -127, "S##01");
 
 	ImGui::SameLine();
-	constructkey(cur_seg->rightmove, 127, "D##01");
+	constructkey(cur_seg->options.rightmove, 127, "D##01");
 
 	ImGui::EndGroup();
 
@@ -342,6 +364,29 @@ void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 	if (options->viewangle_type != viewangle_type::AIMLOCK)
 		return;
 }
+
+void TAS_UI::UI_SelectWeapon()
+{
+
+	auto cur_seg = tas->movement.request_current_segment();
+	auto weaplist = cg::G_GetWeaponsList(&cur_seg->end.ps);
+	static int iWeapon = 0;
+	std::vector<const char*> weapons;
+
+	for (auto& [x, y] : weaplist) {
+		weapons.push_back(x->szDisplayName+7); //C substr :new_moon_with_face:
+	}
+	ImGui::PushItemWidth(150);
+	if (ImGui::Combo("Weapon##01", &iWeapon, weapons.data(), weapons.size())) {
+		Com_Printf(CON_CHANNEL_SUBTITLE, "index: %i\n", weaplist[iWeapon].second);
+		cur_seg->options.weapon = weaplist[iWeapon].second;
+		tas->movement.update_movement_for_each_segment();
+	}
+	
+
+
+}
+
 int32_t TAS_UI::UI_HoldButtons()
 {
 

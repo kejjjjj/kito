@@ -47,7 +47,7 @@ typedef vec_t vec4_t[4];
 #include <filesystem>
 #include <direct.h>
 #include <optional>
-
+#include <map>
 
 // add headers that you want to pre-compile here
 #include "framework.h"
@@ -87,6 +87,7 @@ typedef vec_t vec4_t[4];
 #include "cg_dvar.h"
 
 #include "bg_pmove.hpp"
+#include "bg_weapon.hpp"
 
 #include "game_funcs.hpp"
 #include "sys_main.hpp"

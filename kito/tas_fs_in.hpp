@@ -16,9 +16,15 @@ struct TAS_FileSystem_In
 
 private:
 	
-	std::optional<playerState_s> In_PlayerState();
+	TAS_Movement movement;
+
+	template<typename T>
+	std::optional<T> In_ReadBlock();
+	std::optional<segment_s> In_ReadSegment();
+
 	std::unique_ptr<std::fstream> f;
 	std::string name;
+	std::optional<segment_s> read_seg;
 };
 
 #endif

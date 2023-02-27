@@ -195,6 +195,9 @@
     <ClInclude Include="tas_fs_in.hpp">
       <Filter>Source Files\TAS</Filter>
     </ClInclude>
+    <ClInclude Include="bg_weapon.hpp">
+      <Filter>Source Files\bg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -307,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="tas_fs_in.cpp">
       <Filter>Source Files\TAS</Filter>
+    </ClCompile>
+    <ClCompile Include="bg_weapon.cpp">
+      <Filter>Source Files\bg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -140,6 +140,18 @@ namespace cg
 		}
 
 	}
+	static void PM_BeginWeaponChange_(int weapon, playerState_s* ps, bool quick)
+	{
+		static DWORD fnc = 0x5C0190;
+		__asm
+		{
+			push quick;
+			mov esi, ps;
+			mov edx, weapon;
+			call fnc;
+			add esp, 0x4;
+		}
+	}
 	inline void (*PmoveSingle)(pmove_t* pm) = (void(__cdecl*)(pmove_t*))0x5BCBB0;
 }
 

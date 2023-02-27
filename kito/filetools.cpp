@@ -305,7 +305,7 @@ void fs::F_SyntaxError(const char* msg, ...)
 	_vsnprintf_s(v2, 0x1000u, msg, va);
 	v2[4095] = 0;
 
-	Com_PrintError(CON_CHANNEL_SUBTITLE, "Syntax error on line [%i, %i] with reason: [%s]\n", file.lines_read, file.current_column, v2);
+	Com_Error(ERR_DROP, "Syntax error on line [%i, %i] with reason: %s\n", file.lines_read, file.current_column, v2);
 
 	F_Reset();
 

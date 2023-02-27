@@ -54,5 +54,9 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 		}
 	}
 	cg::temp_delta = cmd->angles[1];
+
+
+	//if (GetAsyncKeyState(VK_NUMPAD5) < 0)
+	//	cmd->weapon = 16;
 	return;
 }

@@ -96,14 +96,16 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 
 	usercmd_s* cmd = cg::input->GetUserCmd(cg::input->cmdNumber);
 
-	int anglex = cmd->forwardmove;
-	int angley = cmd->rightmove;
-	int anglez = cmd->buttons;
+	int anglex = cmd->weapon;
+	int angley = cg::ps_loc->weapon;
+	int anglez = cmd->offHandIndex;
 
-	ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 700), IM_COL32(0, 255, 0, 255), std::format("{}, {}, {}", anglex, angley, anglez).c_str());
-
-		
-	
+	auto ps = cg::predictedPlayerState;
+	if (ps) {
+		ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 700), IM_COL32(0, 255, 0, 255),
+			std::format("weapFlags: {:x}\nweaponstate: {:x}\nweapAnim: {:x}\nweaponTime: {:x}\nweaponDelay: {:x}\nevents: {}\neventParms: {}",
+				ps->weapFlags, ps->weaponstate, ps->weapAnim, ps->weaponTime, ps->weaponDelay, ps->events[ps->eventSequence & 3], ps->eventParms[ps->eventSequence & 3]).c_str());
+	}
 	r_glob->R_EndFrame();
 	
 

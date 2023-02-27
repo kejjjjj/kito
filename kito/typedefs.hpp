@@ -5,15 +5,17 @@
 
 #include "pch.h"
 
+
+
 template <class T>
 struct vec2
 {
-
 	T x, y;
 
 	constexpr vec2() { x = 0; y = 0; }
 	constexpr vec2(const T& v) { x = v; y = v; }
 	constexpr vec2(const T& a, const T& b) { x = a; y = b; }
+
 	constexpr vec2(const vec3_t a) { x = a[0]; y = a[1];  }
 
 #ifdef IMGUI_API

@@ -84,7 +84,7 @@ void cg::CG_SetServerAngles(vec3_t angles)
 	}
 
 }
-float cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
+std::optional<float> cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
 {
 	char forwardmove = pm->cmd.forwardmove;
 	char rightmove = pm->cmd.rightmove;
@@ -92,7 +92,7 @@ float cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
 	float speed = fvec2(pm->ps->velocity).mag();
 
 	if (speed < 1 || forwardmove != 127 && rightmove != 0)
-		return -400;
+		return std::nullopt;
 
 
 	forwardmove = 127;
@@ -120,7 +120,7 @@ float cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
 	double diff = acos((g_speed - accel) / speed) * 180.f / PI;
 
 	if (std::isnan(diff))
-		return -400;
+		return std::nullopt;
 
 	float delta = yaw;
 

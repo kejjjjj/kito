@@ -60,5 +60,8 @@ void UI::UI_ColorTheme(const float transparency)
 	color[ImGuiCol_ButtonActive] = widget_active;
 	color[ImGuiCol_ButtonHovered] = widget_active;
 
+	color[ImGuiCol_HeaderHovered] = widget_color;
+	color[ImGuiCol_HeaderActive] = widget_color;
+
 
 }

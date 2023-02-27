@@ -45,7 +45,7 @@ void TAS_Movement::add_segment()
 	current_segment = &segments.back();
 	current_segment->segment_index = segments.size() - 1;
 	current_segment->content.resize(seg.frame_count);
-	current_segment->forwardmove = 127;
+	current_segment->options.forwardmove = 127;
 	update_movement_for_each_segment();
 }
 void TAS_Movement::insert_segment()
@@ -61,7 +61,7 @@ void TAS_Movement::insert_segment()
 	segments.insert(segments.begin() + seg.segment_index, seg);
 	current_segment = &segments[seg.segment_index];
 	current_segment->content.resize(seg.frame_count);
-	current_segment->forwardmove = 127;
+	current_segment->options.forwardmove = 127;
 
 	update_movement_for_each_segment();
 
@@ -123,12 +123,15 @@ void TAS_Movement::update_all_segment_indices()
 	for (auto& it = begin; it != end; ++it) {
 		i++;
 
-		if (it == segments.begin())
+		if (it == segments.begin()) {
+			it->start_index = 0;
+			it->end_index = it->start_index + it->frame_2count;
 			continue;
+		}
 
 		auto prev = (it - 1);
 
-		it->start_index = prev->end_index + 1;
+		it->start_index = prev->end_index;
 		it->end_index = it->start_index + it->frame_count;
 		it->segment_index = i;
 	}
@@ -141,8 +144,12 @@ recorder_cmd* TAS_Movement::get_frame_data(const int32_t frame)
 
 	const auto SegmentFromFrame = [frame](std::vector<segment_s>& seg) -> segment_s*
 	{
+		if (frame == 0)
+			return &seg.front();
+
 		for (auto& i : seg) {
-			if (i.start_index <= frame && i.end_index >= frame)
+
+			if((frame - i.start_index) <= i.frame_count)
 				return &i;
 		}
 		return nullptr;
@@ -208,12 +215,31 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 	playerState_s* ps = pm->ps;
 	recorder_cmd cmd;
 
+	
+
+	if (seg.segment_index) {
+
+		if (pm->ps->weapon != seg.options.weapon) {
+			ps->weaponstate = WEAPON_RAISING;
+			ps->weaponTime = cg::BG_WeaponNames[seg.options.weapon]->iRaiseTime;
+			cg::PM_BeginWeaponChange_(seg.options.weapon, ps, (ps->mantleState.flags & 0x10) != 0);
+		}
+
+	}
+	//ps->weapon = seg.options.weapon;
+	//ps->weaponTime = 0;
+	//ps->weapFlags &= 0xFFFFFBFF;
+	//ps->weaponstate = WEAPON_RAISING;
+	//ps->weapAnim = ~ps->weapAnim & 0x200;
+	//ps->weaponDelay = 0;
+
 	for (auto& i : list) {
 
 		if (!pm || !pml) {
 			Com_Printf(CON_CHANNEL_SUBTITLE, "yo wtf!\n");
 			break;
 		}
+
 		pmovesingle(pm, pml, seg, i);
 
 
@@ -243,6 +269,9 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		cmd.angles[2] = pm->cmd.angles[2];
 		cmd.mins = pm->mins;
 		cmd.maxs = pm->maxs;
+		cmd.weapon = pm->ps->weapon;
+		cmd.offhand = pm->cmd.offHandIndex;
+
 
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));
 		pm->cmd.buttons = 0;
@@ -251,7 +280,6 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		pm->ps->commandTime += pml->msec;
 
 		i = cmd;
-
 		
 
 	}
@@ -267,14 +295,78 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	auto options = &seg.options;
 	static dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
 
-	pm->cmd.forwardmove = seg.forwardmove;
-	pm->cmd.rightmove = seg.rightmove;
+	pm->cmd.forwardmove = options->forwardmove;
+	pm->cmd.rightmove = options->rightmove;
+	pm->cmd.weapon= seg.options.weapon;
+
+	if ((pm->ps->pm_flags & PMF_MELEE_CHARGE) != 0)
+		pm->cmd.forwardmove = 127;
+
+	if ((ps->pm_flags & PMF_RESPAWNED) != 0)
+	{
+		pm->cmd.buttons &= 0x1301u;
+		pm->cmd.forwardmove = 0;
+		pm->cmd.rightmove = 0;
+		ps->velocity[0] = 0.0;
+		ps->velocity[1] = 0.0;
+		ps->velocity[2] = 0.0;
+	}
+	if (ps->weaponstate == WEAPON_FIRING)
+	{
+		int weaponIdx = ps->weapon;
+		if (weaponIdx)
+		{
+			if (BG_WeaponNames[weaponIdx]->freezeMovementWhenFiring)
+			{
+				pm->cmd.buttons &= 0xFFFFFB3F;
+				pm->cmd.forwardmove = 0;
+				pm->cmd.rightmove = 0;
+				ps->velocity[0] = 0.0;
+				ps->velocity[1] = 0.0;
+				ps->velocity[2] = 0.0;
+			}
+		}
+	}
+
+	ps->pm_flags &= 0xFFFFEFFF;
+	if (ps->pm_type >= PM_DEAD)
+		pm->tracemask &= 0xFDFF3FFF;
+
+	if ((ps->pm_flags & PMF_PRONE) == 0 || BG_WeaponNames[ps->weapon]->overlayReticle && ps->fWeaponPosFrac > 0.0) {
+		ps->pm_flags &= 0xFFFFFDFF;
+	}
 
 	if (PM_InteruptWeaponWithProneMove_(ps))
 	{
 		ps->pm_flags &= 0xFFFFFDFF;
 		PM_ExitAimDownSight_(ps);
 	}
+
+	if ((ps->pm_flags & PMF_SIGHT_AIMING) != 0 && ps->viewHeightTarget == 11)
+	{
+		if (BG_WeaponNames[ps->weapon]->overlayReticle)
+		{
+			if (0.0f >= ps->fWeaponPosFrac)
+			{
+				pm->cmd.forwardmove = 0;
+				pm->cmd.rightmove = 0;
+			}
+		}
+		else
+		{
+			pm->cmd.forwardmove = 0;
+			pm->cmd.rightmove = 0;
+		}
+	}
+	ps->eFlags &= 0xFFFFFFBF;
+
+	if ((ps->pm_flags & PMF_RESPAWNED) == 0)
+	{
+		if ((!ps->weaponstate || ps->weaponstate == 5) && ps->ammoclip[BG_WeaponNames[ps->weapon]->iClipIndex + 4] && (pm->cmd.buttons & 1) != 0)
+			ps->eFlags |= EF_FIRING;
+	}
+	if (ps->pm_type < PM_DEAD && (pm->cmd.buttons & 0x101) == 0)
+		ps->pm_flags &= 0xFFFFFBFF;
 
 	pml->previous_origin[0] = ps->origin[0];
 	pml->previous_origin[1] = ps->origin[1];
@@ -297,16 +389,17 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	float deltaX = 0;
 	float deltaY = 0;
 
+	
+
 	if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) {
-		float yaw = CG_GetOptYaw(pm, pml);
-		if (yaw != -400) {
-			deltaY = yaw - pm->ps->viewangles[YAW];
+		if (auto yaw = CG_GetOptYaw(pm, pml)) {
+			deltaY = yaw.value() - pm->ps->viewangles[YAW];
 		}
-		deltaX = options->strafebot.up;
+		deltaX = -options->strafebot.up;
 
 	}
 	else if (seg.options.viewangle_type == viewangle_type::FIXED_TURNRATE) {
-		deltaX = options->fixed_turn.up;
+		deltaX = -options->fixed_turn.up;
 		deltaY = -options->fixed_turn.right;
 	}
 
@@ -315,6 +408,10 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 	pm->cmd.angles[PITCH] += ANGLE2SHORT(deltaX);
 	pm->cmd.angles[YAW] += ANGLE2SHORT(deltaY);
+
+	//pm->ps->weapon = seg.options.weapon;
+	//pm->cmd.weapon = pm->ps->weapon;
+
 
 	PM_AdjustAimSpreadScale_(pm, pml);
 	PM_UpdateViewAngles(ps, pml->msec, &pm->cmd, pm->handler);
@@ -393,19 +490,7 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		PM_FoliageSnd_(pm);
 		PM_OverBounce(pm, pml);
 		//Sys_SnapVector(pm->ps->velocity); //Sys_SnapVector | not called in singleplayer
-	}
-
-	//int _yaw = pm->cmd.angles[1];
-	//float __yaw = ps->viewangles[YAW];
-
-	//if (__yaw < 0) {
-	//	__yaw += 180;
-	//	__yaw = (__yaw + 180 % 360);
-	//}
-
-	//_yaw -= _yaw * 2 - ANGLE2SHORT(__yaw);
-
-	
+	}	
 
 
 }

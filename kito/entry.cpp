@@ -13,6 +13,7 @@ DWORD WINAPI parent_thread(HMODULE hModule)
     while (!cg::dx->device) {
         std::this_thread::sleep_for(100ms);
     }
+    std::this_thread::sleep_for(500ms);
 
     FILE* _con;
 

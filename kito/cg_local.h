@@ -414,6 +414,37 @@ struct $15067B6A14D88D7E1E730369692C3A81
 	hudelem_s current[31];
 	hudelem_s archival[31];
 };
+enum weaponstate_t
+{
+	WEAPON_READY = 0x0,
+	WEAPON_RAISING = 0x1,
+	WEAPON_RAISING_ALTSWITCH = 0x2,
+	WEAPON_DROPPING = 0x3,
+	WEAPON_DROPPING_QUICK = 0x4,
+	WEAPON_FIRING = 0x5,
+	WEAPON_RECHAMBERING = 0x6,
+	WEAPON_RELOADING = 0x7,
+	WEAPON_RELOADING_INTERUPT = 0x8,
+	WEAPON_RELOAD_START = 0x9,
+	WEAPON_RELOAD_START_INTERUPT = 0xA,
+	WEAPON_RELOAD_END = 0xB,
+	WEAPON_MELEE_INIT = 0xC,
+	WEAPON_MELEE_FIRE = 0xD,
+	WEAPON_MELEE_END = 0xE,
+	WEAPON_OFFHAND_INIT = 0xF,
+	WEAPON_OFFHAND_PREPARE = 0x10,
+	WEAPON_OFFHAND_HOLD = 0x11,
+	WEAPON_OFFHAND_START = 0x12,
+	WEAPON_OFFHAND = 0x13,
+	WEAPON_OFFHAND_END = 0x14,
+	WEAPON_DETONATING = 0x15,
+	WEAPON_SPRINT_RAISE = 0x16,
+	WEAPON_SPRINT_LOOP = 0x17,
+	WEAPON_SPRINT_DROP = 0x18,
+	WEAPON_NIGHTVISION_WEAR = 0x19,
+	WEAPON_NIGHTVISION_REMOVE = 0x1A,
+	WEAPONSTATES_NUM = 0x1B,
+};
 
 // playerState_t is the information needed by both the client and server
 // to predict player motion and actions
@@ -475,23 +506,23 @@ struct playerState_s
 	int damageYaw;
 	int damagePitch;
 	int damageCount;
-	int stats[5];
 	int ammo[128];
 	int ammoclip[128];
-	unsigned int weapons[4];
 	unsigned int weaponold[4];
+	unsigned int weapons[4];
 	unsigned int weaponchamber[3];
+	int stats[5];
 	float proneDirection;
 	float proneDirectionPitch;
 	float proneTorsoPitch;
-	ViewLockTypes viewlocked; //this might be the wrong offset
-	int viewlocked_entNum; //this might be the wrong offset
-	int cursorHint; //this might be the wrong offset
-	int cursorHintString; //this might be the wrong offset
-	int cursorHintEntIndex; //this might be the wrong offset
-	int iCompassPlayerInfo; //this might be the wrong offset
-	int radarEnabled; //this might be the wrong offset
-	int locationSelectionInfo; //this might be the wrong offset
+	ViewLockTypes viewlocked;
+	int viewlocked_entNum;
+	int cursorHint;
+	int cursorHintString;
+	int cursorHintEntIndex;
+	int iCompassPlayerInfo;
+	int radarEnabled;
+	int locationSelectionInfo;
 	int pad00[5];
 	SprintState sprintState;
 	float fTorsoPitch;
@@ -503,10 +534,10 @@ struct playerState_s
 	float meleeChargeYaw;
 	int meleeChargeDist;
 	int meleeChargeTime;
-	int perks; //this might be the wrong offset
-	ActionSlotType actionSlotType[4]; //this might be the wrong offset 
-	ActionSlotParam actionSlotParam[4]; //this might be the wrong offset
-	int entityEventSequence; //this might be the wrong offset
+	int perks;
+	ActionSlotType actionSlotType[4];
+	ActionSlotParam actionSlotParam[4];
+	int entityEventSequence;
 	char _pad[16];
 	int weapAnim;
 	float aimSpreadScale;
@@ -525,9 +556,10 @@ struct playerState_s
 	objective_t objective[16];
 	char weaponmodels[128];
 	int deltaTime;
-	int killCamEntity; //very likely wrong
-	$15067B6A14D88D7E1E730369692C3A81 hud; 
+	int killCamEntity;
+	$15067B6A14D88D7E1E730369692C3A81 hud;
 };
+
 
 
 struct playerState_t_origin
@@ -1592,6 +1624,26 @@ union FxElemDefVisuals
 	FxElemVisuals* array;
 	FxElemVisuals instance;
 };
+enum pmeflags_t
+{
+	EF_TELEPORT_BIT = 0x2,
+	EF_DUCKED = 0x4,
+	EF_PRONE = 0x8,
+	EF_NOT_STANDING = 0xC,
+	EF_NODRAW = 0x20,
+	EF_FIRING = 0x40,
+	EF_TURRET_ACTIVE_PRONE = 0x100,
+	EF_TURRET_ACTIVE_DUCK = 0x200,
+	EF_TURRET_ACTIVE = 0x300,
+	EF_AIM_ASSIST = 0x800,
+	EF_VEHICLE_ACTIVE = 0x4000,
+	EF_TIMED_OBJECT = 0x10000,
+	EF_DEAD = 0x20000,
+	EF_ADS = 0x40000,
+	EF_VOTED = 0x100000,
+	EF_TALK = 0x200000,
+};
+
 struct WeaponDef
 {
 	const char* szInternalName;

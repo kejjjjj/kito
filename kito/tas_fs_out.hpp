@@ -24,7 +24,9 @@ struct TAS_FileSystem_Out
 
 private:
 	
-	void Out_PlayerState(const std::unique_ptr<playerState_s>& ps);
+	template<typename T>
+	void Out_DataBlock(const std::unique_ptr<T>& data);
+
 	void Out_Segment(const std::unique_ptr<segment_s>& segment);
 
 	int16_t indentation_depth = 0;

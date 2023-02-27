@@ -45,7 +45,8 @@ void Recorder::Playback(usercmd_s* cmd)
 	cmd->angles[1] = it->angles[1];
 	cmd->angles[2] = it->angles[2];
 	cmd->serverTime = refTime + (it->serverTime - Recorder::recorder_sequence.front().serverTime);
-
+	cmd->weapon = it->weapon;
+	cmd->offHandIndex = it->offhand;
 	com_maxfps->current.integer = it->FPS;
 
 	*(int*)(0x85BD98 + 11454) = cmd->serverTime; //clients->serverTime

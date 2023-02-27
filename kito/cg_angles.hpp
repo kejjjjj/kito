@@ -13,7 +13,7 @@ namespace cg {
 	void CG_SetPlayerAngles(vec3_t source, vec3_t target);
 	void CG_SetPlayerAngles(fvec3 source, fvec3 target);
 
-	float CG_GetOptYaw(pmove_t* pm, pml_t* pml);
+	std::optional<float> CG_GetOptYaw(pmove_t* pm, pml_t* pml);
 
 	void CG_SetServerAngles(int* a);
 	void CG_SetServerAngles(vec3_t angles);

@@ -24,62 +24,150 @@ std::optional<std::shared_ptr<TAS_Movement>> TAS_FileSystem_In::read()
 	if (!ok)
 		return std::nullopt;
 	
-	std::shared_ptr<TAS_Movement> movement = std::unique_ptr<TAS_Movement>(new TAS_Movement);
+	fs::F_Reset();
+
+	std::shared_ptr<TAS_Movement> movement = std::shared_ptr<TAS_Movement>(new TAS_Movement);
 
 	Com_Printf(CON_CHANNEL_SUBTITLE, "TAS_FileSystem_In::read(%s)\n", name.c_str());
 
-	auto ps = In_PlayerState();
+	const auto ps = In_ReadBlock<playerState_s>();	
 	if (!ps) return std::nullopt;
 
-	movement->entry.ps = ps.value();
+	const auto pm = In_ReadBlock<pmove_t>();
+	if (!pm) return std::nullopt;
 
+	const auto pml = In_ReadBlock<pml_t>();
+	if (!pml) return std::nullopt;
+
+	movement->entry.ps = ps.value();
+	movement->entry.pm = pm.value();
+	movement->entry.pml = pml.value();
+	
+	while (true) {
+		if (!(read_seg = In_ReadSegment()))
+			break;
+
+		movement->segments.push_back(read_seg.value());
+	}
+
+	std::cout << "segments loaded: " << movement->segments.size() << '\n';
 
 	return movement;
 
 
 }
 using namespace fs;
-std::optional<playerState_s> TAS_FileSystem_In::In_PlayerState()
+template<typename T>
+std::optional<T> TAS_FileSystem_In::In_ReadBlock()
 {
-	playerState_s ps{};
+	T data{};
 
 	char ch = F_Get(*f);
-	bool stoploop = false;
 	if (ch != '[') {
-		Com_Error(ERR_DROP, "TAS_FileSystem_In::In_PlayerState(): expected %c instead of %c", '[', ch);
+		F_SyntaxError("std::optional<T> TAS_FileSystem_In::In_ReadBlock(): expected %c instead of %c", '[', ch);
 		return std::nullopt;
 	}
-
-	DWORD base = (DWORD)( & ps);
+	size_t bytes_read = 0;
+	DWORD base = (DWORD)(&data);
 	do {
 		std::string hex = "0x";
 
 		for (int i = 0; i < 2; i++) {
-			
+
 			if (f->eof() || !f->good()) {
-				Com_Error(ERR_DROP, "TAS_FileSystem_In::In_PlayerState(): unexpected end of file");
+				F_SyntaxError("std::optional<T> TAS_FileSystem_In::In_ReadBlock(): unexpected end of file");
 				return std::nullopt;
 			}
 
 			ch = F_Get(*f);
 
-			if (ch == ']') {
-				//std::cout << "{ " << ps.origin[0] <<  ", " << ps.origin[1] << ", " << ps.origin[2] << " }\n";
-				return ps;
+			if (bytes_read == sizeof(T) && ch != ']') {
+				F_SyntaxError("bytes_read (%u) == sizeof(T) (%u) && ch != ']' (%c)", bytes_read, sizeof(T), ch);
+				return std::nullopt;
+			}
+
+			else if (bytes_read == sizeof(T) && ch == ']') {
+				F_Get(*f); //skip the newline
+				return data;
 			}
 
 			if (!IsHex(ch)) {
-				Com_Error(ERR_DROP, "TAS_FileSystem_In::In_PlayerState(): expected a hex character instead of %c", ch);
+				F_SyntaxError("std::optional<T> TAS_FileSystem_In::In_ReadBlock(): expected a hex character instead of %c", ch);
 				return std::nullopt;
 			}
 			hex.push_back(ch);
+
+
 		}
 		//here it HAS to be from 0 to 255
 		auto hex_byte = std::strtol(hex.c_str(), NULL, 0);
 		*(BYTE*)base = (BYTE)hex_byte;
 
 		base += 1;
-
+		bytes_read++;
 
 	} while (true);
+
+
+	return data;
+}
+std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment()
+{
+	segment_s data{};
+
+	char ch = F_Get(*f);
+	if (ch != '{') {
+
+		if (std::isspace(ch) || f->eof() || !f->good())
+			return std::nullopt;
+
+		F_SyntaxError("std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment(): expected %c instead of %c", '{', ch);
+		return std::nullopt;
+	}F_Get(*f); //skip newline
+
+	auto options = In_ReadBlock<segment_options>();
+
+	if (!options)
+		return std::nullopt;
+
+	data.options = options.value();
+
+	auto framecount = In_ReadBlock<int>();
+
+	if (!framecount)
+		return std::nullopt;
+
+	data.frame_count = framecount.value();
+
+	std::cout << "framecount: " << data.frame_count << '\n';
+
+	ch = F_Get(*f);
+	if (ch != '}') {
+		F_SyntaxError("std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment(): expected %c instead of %c", '}', ch);
+		return std::nullopt;
+	}F_Get(*f); //skip newline
+
+	ch = F_Get(*f);
+	if (ch != '{') {
+		F_SyntaxError("std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment(): expected %c instead of %c", '{', ch);
+		return std::nullopt;
+	}F_Get(*f); //skip newline
+
+	
+	for (int i = 0; i < data.frame_count; i++) {
+
+		auto cmd = In_ReadBlock<recorder_cmd>();
+		if (!cmd) {
+			return std::nullopt;
+		}
+		data.content.push_back(cmd.value());
+	}
+
+	ch = F_Get(*f);
+	if (ch != '}') {
+		F_SyntaxError("std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment(): expected %c instead of %c", '}', ch);
+		return std::nullopt;
+	}F_Get(*f); //skip newline
+
+	return data;
 }

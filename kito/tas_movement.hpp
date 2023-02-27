@@ -34,6 +34,10 @@ enum class viewangle_type : int
 };
 struct segment_options
 {
+	char forwardmove = 0;
+	char rightmove = 0;
+	int weapon = 0;
+
 	struct fixed_turn_s {
 		float right = 0.f;
 		float up = 0.f;
@@ -59,8 +63,6 @@ struct segment_s
 	int32_t start_index = 0;
 	int32_t end_index = 0;
 	int32_t frame_count = 0;
-	char forwardmove = 0;
-	char rightmove = 0;
 	movement_data end;
 	segment_options options;
 	segment_list content;
