@@ -77,6 +77,8 @@ public:
 	void UI_AngleControls_Aimlock(segment_options* options);
 
 	void UI_SelectWeapon();
+	int32_t iWeapon = 0;
+
 
 	int32_t UI_HoldButtons();
 	int32_t UI_SpamButtons();

@@ -103,9 +103,14 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	auto ps = cg::predictedPlayerState;
 	if (ps) {
 		ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 700), IM_COL32(0, 255, 0, 255),
-			std::format("weapFlags: {:x}\nweaponstate: {:x}\nweapAnim: {:x}\nweaponTime: {:x}\nweaponDelay: {:x}\nevents: {}\neventParms: {}",
+			std::format("weapFlags: {}\nweaponstate: {}\nweapAnim: {}\nweaponTime: {}\nweaponDelay: {}\nevents: {}\neventParms: {}",
 				ps->weapFlags, ps->weaponstate, ps->weapAnim, ps->weaponTime, ps->weaponDelay, ps->events[ps->eventSequence & 3], ps->eventParms[ps->eventSequence & 3]).c_str());
+
+		if (GetAsyncKeyState(VK_NUMPAD3) & 1) {
+			std::cout << "pad: " << &ps->_pad[0] << '\n';
+		}
 	}
+
 	r_glob->R_EndFrame();
 	
 

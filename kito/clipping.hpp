@@ -19,6 +19,9 @@ struct recorder_cmd
 	fvec3 origin;
 	fvec3 velocity;
 	fvec3 mins, maxs;
+	//int weaponTime;
+	//int weapAnim;
+	//int weaponstate;
 };
 
 struct Recorder

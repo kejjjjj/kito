@@ -106,7 +106,7 @@
 
 constexpr auto CMD_MASK = 0x3F;
 
-enum pmflags_t
+enum pmflags_t : int
 {
 	PMF_NONE = 0x0,
 	PMF_PRONE = 0x1,
@@ -141,7 +141,15 @@ struct GfxWindowTarget
 	int width;
 	int height;
 };
-
+enum pmtype_t : int
+{
+	PM_NORMAL = 0x0,
+	PM_NORMAL_LINKED = 0x1,
+	PM_NOCLIP = 0x2,
+	PM_UFO = 0x3,
+	PM_DEAD = 0x4,
+	PM_DEAD_LINKED = 0x5,
+};
 struct __declspec(align(8)) DxGlobals
 {
 	IDirect3D9* d3d9;
@@ -535,10 +543,10 @@ struct playerState_s
 	int meleeChargeDist;
 	int meleeChargeTime;
 	int perks;
+	int _pad[4];
 	ActionSlotType actionSlotType[4];
 	ActionSlotParam actionSlotParam[4];
 	int entityEventSequence;
-	char _pad[16];
 	int weapAnim;
 	float aimSpreadScale;
 	int shellshockIndex;
@@ -559,6 +567,7 @@ struct playerState_s
 	int killCamEntity;
 	$15067B6A14D88D7E1E730369692C3A81 hud;
 };
+
 
 
 
@@ -2051,14 +2060,6 @@ enum errorParm_t
 	ERR_LOCALIZATION = 0x6,
 	ERR_MAPLOADERRORSUMMARY = 0x7,
 };
-enum pmtype_t
-{
-	PM_NORMAL = 0x0,
-	PM_NORMAL_LINKED = 0x1,
-	PM_NOCLIP = 0x2,
-	PM_UFO = 0x3,
-	PM_DEAD = 0x4,
-	PM_DEAD_LINKED = 0x5,
-};
+
 
 #endif

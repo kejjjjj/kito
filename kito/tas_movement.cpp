@@ -14,13 +14,11 @@ void TAS_Movement::create_first_segment(pmove_t* pm, pml_t* pml)
 	entry.origin = pm->ps->origin;
 	entry.fps = pml->frametime * 1000;
 
-	add_segment();
-
-
-
 	first_segment.pm = entry.pm;
 	first_segment.pml = entry.pml;
 	first_segment.ps = entry.ps;
+
+	add_segment();
 
 	//Com_Printf(CON_CHANNEL_SUBTITLE, "new project \"%s\" created", tas->cfile->display_name.c_str());
 
@@ -42,10 +40,30 @@ void TAS_Movement::add_segment()
 		seg.end_index = seg.start_index + seg.frame_count;
 	}
 	segments.push_back(seg);
+	if (current_segment)
+		frame_index = current_segment->end_index;
+	else
+		frame_index = 0;
+
+
+
 	current_segment = &segments.back();
 	current_segment->segment_index = segments.size() - 1;
+
 	current_segment->content.resize(seg.frame_count);
 	current_segment->options.forwardmove = 127;
+
+	if (segments.size() > 1) {
+		auto prev = &segments[current_segment->segment_index - 1];
+		current_segment->options.weapon = prev->options.weapon;
+		current_segment->options.iWeapon = prev->options.iWeapon;
+	}
+	else
+	{
+		auto weapons = cg::G_GetWeaponsList(&first_segment.ps);
+		current_segment->options.weapon = weapons.front().second;
+		current_segment->options.iWeapon = 0;
+	}
 	update_movement_for_each_segment();
 }
 void TAS_Movement::insert_segment()
@@ -59,9 +77,15 @@ void TAS_Movement::insert_segment()
 	seg.segment_index = current_segment->segment_index+1;
 
 	segments.insert(segments.begin() + seg.segment_index, seg);
+
+	auto prev = &segments[seg.segment_index - 1];
+
 	current_segment = &segments[seg.segment_index];
 	current_segment->content.resize(seg.frame_count);
 	current_segment->options.forwardmove = 127;
+	current_segment->options.weapon = prev->options.weapon;
+	current_segment->options.iWeapon = prev->options.iWeapon;
+
 
 	update_movement_for_each_segment();
 
@@ -74,6 +98,7 @@ void TAS_Movement::delete_segment()
 
 	segments.erase(segments.begin() + current_segment->segment_index, segments.begin() + current_segment->segment_index + 1);
 	current_segment = &segments[current_segment->segment_index-1];
+	frame_index = current_segment->end_index;
 	update_movement_for_each_segment();
 }
 void TAS_Movement::add_frames_to_current_segment(int32_t& amount)
@@ -87,7 +112,6 @@ void TAS_Movement::add_frames_to_current_segment(int32_t& amount)
 	current_segment->end_index = current_segment->start_index + current_segment->frame_count;
 
 	current_segment->content.resize(current_segment->frame_count);
-
 
 	update_movement_for_each_segment();
 
@@ -125,7 +149,7 @@ void TAS_Movement::update_all_segment_indices()
 
 		if (it == segments.begin()) {
 			it->start_index = 0;
-			it->end_index = it->start_index + it->frame_2count;
+			it->end_index = it->start_index + it->frame_count;
 			continue;
 		}
 
@@ -152,12 +176,12 @@ recorder_cmd* TAS_Movement::get_frame_data(const int32_t frame)
 			if((frame - i.start_index) <= i.frame_count)
 				return &i;
 		}
-		return nullptr;
+		return 0;
 	};
 
 	auto seg = SegmentFromFrame(this->segments);
 	if (!seg)
-		return 0;
+		return &segments.front().content.front();
 
 	auto it = seg->content.begin();
 
@@ -201,6 +225,7 @@ movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 	return &this_segment;
 
 }
+int weapon_change_time = 0;
 void TAS_Movement::update_movement_for_segment(segment_s& seg)
 {
 	auto& list = seg.content;
@@ -217,15 +242,10 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 
 	
 
-	if (seg.segment_index) {
+	//if (seg.segment_index) {
 
-		if (pm->ps->weapon != seg.options.weapon) {
-			ps->weaponstate = WEAPON_RAISING;
-			ps->weaponTime = cg::BG_WeaponNames[seg.options.weapon]->iRaiseTime;
-			cg::PM_BeginWeaponChange_(seg.options.weapon, ps, (ps->mantleState.flags & 0x10) != 0);
-		}
 
-	}
+	//}
 	//ps->weapon = seg.options.weapon;
 	//ps->weaponTime = 0;
 	//ps->weapFlags &= 0xFFFFFBFF;
@@ -233,6 +253,21 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 	//ps->weapAnim = ~ps->weapAnim & 0x200;
 	//ps->weaponDelay = 0;
 
+	if (pm->ps->weapon != seg.options.weapon) {
+		bool alive; // cc
+
+		ps->weapFlags &= 0xFFFFFFFD;
+		ps->pm_flags &= 0xFFFFFDFF;
+		alive = ps->pm_type < PM_DEAD;
+		ps->weaponTime = 0;
+		ps->weaponDelay = 0;
+		ps->weaponstate = WEAPON_READY;
+		if (alive)
+			ps->weapAnim = ~ps->weapAnim & 0x200;
+
+		pm->cmd.weapon = seg.options.weapon;
+	}
+	int j = 0;
 	for (auto& i : list) {
 
 		if (!pm || !pml) {
@@ -259,6 +294,11 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		else if (pm->cmd.rightmove < 0)
 			pm->cmd.rightmove = -127;
 
+		if (j == 1) {
+			if (ps->weaponstate == WEAPON_RAISING)
+				ps->weaponstate = WEAPON_DROPPING_QUICK;
+		}
+
 		cmd.forwardmove = pm->cmd.forwardmove;
 		cmd.rightmove = pm->cmd.rightmove;
 		cmd.FPS = 1000 / pml->msec;
@@ -269,9 +309,8 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		cmd.angles[2] = pm->cmd.angles[2];
 		cmd.mins = pm->mins;
 		cmd.maxs = pm->maxs;
-		cmd.weapon = pm->ps->weapon;
+		cmd.weapon = ps->weapon;
 		cmd.offhand = pm->cmd.offHandIndex;
-
 
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));
 		pm->cmd.buttons = 0;
@@ -280,7 +319,7 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		pm->ps->commandTime += pml->msec;
 
 		i = cmd;
-		
+		j++;
 
 	}
 	memcpy_s(&seg.end.pm, sizeof(pmove_t), pm, sizeof(pmove_t));
@@ -297,7 +336,7 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 	pm->cmd.forwardmove = options->forwardmove;
 	pm->cmd.rightmove = options->rightmove;
-	pm->cmd.weapon= seg.options.weapon;
+	//pm->cmd.weapon= seg.options.weapon;
 
 	if ((pm->ps->pm_flags & PMF_MELEE_CHARGE) != 0)
 		pm->cmd.forwardmove = 127;
@@ -430,6 +469,9 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		ps->pm_flags |= PMF_BACKWARDS_RUN;
 	}
 
+	//if (pm->ps->weapon != seg.options.weapon) {
+	//	ps->weaponstate = WEAPON_OFFHAND_START;
+	//}
 
 	//if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) 
 	//	rcmd.angles[YAW] = ANGLE2SHORT(pm->ps->viewangles[YAW]);

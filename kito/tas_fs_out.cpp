@@ -56,8 +56,20 @@ bool TAS_FileSystem_Out::write()
 
 		*f << "}\n";
 	}
+	auto ext = fs::GetFileExtension(tas->cfile->full_path);
+	auto copy = fs::removeFileExtension(tas->cfile->full_path, ext.size());
+	fs::F_CloseFile(*f);
+	Sleep(5);
 
+	try {
+		if(fs::F_FileExists(copy + "_backup.kej"))
+			std::filesystem::remove(copy + "_backup.kej");
 
+		std::filesystem::copy(tas->cfile->full_path, copy + "_backup.kej");
+	}
+	catch (std::filesystem::filesystem_error& err) {
+		Com_Printf(CON_CHANNEL_SUBTITLE, "^1backup failed: %s\n", err.what());
+	}
 	return 1;
 }
 template<typename T>

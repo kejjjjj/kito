@@ -5,15 +5,36 @@ void TAS_UI::UI_Render()
 	//no existing project
 	if (!draw_save_list && (tas->filesystem.empty() || tas->movement.waiting_for_creation)) {
 
-		if (ImGui::ButtonCentered("Create Project") && !tas->movement.waiting_for_creation) { //the 2nd condition could cause memory bugs if it wasn't there
-			TAS_FileSystem fs("test");
+		static bool bName = false;
+		static std::string sName;
+		if (bName) {
 
-			if (fs.valid) {
-				tas->filesystem.push_back(fs);
-				tas->cfile = std::make_unique<TAS_FileSystem>(tas->filesystem.back());
-				Com_Printf(CON_CHANNEL_SUBTITLE, "tas->cfile->display_name = %s\n", tas->cfile->display_name.c_str());
-				tas->movement.waiting_for_creation = true;
+			ImGui::Begin("Project Name", 0, ImGuiWindowFlags_AlwaysAutoResize);
+
+			ImGui::InputText("##044", &sName);
+			
+			if (ImGui::ButtonCentered("OK##02")) {
+				bName = false;
+
+				TAS_FileSystem fs(sName);
+
+				if (fs.valid) {
+					tas->filesystem.push_back(fs);
+					tas->cfile = std::make_unique<TAS_FileSystem>(tas->filesystem.back());
+					Com_Printf(CON_CHANNEL_SUBTITLE, "tas->cfile->display_name = %s\n", tas->cfile->display_name.c_str());
+					tas->movement.waiting_for_creation = true;
+				}
+
 			}
+
+			ImGui::End();
+			return;
+		}
+
+		if (ImGui::ButtonCentered("Create Project") && !tas->movement.waiting_for_creation) { //the 2nd condition could cause memory bugs if it wasn't there
+			bName = true;
+			return;
+
 		}ImGui::Text("or ");
 
 		if (ImGui::ButtonCentered("Load Project")) {
@@ -69,12 +90,10 @@ void TAS_UI::UI_Render()
 
 	ImGui::NewLine();
 
-	ImGui::Text("weapon: %i", (int)tas->movement.request_current_segment()->options.weapon);
-
 	auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
 
+	ImGui::Text("weapon: %i", (int)frame->weapon);
 	ImGui::Text("velocity: %i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()) );
-
 	TAS_UI::UI_FileSystem();
 
 
@@ -370,16 +389,15 @@ void TAS_UI::UI_SelectWeapon()
 
 	auto cur_seg = tas->movement.request_current_segment();
 	auto weaplist = cg::G_GetWeaponsList(&cur_seg->end.ps);
-	static int iWeapon = 0;
 	std::vector<const char*> weapons;
 
 	for (auto& [x, y] : weaplist) {
 		weapons.push_back(x->szDisplayName+7); //C substr :new_moon_with_face:
 	}
 	ImGui::PushItemWidth(150);
-	if (ImGui::Combo("Weapon##01", &iWeapon, weapons.data(), weapons.size())) {
-		Com_Printf(CON_CHANNEL_SUBTITLE, "index: %i\n", weaplist[iWeapon].second);
-		cur_seg->options.weapon = weaplist[iWeapon].second;
+	if (ImGui::Combo("Weapon##01", &cur_seg->options.iWeapon, weapons.data(), weapons.size())) {
+		Com_Printf(CON_CHANNEL_SUBTITLE, "index: %i\n", weaplist[cur_seg->options.iWeapon].second);
+		cur_seg->options.weapon = weaplist[cur_seg->options.iWeapon].second;
 		tas->movement.update_movement_for_each_segment();
 	}
 	
@@ -480,6 +498,7 @@ void TAS_UI::UI_FileSystem()
 
 		if (tas->cfile->save->ok) {
 			tas->cfile->save->write();
+			Com_Printf(CON_CHANNEL_SUBTITLE, "saved...\n");
 		}
 
 		delete tas->cfile->save;

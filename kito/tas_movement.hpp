@@ -37,6 +37,7 @@ struct segment_options
 	char forwardmove = 0;
 	char rightmove = 0;
 	int weapon = 0;
+	int iWeapon = 0;
 
 	struct fixed_turn_s {
 		float right = 0.f;
