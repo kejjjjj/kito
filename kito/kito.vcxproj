@@ -192,6 +192,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="q_math.hpp" />
     <ClInclude Include="r_drawlist.hpp" />
+    <ClInclude Include="r_drawtools.hpp" />
     <ClInclude Include="r_init.hpp" />
     <ClInclude Include="r_selectionwheel.hpp" />
     <ClInclude Include="r_userinterface.hpp" />
@@ -262,6 +263,7 @@
     </ClCompile>
     <ClCompile Include="q_math.cpp" />
     <ClCompile Include="r_drawlist.cpp" />
+    <ClCompile Include="r_drawtools.cpp" />
     <ClCompile Include="r_selectionwheel.cpp" />
     <ClCompile Include="r_init.cpp" />
     <ClCompile Include="r_userinterface.cpp" />

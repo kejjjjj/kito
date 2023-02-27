@@ -427,21 +427,31 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 	float deltaX = 0;
 	float deltaY = 0;
-
+	fvec3 org, vector;
 	
+	switch (seg.options.viewangle_type) 
+	{
+		case viewangle_type::STRAFEBOT:
+			if (auto yaw = CG_GetOptYaw(pm, pml)) {
+				deltaY = yaw.value() - pm->ps->viewangles[YAW];
+			}
+			deltaX = -options->strafebot.up;
+			break;
+		
+		case viewangle_type::FIXED_TURNRATE:
+			deltaX = -options->fixed_turn.up;
+			deltaY = -options->fixed_turn.right;
+			break;
+		case viewangle_type::AIMLOCK:
+			org = ps->origin; org.z += ps->viewHeightCurrent;
+			vector = (seg.options.aimlock.target - org).toangles();
 
-	if (seg.options.viewangle_type == viewangle_type::STRAFEBOT) {
-		if (auto yaw = CG_GetOptYaw(pm, pml)) {
-			deltaY = yaw.value() - pm->ps->viewangles[YAW];
-		}
-		deltaX = -options->strafebot.up;
-
+			deltaX = vector.x - ps->viewangles[PITCH];
+			deltaY = vector.y - ps->viewangles[YAW];
+			break;
+		default:
+			break;
 	}
-	else if (seg.options.viewangle_type == viewangle_type::FIXED_TURNRATE) {
-		deltaX = -options->fixed_turn.up;
-		deltaY = -options->fixed_turn.right;
-	}
-
 	pm->ps->viewangles[PITCH] += deltaX;
 	pm->ps->viewangles[YAW] += deltaY;
 

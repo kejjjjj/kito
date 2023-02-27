@@ -8,12 +8,15 @@ bool UI::UI_Checkbox(bool& var)
 void UI::UI_Draw()
 {
 
-	if (GetAsyncKeyState(VK_NUMPAD2) & 1) {
+	if (ImGui::GetIO().KeysDownDuration[VK_NUMPAD2] == 0.f) {
 		tas->ui.editing = !tas->ui.editing;
 		IN_ActivateMouse(!tas->ui.editing);
 		UI_SetSystemCursorPos();
 		ImGui::GetIO().MouseDrawCursor = tas->ui.editing;
 		UI::UI_ColorTheme();
+
+		if (!tas->ui.editing)
+			tas->movement.player_pov = false;
 	}
 
 	if (!tas->ui.editing)

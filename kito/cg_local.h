@@ -1376,6 +1376,29 @@ struct Material
 	MaterialConstantDef* constantTable;
 	GfxStateBits* stateBitsTable;
 };
+struct Glyph
+{
+	unsigned __int16 letter;
+	char x0;
+	char y0;
+	char dx;
+	char pixelWidth;
+	char pixelHeight;
+	float s0;
+	float t0;
+	float s1;
+	float t1;
+};
+
+struct Font_s
+{
+	const char* fontName;
+	int pixelHeight;
+	int glyphCount;
+	Material* material;
+	Material* glowMaterial;
+	Glyph* glyphs;
+};
 struct XModelLodInfo
 {
 	float dist;

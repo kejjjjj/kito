@@ -18,6 +18,9 @@ typedef vec_t vec3_t[3];
 typedef vec_t vec4_t[4];
 
 #define PI 3.14159265f
+#ifndef M_PI
+#define M_PI        3.14159265358979323846f // matches value in gcc v2 math.h
+#endif
 #define DotProduct(x,y)			((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
 #define VectorSubtract(a,b,c)	((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
 #define VectorAdd(a,b,c)		((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
@@ -95,6 +98,7 @@ typedef vec_t vec4_t[4];
 #include "r_selectionwheel.hpp"
 #include "r_userinterface.hpp"
 #include "r_world.hpp"
+#include "r_drawtools.hpp"
 
 #include "r_drawlist.hpp"
 #include "r_init.hpp"

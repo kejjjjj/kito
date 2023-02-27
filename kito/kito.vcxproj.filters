@@ -198,6 +198,9 @@
     <ClInclude Include="bg_weapon.hpp">
       <Filter>Source Files\bg</Filter>
     </ClInclude>
+    <ClInclude Include="r_drawtools.hpp">
+      <Filter>Source Files\r</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -313,6 +316,9 @@
     </ClCompile>
     <ClCompile Include="bg_weapon.cpp">
       <Filter>Source Files\bg</Filter>
+    </ClCompile>
+    <ClCompile Include="r_drawtools.cpp">
+      <Filter>Source Files\r</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

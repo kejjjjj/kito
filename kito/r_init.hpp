@@ -29,8 +29,10 @@ struct R
 
 	void (*CL_ShutdownRenderer_f)();
 	static void CL_ShutdownRenderer();
-
 	static void R_RecoverLostDevice();
+
+	static void CG_DrawActive();
+	void(*CG_DrawActive_f)();
 
 	bool R_BeginFrame();
 	void R_EndFrame();

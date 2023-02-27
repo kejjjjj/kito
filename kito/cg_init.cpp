@@ -30,10 +30,11 @@ void cg::CG_InitForeverHooks()
 	PM_AirMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8820);
 	PM_WalkMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8940);
 	PM_UFOMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8E30);
-	Mantle_Check_f					= (void(*)(pmove_t*, pml_t*))								(0x5B36C0);
+	Mantle_Check_f					= (void(*)(pmove_t*, pml_t*))						(0x5B36C0);
 
 	r_glob->R_RecoverLostDevice_f	= (void(*)())										(0x5DA020);
 	r_glob->CL_ShutdownRenderer_f	= (void(*)())										(0x4452E0);
+	r_glob->CG_DrawActive_f			= (void(*)())										(0x4111D0);
 
 	hook::install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
 	hook::install(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
@@ -44,6 +45,7 @@ void cg::CG_InitForeverHooks()
 
 	hook::install(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
 	hook::install(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
+	hook::install(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
 
 	hook::install(&(PVOID&)Pmove_f, Pmove);
 
@@ -79,6 +81,7 @@ void cg::CG_RemoveHooks()
 	hook::remove(&(PVOID&)PM_WalkMove_f, PM_WalkMove);
 	hook::remove(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
 	hook::remove(&(PVOID&)Mantle_Check_f, Mantle_Check);
+	hook::remove(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");
 

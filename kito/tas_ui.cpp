@@ -26,7 +26,10 @@ void TAS_UI::UI_Render()
 				}
 
 			}
-
+			ImGui::SameLine();
+			if (ImGui::ButtonCentered("Cancel##02")) {
+				bName = false;
+			}
 			ImGui::End();
 			return;
 		}
@@ -90,10 +93,10 @@ void TAS_UI::UI_Render()
 
 	ImGui::NewLine();
 
-	auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
+	//auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
 
-	ImGui::Text("weapon: %i", (int)frame->weapon);
-	ImGui::Text("velocity: %i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()) );
+	//ImGui::Text("weapon: %i", (int)frame->weapon);
+	//ImGui::Text("velocity: %i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()) );
 	TAS_UI::UI_FileSystem();
 
 
@@ -382,6 +385,18 @@ void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 {
 	if (options->viewangle_type != viewangle_type::AIMLOCK)
 		return;
+
+	ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("X##02", &options->aimlock.target.x, 0.f, 0.f, "%.3f")) {
+		tas->movement.update_movement_for_each_segment();
+	}ImGui::PushItemWidth(150); 
+	if (ImGui::InputFloat("Y##02", &options->aimlock.target.y, 0.f, 0.f, "%.3f")) {
+		tas->movement.update_movement_for_each_segment();
+	}ImGui::PushItemWidth(150); 
+	if (ImGui::InputFloat("Z##02", &options->aimlock.target.z, 0.f, 0.f, "%.3f")) {
+		tas->movement.update_movement_for_each_segment();
+	}
+
 }
 
 void TAS_UI::UI_SelectWeapon()
