@@ -18,5 +18,7 @@ namespace r {
 		int style, float* glowColor, Material* fxMaterial, Material* fxMaterialGlow, int fxBirthTime, 
 		int fxLetterTime, int fxDecayStartTime, int fxDecayDuration); //holy this takes a lot of args
 
+	void R_DrawTextWithEffects(const std::string& text, const char* fontname, float x, float y, float xScale, float yScale, float rotation, float* color, int style, float* glowColor);
+
 }
 #endif

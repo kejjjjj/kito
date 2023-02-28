@@ -156,3 +156,85 @@ bool cg::WorldToScreen(const fvec3& location, ivec2* out)
 	return vTransform.z > 0;
 
 }
+std::optional<ivec2> cg::WorldToScreen(const fvec3& location)
+{
+	const int centerX = refdef->width / 2;
+	const int centerY = refdef->height / 2;
+
+	const fvec3 vright = refdef->viewaxis[1];
+	const fvec3 vup = refdef->viewaxis[2];
+	const fvec3 vfwd = refdef->viewaxis[0];
+
+	const fvec3 vLocal = location - refdef->vieworg;
+	fvec3 vTransform;
+
+	vTransform.x = vLocal.dot(vright);
+	vTransform.y = vLocal.dot(vup);
+	vTransform.z = vLocal.dot(vfwd);
+
+	if (vTransform.z < 0.01) {
+		return std::nullopt;
+	}
+	ivec2 out;
+
+	out.x = centerX * (1 - (vTransform.x / refdef->tanHalfFovX / vTransform.z));
+	out.y = centerY * (1 - (vTransform.y / refdef->tanHalfFovY / vTransform.z));
+	
+
+	if (vTransform.z > 0)
+		return out;
+
+	return std::nullopt;
+}
+void cg::CG_DrawCoordinates()
+{
+	char buff[128];
+	if (tas->ui.editing) {
+
+		const auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
+
+		if (!frame)
+			return;
+
+		sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f", frame->origin.x, frame->origin.y, frame->origin.z, frame->viewangles.y);
+
+		r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
+		return;
+
+	}
+	auto ps = predictedPlayerState;
+
+	if (!ps)
+		return;
+
+	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1]);
+	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
+
+
+}
+void cg::CG_DrawVelocity()
+{
+	char buff[32];
+	if (tas->ui.editing) {
+
+		const auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
+
+		if (!frame)
+			return;
+
+		sprintf_s(buff, "%i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()));
+
+		r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width / 2 - strlen(buff)*2, refdef->height / 2, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
+		return;
+
+	}
+	auto ps = predictedPlayerState;
+
+	if (!ps)
+		return;
+
+	sprintf_s(buff, "%i", (int)(fvec2(ps->velocity[0], ps->velocity[1]).mag()));
+	r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width/2-strlen(buff)*2, refdef->height / 2, 1.f, 1.f, 0, vec4_t{1,1,1,1}, 3, vec4_t{1,0,0,1});
+
+
+}

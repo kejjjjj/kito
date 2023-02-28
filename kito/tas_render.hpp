@@ -10,6 +10,9 @@ class TAS_Render
 public:
 	void R_Render();
 	void R_ShowSegmentPath(const segment_s* seg, unsigned int color);
+
+	void R_ShowSegmentPathColored(const segment_s* seg, Pixel& refColor);
+
 	void R_DrawHitbox();
 
 private:

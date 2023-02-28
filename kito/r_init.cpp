@@ -74,7 +74,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 
 	r_glob->R_BeginFrame();
 
-	dl->ui_wheel->Draw();
+	//dl->ui_wheel->Draw();
 
 	dl->ui.UI_Draw();
 	tas->render.R_Render();
@@ -84,27 +84,11 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 
 			auto current = tas->movement.recorder->CurrentCmd();
 			
-			if (current) {
-				float dist = current->origin.dist(cg::coord->origin);
+			if (current && cg::predictedPlayerState) {
+				float dist = current->origin.dist(cg::predictedPlayerState->origin);
 				ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}", dist).c_str());
 			}
 		}
-	}
-
-	int dist = (int)fvec2(cg::temp_velocity).mag();
-	ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 1080 / 2), IM_COL32(0,255,0,255), std::format("{}", dist).c_str());
-
-	usercmd_s* cmd = cg::input->GetUserCmd(cg::input->cmdNumber);
-
-	int anglex = cmd->weapon;
-	int angley = cg::ps_loc->weapon;
-	int anglez = cmd->offHandIndex;
-
-	auto ps = cg::predictedPlayerState;
-	if (ps) {
-		ImGui::GetBackgroundDrawList()->AddText(ImVec2(1920 / 2, 700), IM_COL32(0, 255, 0, 255),
-			std::format("weapFlags: {}\nweaponstate: {}\nweapAnim: {}\nweaponTime: {}\nweaponDelay: {}\nevents: {}\neventParms: {}",
-				ps->weapFlags, ps->weaponstate, ps->weapAnim, ps->weaponTime, ps->weaponDelay, ps->events[ps->eventSequence & 3], ps->eventParms[ps->eventSequence & 3]).c_str());
 	}
 
 	r_glob->R_EndFrame();
@@ -117,13 +101,10 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 using namespace r;
 void R::CG_DrawActive()
 {
-	//R_DrawText("hello", "fonts/objectivefont", 500, 500, 2, 2, 45, vec4_t{ 1,0,1,1 }, 3);
-	auto font = R_RegisterFont("fonts/objectivefont");
+	//R_DrawTextWithEffects("hello", "fonts/objectivefont", 500, 500, 2, 2, 180, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
 
-	Material* fxMaterial = r::R_RegisterMaterial("decode_characters");
-	Material* fxMaterialGlow = r::R_RegisterMaterial("decode_characters_glow");
-
-	r::R_AddCmdDrawTextWithEffects((char*)"hello", font, 500, 500, 2, 2, 45, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 }, fxMaterial, fxMaterialGlow, 0, 500, 1000, 2000);
+	cg::CG_DrawCoordinates();
+	cg::CG_DrawVelocity();
 
 	return r_glob->CG_DrawActive_f();
 }

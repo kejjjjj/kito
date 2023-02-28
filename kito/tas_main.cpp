@@ -30,6 +30,7 @@ void TAS::TAS_LoadFont(const char* _name, const std::string& name, float scale)
 
 	if (!font) {
 		std::cout << "font: " << std::quoted(c_str) << " does not exist!\n";
+		Com_Error(ERR_DROP, "font '%s' does not exist!", c_str.c_str());
 		return;
 	}
 

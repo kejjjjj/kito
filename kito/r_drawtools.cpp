@@ -55,6 +55,19 @@ void r::R_AddCmdDrawTextWithEffects(char* text, Font_s* font, float x, float y, 
 			style, glowColor, fxMaterial, fxMaterialGlow,
 			fxBirthTime, fxLetterTime, fxDecayStartTime, fxDecayDuration);
 }
+void r::R_DrawTextWithEffects(const std::string& text, const char* fontname, float x, float y, float xScale, float yScale, float rotation, float* color, int style, float* glowColor)
+{
+	auto font = R_RegisterFont(fontname);
+
+	Material* fxMaterial = r::R_RegisterMaterial("decode_characters");
+	Material* fxMaterialGlow = r::R_RegisterMaterial("decode_characters_glow");
+
+	if (!font || !fxMaterial || !fxMaterialGlow)
+		return;
+
+	//CG_AdjustFrom640(x, y, xScale, yScale);
+	return R_AddCmdDrawTextWithEffects((char*)text.c_str(), font, x, y, xScale, yScale, rotation, color, style, glowColor, fxMaterial, fxMaterialGlow, 0, 500, 1000, 2000);
+}
 void r::R_DrawText(const std::string& text, const char* fontname, float x, float y, float xScale, float yScale, float rotation, vec4_t color, int style)
 {
 	auto font = R_RegisterFont(fontname);
@@ -62,7 +75,7 @@ void r::R_DrawText(const std::string& text, const char* fontname, float x, float
 	if (!font)
 		return;
 
-	CG_AdjustFrom640(x, y, xScale, yScale);
+	//CG_AdjustFrom640(x, y, xScale, yScale);
 	R_AddCmdDrawText(text.c_str(), text.size(), font, x, y, xScale, yScale, rotation, color, style);
 
 }

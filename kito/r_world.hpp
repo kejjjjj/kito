@@ -39,7 +39,9 @@ private:
 namespace cg
 {
 	bool WorldToScreen(const fvec3& location, ivec2* out);
-
+	std::optional<ivec2> WorldToScreen(const fvec3& location);
+	void CG_DrawCoordinates();
+	void CG_DrawVelocity();
 }
 
 #endif

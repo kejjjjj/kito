@@ -36,6 +36,7 @@ typedef vec_t vec4_t[4];
 #define RAD2SHORT(a) ((a) * (32768.f / (float)M_PI))
 #define SHORT2RAD(a) ((a) * ((float)M_PI / 32768.f))
 #define SHORT2DEG(a) (((a) / 32768.f) * 180.0f)
+#define	VALUE2COLOR(x,y)	((x/y)*32)
 
 
 #include <Windows.h>
@@ -51,6 +52,7 @@ typedef vec_t vec4_t[4];
 #include <direct.h>
 #include <optional>
 #include <map>
+#include <unordered_map>
 
 // add headers that you want to pre-compile here
 #include "framework.h"

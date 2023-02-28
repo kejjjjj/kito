@@ -18,6 +18,7 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 	}
 
 	static DWORD ms = Sys_Milliseconds();
+	static bool wait_weapon = false;
 
 	tas->movement.set_player_pov(cmd);
 
@@ -34,14 +35,18 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 			tas->movement.recorder = new Recorder(tas->movement.create_a_list_from_segments());
 
 			ms = Sys_Milliseconds();
-
+			wait_weapon = true;
 			return;
 		}
 	}
 
 	if (tas->movement.recorder) {
+		segment_s* first = tas->movement.get_first_segment();
 
-		if (ms + 1000 < Sys_Milliseconds()) {
+		if (wait_weapon)
+			wait_weapon = ps_loc->weapon != first->content.front().weapon;
+
+		if (ms + 1000 < Sys_Milliseconds() && !wait_weapon) {
 
 			if (tas->movement.recorder->IsPlayback()) {
 				tas->movement.recorder->Playback(cmd);
@@ -53,10 +58,10 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 			}
 		}
 		else {
-			segment_s* first = tas->movement.get_first_segment();
 			cmd->angles[0] = first->content.front().angles[0];
 			cmd->angles[1] = first->content.front().angles[1];
 			cmd->angles[2] = first->content.front().angles[2];
+			cmd->weapon = first->content.front().weapon;
 		}
 	}
 	cg::temp_delta = cmd->angles[1];

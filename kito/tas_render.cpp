@@ -3,9 +3,15 @@
 void TAS_Render::R_Render()
 {
 
-	for (size_t i = 0; i < tas->movement.get_segment_count(); i++) 
-		R_ShowSegmentPath(tas->movement.get_segment_by_index(i), i == tas->movement.segment_index ?  IM_COL32(0, 255, 0, 255) : IM_COL32(255, 255, 0, 255));
-	
+	//for (size_t i = 0; i < tas->movement.get_segment_count(); i++) 
+	//	R_ShowSegmentPath(tas->movement.get_segment_by_index(i), i == tas->movement.segment_index ?  IM_COL32(0, 255, 0, 255) : IM_COL32(255, 255, 0, 255));
+	//
+	auto c = Pixel(130, 130, 0, 255);
+	for (auto& i : tas->movement.segments) {
+
+		R_ShowSegmentPathColored(&i, c);
+
+	 }
 
 	R_DrawHitbox();
 
@@ -30,6 +36,70 @@ void TAS_Render::R_ShowSegmentPath(const segment_s* seg, unsigned int color)
 
 		--it;
 
+	}
+
+
+	
+}
+void TAS_Render::R_ShowSegmentPathColored(const segment_s* seg, Pixel& refColor)
+{
+	//float average{};
+	
+	if (!seg)
+		return;
+	
+	auto data = ([](const segment_s& segment)-> std::list<std::pair<ivec2, float>>
+	{
+		std::list<std::pair<ivec2, float>> points;
+		for (const auto& i : segment.content) {
+			if (auto xy = cg::WorldToScreen(i.origin)) {
+				points.push_back(std::make_pair(xy.value(), fvec2(i.velocity.x, i.velocity.y).mag()));
+			}else
+				points.push_back(std::make_pair(ivec2(-1,-1), fvec2(i.velocity.x, i.velocity.y).mag()));
+
+
+		}
+		return points;
+	})(*seg);
+
+	//for (auto& [x, y] : data) {
+	//	average += y;
+	//} average /= data.size();
+
+	float pv = data.begin()->second;
+	ivec2 pp = data.begin()->first;
+	Pixel c;
+	for (const auto& [p, v] : data) {
+		int r = refColor.r, g = refColor.g;
+		refColor.b = 0;
+
+
+		if (v < pv) {
+			
+			r = std::clamp(r + int(pv - v), 0, 255);
+			g = std::clamp(g - int(pv - v), 0, 255);
+		}
+		else if (v > pv) {
+
+			r = std::clamp(r - int(v - pv), 0, 255);
+			g = std::clamp(g + int(v - pv), 0, 255);
+
+		}
+
+		refColor.r = r;
+		refColor.g = g;
+
+		*(unsigned int*)&c = refColor.packed(); //ok
+
+		if (seg->segment_index == tas->movement.request_current_segment()->segment_index) {
+			c.r = c.g = c.b = 255;
+		}
+
+		if (p != ivec2(-1, -1) && pp != ivec2(-1,-1))
+			ImGui::GetBackgroundDrawList()->AddLine(pp, p, c.packed(), 3.f);
+
+		pp = p;
+		pv = v;
 	}
 
 
