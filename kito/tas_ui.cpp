@@ -154,6 +154,8 @@ void TAS_UI::UI_SegmentEditor()
 		if (tas->movement.segment_index - 1 > 0 && ms + 100 < Sys_Milliseconds()) {
 			tas->movement.segment_index--;
 			ms = Sys_Milliseconds();
+			tas->movement.set_current_segment(tas->movement.segment_index);
+
 		}
 	}
 	ImGui::SameLine();
@@ -162,6 +164,7 @@ void TAS_UI::UI_SegmentEditor()
 		if (tas->movement.segment_index + 1 < tas->movement.get_segment_count() && ms + 100 < Sys_Milliseconds()) {
 			tas->movement.segment_index++;
 			ms = Sys_Milliseconds();
+			tas->movement.set_current_segment(tas->movement.segment_index);
 		}
 	}
 
@@ -380,6 +383,7 @@ void TAS_UI::UI_AngleControls_Strafebot(segment_options* options)
 		tas->movement.update_movement_for_each_segment();
 
 	}
+	ImGui::Checkbox2("Spam##01", &options->strafebot.go_straight);
 }
 void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 {
@@ -415,7 +419,9 @@ void TAS_UI::UI_SelectWeapon()
 		cur_seg->options.weapon = weaplist[cur_seg->options.iWeapon].second;
 		tas->movement.update_movement_for_each_segment();
 	}
-	
+	ImGui::PushItemWidth(150);
+	if(ImGui::InputInt("FPS##02", &cur_seg->options.FPS))
+		tas->movement.update_movement_for_each_segment();
 
 
 }
@@ -507,18 +513,7 @@ void TAS_UI::UI_FileSystem()
 
 	if (ImGui::Button("S##04", ImVec2(30, 30))) {
 
-		//auto list = tas->movement.create_a_list_from_segments();
-
-		tas->cfile->save = new TAS_FileSystem_Out(tas->movement);
-
-		if (tas->cfile->save->ok) {
-			tas->cfile->save->write();
-			Com_Printf(CON_CHANNEL_SUBTITLE, "saved...\n");
-		}
-
-		delete tas->cfile->save;
-
-		//tas->cfile->save(list);
+		tas->TAS_AutoSave();
 
 	}
 

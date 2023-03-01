@@ -91,6 +91,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 		}
 	}
 
+
 	r_glob->R_EndFrame();
 	
 
@@ -102,11 +103,41 @@ using namespace r;
 void R::CG_DrawActive()
 {
 	//R_DrawTextWithEffects("hello", "fonts/objectivefont", 500, 500, 2, 2, 180, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
-
+	
+	tas->render.R_FrameData();
 	cg::CG_DrawCoordinates();
 	cg::CG_DrawVelocity();
 
+	if (tas->TAS_CheckAutoSave())
+		tas->TAS_AutoSave();
+
+
 	return r_glob->CG_DrawActive_f();
+}
+void CG_CalcViewValues(int a1, void*a2)
+{
+	//cg::predictedPlayerState->viewangles[YAW] = 90;
+
+	CG_CalcViewValues_f(a1, a2);
+
+
+	//vec3_t viewangles{ (*(float*)0x724110), *(float*)(0x724110+4), *(float*)(0x724110+8)};
+	//viewangles[1] += 5;
+	//AnglesToAxis(viewangles, cg::refdef->viewaxis);
+
+	//cg::refdef->viewaxis[0][0] = 1;
+
+	//vec3_t old;
+	//if (cg::predictedPlayerState) {
+	//	VectorCopy(cg::predictedPlayerState->viewangles, old);
+
+	//	cg::predictedPlayerState->viewangles[YAW] = 90;
+	//}
+	
+	//if(cg::predictedPlayerState)
+	//	VectorCopy(old, cg::predictedPlayerState->viewangles);
+
+	return;
 }
 LRESULT __stdcall R::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

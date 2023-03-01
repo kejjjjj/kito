@@ -46,7 +46,7 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 		if (wait_weapon)
 			wait_weapon = ps_loc->weapon != first->content.front().weapon;
 
-		if (ms + 1000 < Sys_Milliseconds() && !wait_weapon) {
+		else if (ms + 1000 < Sys_Milliseconds() && !wait_weapon) {
 
 			if (tas->movement.recorder->IsPlayback()) {
 				tas->movement.recorder->Playback(cmd);
@@ -56,13 +56,14 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 				delete tas->movement.recorder;
 				tas->movement.recorder = 0;
 			}
+			return;
 		}
-		else {
-			cmd->angles[0] = first->content.front().angles[0];
-			cmd->angles[1] = first->content.front().angles[1];
-			cmd->angles[2] = first->content.front().angles[2];
-			cmd->weapon = first->content.front().weapon;
-		}
+		cmd->angles[0] = first->content.front().angles[0];
+		cmd->angles[1] = first->content.front().angles[1];
+		cmd->angles[2] = first->content.front().angles[2];
+		cmd->weapon = first->content.front().weapon;
+		Dvar_FindMalleableVar("com_maxfps")->current.integer = first->content.front().FPS;
+		
 	}
 	cg::temp_delta = cmd->angles[1];
 

@@ -64,6 +64,7 @@ void TAS_Movement::add_segment()
 		current_segment->options.weapon = weapons.front().second;
 		current_segment->options.iWeapon = 0;
 	}
+	current_segment->options.FPS = 125;
 	update_movement_for_each_segment();
 }
 void TAS_Movement::insert_segment()
@@ -85,7 +86,7 @@ void TAS_Movement::insert_segment()
 	current_segment->options.forwardmove = 127;
 	current_segment->options.weapon = prev->options.weapon;
 	current_segment->options.iWeapon = prev->options.iWeapon;
-
+	current_segment->options.FPS = 125;
 
 	update_movement_for_each_segment();
 
@@ -195,6 +196,13 @@ void TAS_Movement::update_movement_for_each_segment()
 	update_all_segment_indices();
 	std::for_each(segments.begin(), segments.end(), [this](segment_s& seg) {
 		TAS_Movement::update_movement_for_segment(seg); });
+
+	auto cmd = cg::input->GetUserCmd(cg::input->cmdNumber - 1);
+	if (!cmd) {
+		Com_Printf(CON_CHANNEL_SUBTITLE, "^1Autosave failed!\n");
+		return;
+	}
+	tas->autosave = cmd->serverTime;
 }
 movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 {
@@ -315,9 +323,6 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));
 		pm->cmd.buttons = 0;
 
-		pm->cmd.serverTime += pml->msec;
-		pm->ps->commandTime += pml->msec;
-
 		i = cmd;
 		j++;
 
@@ -333,6 +338,7 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	playerState_s* ps = pm->ps;
 	auto options = &seg.options;
 	static dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
+
 
 	pm->cmd.forwardmove = options->forwardmove;
 	pm->cmd.rightmove = options->rightmove;
@@ -414,10 +420,15 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	pml->previous_velocity[1] = ps->velocity[1];
 	pml->previous_velocity[2] = ps->velocity[2];
 
-	pml->msec = 1000 / 125; //simulate 125fps
+	pml->msec = 1000 / ((options->FPS == 0) ? 1 : options->FPS); //simulate fps
 	pml->frametime = (float)pml->msec / 1000.f;
-
+	pm->cmd.serverTime += pml->msec;
+	pm->ps->commandTime += pml->msec;
 	pm->cmd.buttons = options->hold_buttons;
+
+	if ((pm->cmd.buttons & cmdEnums::fire) != 0 && ps->weaponstate != WEAPON_READY)
+		pm->cmd.buttons -= cmdEnums::fire;
+
 
 	//if (seg.options.bhop)
 	//	pm->cmd.buttons |= cmdEnums::jump;
@@ -432,6 +443,15 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	switch (seg.options.viewangle_type) 
 	{
 		case viewangle_type::STRAFEBOT:
+
+			if (seg.options.strafebot.go_straight) {
+				pm->cmd.forwardmove = 127;
+				if (pm->oldcmd.rightmove > 0)
+					pm->cmd.rightmove = -127;
+				else if (pm->oldcmd.rightmove < 0)
+					pm->cmd.rightmove = 127;
+			}
+
 			if (auto yaw = CG_GetOptYaw(pm, pml)) {
 				deltaY = yaw.value() - pm->ps->viewangles[YAW];
 			}
@@ -544,7 +564,24 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		//Sys_SnapVector(pm->ps->velocity); //Sys_SnapVector | not called in singleplayer
 	}	
 
+	//if (ps->weaponstate != WEAPON_READY && !ps->weaponTime && !ps->weaponRestrictKickTime && !ps->weaponDelay) {
 
+	//	vec3_t angles;
+	//	angles[2] = ps->viewangles[2];
+	//	angles[0] = ps->viewangles[0];
+	//	angles[1] = ps->viewangles[1];
+
+	//	vec3_t forward;
+
+	//	AngleVectors(angles, forward, NULL, NULL);
+
+	//	ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
+	//	ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
+	//	ps->velocity[2] = ps->velocity[2] - forward[2] * 64;
+
+	//	Com_Printf(CON_CHANNEL_SUBTITLE, "hello!\n");
+
+	//}
 }
 std::list<recorder_cmd> TAS_Movement::create_a_list_from_segments()
 {

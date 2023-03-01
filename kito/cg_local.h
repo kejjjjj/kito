@@ -856,9 +856,12 @@ struct cmd_function_s
 
 struct refdef_s
 {
+	unsigned int x;
+	unsigned int y;
 	unsigned int width;
 	unsigned int height;
 	float tanHalfFovX;
+	//float something[2];
 	float tanHalfFovY;
 	float vieworg[3];
 	float viewaxis[3][3];
@@ -874,6 +877,7 @@ struct refdef_s
 	bool useScissorViewport;
 	int localClientNum;
 };
+
 
 
 

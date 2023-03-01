@@ -24,11 +24,17 @@ public:
 	std::vector<std::pair<ImFont*, const char*> > fonts;
 	std::optional<ImFont*> FetchFont(const char* name);
 
+	int autosave = 0;
+
+	bool TAS_CheckAutoSave();
+	void TAS_AutoSave();
+
 private:
 	void TAS_SetupHardcodedFont();
 	void TAS_CreateEssentialDirectories();
 	void TAS_CreateSubDirectory(const std::string& name);
 	void TAS_LoadFont(const char* _name, const std::string& name, float scale = 24.f);
+
 	std::string name;
 };
 

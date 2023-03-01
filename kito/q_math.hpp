@@ -40,6 +40,6 @@ void ProjectPointOnPlane(vec3_t dst, const vec3_t p, const vec3_t normal);
 bool VectorCompare(const vec3_t v1, const vec3_t v2);
 
 bool WithinRange(float value, float a, float b);
-
+void AnglesToAxis(const vec3_t angles, vec3_t axis[3]);
 
 #endif

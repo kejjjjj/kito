@@ -362,3 +362,10 @@ bool IsHex(char c)
 {
 	return (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F') || std::isdigit(c);
 }
+void AnglesToAxis(const vec3_t angles, vec3_t axis[3]) {
+	vec3_t right;
+	vec3_t vec3_origin{ 0,0,0 };
+	// angle vectors returns "right" instead of "y axis"
+	AngleVectors(angles, axis[0], right, axis[2]);
+	VectorSubtract(vec3_origin, right, axis[1]);
+}

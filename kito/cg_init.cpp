@@ -36,6 +36,9 @@ void cg::CG_InitForeverHooks()
 	r_glob->CL_ShutdownRenderer_f	= (void(*)())										(0x4452E0);
 	r_glob->CG_DrawActive_f			= (void(*)())										(0x4111D0);
 
+	CG_CalcViewValues_f		= (void(*)(int, void*))				(0x42EA30);
+
+
 	hook::install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
 	hook::install(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
 	hook::install(&(PVOID&)PM_AirMove_f, PM_AirMove);
@@ -43,11 +46,13 @@ void cg::CG_InitForeverHooks()
 	hook::install(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
 	//hook::install(&(PVOID&)Mantle_Check_f, Mantle_Check);
 
+	hook::install(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
 	hook::install(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
 	hook::install(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
 	hook::install(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
+	
 
-	hook::install(&(PVOID&)Pmove_f, Pmove);
+	//hook::install(&(PVOID&)Pmove_f, Pmove);
 
 }
 void cg::CG_InitHooks()
@@ -74,7 +79,7 @@ void cg::CG_RemoveHooks()
 
 	hook::remove(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
 	hook::remove(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
-	hook::remove(&(PVOID&)Pmove_f, Pmove);
+	//hook::remove(&(PVOID&)Pmove_f, Pmove);
 	hook::remove(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
 	hook::remove(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
 	hook::remove(&(PVOID&)PM_AirMove_f, PM_AirMove);
@@ -82,6 +87,7 @@ void cg::CG_RemoveHooks()
 	hook::remove(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
 	hook::remove(&(PVOID&)Mantle_Check_f, Mantle_Check);
 	hook::remove(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
+	hook::remove(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");
 

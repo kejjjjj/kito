@@ -38,7 +38,7 @@ struct segment_options
 	char rightmove = 0;
 	int weapon = 0;
 	int iWeapon = 0;
-
+	int FPS = 125;
 	struct fixed_turn_s {
 		float right = 0.f;
 		float up = 0.f;
@@ -48,6 +48,7 @@ struct segment_options
 	struct strafebot_s {
 		float smoothing = 0.f;
 		float up = 0.f;
+		bool go_straight = 0;
 	}strafebot;
 
 	struct aimlock_s {

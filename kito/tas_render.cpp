@@ -91,9 +91,9 @@ void TAS_Render::R_ShowSegmentPathColored(const segment_s* seg, Pixel& refColor)
 
 		*(unsigned int*)&c = refColor.packed(); //ok
 
-		if (seg->segment_index == tas->movement.request_current_segment()->segment_index) {
+		if (seg->segment_index == tas->movement.request_current_segment()->segment_index) 
 			c.r = c.g = c.b = 255;
-		}
+		
 
 		if (p != ivec2(-1, -1) && pp != ivec2(-1,-1))
 			ImGui::GetBackgroundDrawList()->AddLine(pp, p, c.packed(), 3.f);
@@ -118,4 +118,21 @@ void TAS_Render::R_DrawHitbox()
 	box_s box(data->origin, data->mins, data->maxs);
 	box.R_DrawConstructedBoxEdges(vec4_t{ 255, 0, 0,255 });
 	box.R_DrawConstructedBox(vec4_t{ 255, 0, 0,50 });
+}
+void TAS_Render::R_FrameData()
+{
+	auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
+
+	if (!frame)
+		return;
+
+	char buffer[256];
+
+	
+
+	if (auto xy = cg::WorldToScreen(frame->origin)) {
+		sprintf_s(buffer, "XY Speed: %.6f\nZ: %.6f\nElapsed time: %.6f", fvec2(frame->velocity.x, frame->velocity.y).mag(), frame->velocity.z, (float)(frame->serverTime - tas->movement.entry.pm.cmd.serverTime) / 1000 );
+		r::R_DrawTextWithEffects(buffer, "fonts/normalfont", xy.value().x, xy.value().y, 1.25f, 1.25f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 0,0,0,1 });
+	}
+
 }

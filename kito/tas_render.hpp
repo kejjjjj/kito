@@ -14,6 +14,7 @@ public:
 	void R_ShowSegmentPathColored(const segment_s* seg, Pixel& refColor);
 
 	void R_DrawHitbox();
+	void R_FrameData();
 
 private:
 };

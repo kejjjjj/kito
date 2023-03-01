@@ -59,7 +59,7 @@ bool TAS_FileSystem_Out::write()
 	auto ext = fs::GetFileExtension(tas->cfile->full_path);
 	auto copy = fs::removeFileExtension(tas->cfile->full_path, ext.size());
 	fs::F_CloseFile(*f);
-	Sleep(5);
+	//Sleep(5);
 
 	try {
 		if(fs::F_FileExists(copy + "_backup.kej"))

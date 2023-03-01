@@ -72,3 +72,31 @@ void TAS::TAS_CreateSubDirectory(const std::string& name)
 		}
 	}
 }
+bool TAS::TAS_CheckAutoSave()
+{
+	if (!autosave)
+		return false;
+
+	auto cmd = cg::input->GetUserCmd(cg::input->cmdNumber - 1);
+	if (!cmd)
+		return false;
+
+	if ((cmd->serverTime - 5000) >= autosave) //5 seconds after each change
+		return true;
+
+	return false;
+
+}
+void TAS::TAS_AutoSave()
+{
+	tas->cfile->save = new TAS_FileSystem_Out(tas->movement);
+
+	if (tas->cfile->save->ok) {
+		tas->cfile->save->write();
+		Com_Printf(CON_CHANNEL_SUBTITLE, "saved...\n");
+	}
+
+	autosave = 0;
+
+	delete tas->cfile->save;
+}

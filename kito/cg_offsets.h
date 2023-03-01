@@ -19,7 +19,7 @@ namespace cg
 	static playerState_s* predictedPlayerState = (playerState_s*)(0x714BA8);
 
 	static velocity* vel = (velocity*)(0xC8143C);
-	static refdef_s* refdef = (refdef_s*)(0x720080);
+	static refdef_s* refdef = (refdef_s*)(0x720080-8);
 	inline WinMouseVars_t* s_wmv = (WinMouseVars_t*)(0x13E06F0);
 
 	inline WeaponDef** BG_WeaponNames = reinterpret_cast<WeaponDef**>(0x14227A8);

@@ -34,9 +34,14 @@ struct R
 	static void CG_DrawActive();
 	void(*CG_DrawActive_f)();
 
+
+
 	bool R_BeginFrame();
 	void R_EndFrame();
 };
+
+void CG_CalcViewValues(int a1, void* a2);
+inline void (*CG_CalcViewValues_f)(int, void*);
 
 inline R* r_glob = 0;
 
