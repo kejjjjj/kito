@@ -171,13 +171,17 @@ void TAS_UI::UI_SegmentEditor()
 	if (auto font = tas->FetchFont("conduit"))
 		ImGui::SetCurrentFont(font.value());
 
-	if (ImGui::Button("Add"))
+	if (ImGui::Button("Add")) {
 		tas->movement.add_segment();
-		
+		cur_seg = tas->movement.request_current_segment();
+
+	}
 	ImGui::SameLine(); 
-	if (ImGui::Button("Insert"))
+	if (ImGui::Button("Insert")) {
 		tas->movement.insert_segment();
-	
+		cur_seg = tas->movement.request_current_segment();
+
+	}
 	ImGui::SameLine(); 
 	if (cur_seg->segment_index == 0)
 		ImGui::BeginDisabled();
@@ -281,7 +285,13 @@ void TAS_UI::UI_OtherControls()
 }
 void TAS_UI::UI_ControlsDPAD()
 {
+	
+
 	auto cur_seg = tas->movement.request_current_segment();
+	const bool disabled = cur_seg->options.viewangle_type == viewangle_type::STRAFEBOT && cur_seg->options.strafebot.go_straight;
+	if (disabled) {
+		ImGui::BeginDisabled();
+	}
 
 	const auto constructkey = [](char& dir, char value, const char* name) -> void {
 
@@ -320,6 +330,10 @@ void TAS_UI::UI_ControlsDPAD()
 	constructkey(cur_seg->options.rightmove, 127, "D##01");
 
 	ImGui::EndGroup();
+
+	if (disabled) {
+		ImGui::EndDisabled();
+	}
 
 	//ImGui::NewLine();
 	//ImGui::Separator();
@@ -376,14 +390,17 @@ void TAS_UI::UI_AngleControls_Strafebot(segment_options* options)
 		options->strafebot.up = std::clamp(options->strafebot.up, -85.f, 85.f);
 		tas->movement.update_movement_for_each_segment();
 	}
+	if (options->strafebot.go_straight) {
+		ImGui::PushItemWidth(150);
+		if (ImGui::InputInt("Smooth", &options->strafebot.smoothing_window, 1.f, 100.f)) {
+			options->strafebot.smoothing_window = std::clamp(options->strafebot.smoothing_window, 0, INT_MAX);
+			tas->movement.update_movement_for_each_segment();
 
-	ImGui::PushItemWidth(150);
-	if (ImGui::InputFloat("Smoothing", &options->strafebot.smoothing, 0.f, 0.f, "%.3f")) {
-		options->strafebot.smoothing = std::clamp(options->strafebot.smoothing, 0.f, 360.f);
+		}
+	}
+	if(ImGui::Checkbox2("Spam##01", &options->strafebot.go_straight))
 		tas->movement.update_movement_for_each_segment();
 
-	}
-	ImGui::Checkbox2("Spam##01", &options->strafebot.go_straight);
 }
 void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 {

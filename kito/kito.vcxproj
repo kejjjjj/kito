@@ -170,6 +170,7 @@
     <ClInclude Include="cg_offsets.h" />
     <ClInclude Include="clipping.hpp" />
     <ClInclude Include="cl_keymove.hpp" />
+    <ClInclude Include="cm_triggers.hpp" />
     <ClInclude Include="com_channel.h" />
     <ClInclude Include="detours\detours.h" />
     <ClInclude Include="detours\detver.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="cg_init.cpp" />
     <ClCompile Include="clipping.cpp" />
     <ClCompile Include="cl_keymove.cpp" />
+    <ClCompile Include="cm_triggers.cpp" />
     <ClCompile Include="com_channel.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="entry.cpp" />

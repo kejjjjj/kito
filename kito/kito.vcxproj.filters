@@ -61,6 +61,9 @@
     <Filter Include="Source Files\TAS">
       <UniqueIdentifier>{d9a1e093-d522-4401-8a7a-cf1e2bbcf6de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\cm">
+      <UniqueIdentifier>{28cbbbaf-9fc4-435d-9292-84259be6af48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -201,6 +204,9 @@
     <ClInclude Include="r_drawtools.hpp">
       <Filter>Source Files\r</Filter>
     </ClInclude>
+    <ClInclude Include="cm_triggers.hpp">
+      <Filter>Source Files\cm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cg_init.cpp">
@@ -319,6 +325,9 @@
     </ClCompile>
     <ClCompile Include="r_drawtools.cpp">
       <Filter>Source Files\r</Filter>
+    </ClCompile>
+    <ClCompile Include="cm_triggers.cpp">
+      <Filter>Source Files\cm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

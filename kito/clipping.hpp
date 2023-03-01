@@ -19,6 +19,7 @@ struct recorder_cmd
 	fvec3 origin;
 	fvec3 velocity;
 	fvec3 mins, maxs;
+	float camera_yaw = 0;
 	//int weaponTime;
 	//int weapAnim;
 	//int weaponstate;

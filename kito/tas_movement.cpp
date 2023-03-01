@@ -186,7 +186,7 @@ recorder_cmd* TAS_Movement::get_frame_data(const int32_t frame)
 
 	auto it = seg->content.begin();
 
-	std::advance(it, frame - seg->start_index);
+	std::advance(it, frame - seg->start_index - (seg->start_index != 0 ? 1 : 0));
 
 	return &*it;
 
@@ -275,11 +275,17 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 
 		pm->cmd.weapon = seg.options.weapon;
 	}
+
+	if (seg.options.viewangle_type == viewangle_type::STRAFEBOT && seg.options.strafebot.go_straight) {
+		pm->cmd.forwardmove = 127;
+		pm->cmd.rightmove = 127;
+	}
+
 	int j = 0;
 	for (auto& i : list) {
 
 		if (!pm || !pml) {
-			Com_Printf(CON_CHANNEL_SUBTITLE, "yo wtf!\n");
+			Com_Error(ERR_DISCONNECT, "update_movement_for_segment(): (!pm || !pml)\n");
 			break;
 		}
 
@@ -287,7 +293,7 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 
 
 
-
+		cmd.camera_yaw = i.camera_yaw;
 		cmd.viewangles = ps->viewangles;
 		cmd.origin = ps->origin;
 		cmd.velocity = ps->velocity;
@@ -439,7 +445,10 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	float deltaX = 0;
 	float deltaY = 0;
 	fvec3 org, vector;
-	
+	static int last_smoothingTime = ps->commandTime;
+	static std::vector<float> smoothing_ref_angles;
+	static float camera_yaw_offset = ps->viewangles[1];
+	rcmd.camera_yaw = -400;
 	switch (seg.options.viewangle_type) 
 	{
 		case viewangle_type::STRAFEBOT:
@@ -451,10 +460,43 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 				else if (pm->oldcmd.rightmove < 0)
 					pm->cmd.rightmove = 127;
 			}
-
+			
 			if (auto yaw = CG_GetOptYaw(pm, pml)) {
 				deltaY = yaw.value() - pm->ps->viewangles[YAW];
+
+				if (ps->commandTime < last_smoothingTime)
+					last_smoothingTime = ps->commandTime;
+
+				if (seg.options.strafebot.go_straight) {
+
+					if ((ps->commandTime >= (last_smoothingTime + (pml->msec * seg.options.strafebot.smoothing_window))) && !smoothing_ref_angles.empty()) { //smooth every 5 frames
+
+						float average = 0;
+
+						for (auto& i : smoothing_ref_angles)
+							average += i;
+
+						average /= smoothing_ref_angles.size();
+
+						if (average < 0) {
+							average += 180;
+							average = (average + 180 % 360);
+						}
+
+						camera_yaw_offset = average;
+						last_smoothingTime = ps->commandTime;
+						smoothing_ref_angles.clear();
+					}
+					else {
+						smoothing_ref_angles.push_back(yaw.value());
+					}
+					rcmd.camera_yaw = camera_yaw_offset;
+				}
+
+
 			}
+			
+			//Com_Printf(CON_CHANNEL_SUBTITLE, "%.6f = %.6f\n", camera_yaw_offset, rcmd.camera_yaw);
 			deltaX = -options->strafebot.up;
 			break;
 		

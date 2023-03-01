@@ -2087,6 +2087,280 @@ enum errorParm_t
 	ERR_LOCALIZATION = 0x6,
 	ERR_MAPLOADERRORSUMMARY = 0x7,
 };
+struct cStaticModelWritable
+{
+	unsigned __int16 nextModelInWorldSector;
+};
+
+struct cStaticModel_s
+{
+	cStaticModelWritable writable;
+	XModel* xmodel;
+	float origin[3];
+	float invScaledAxis[3][3];
+	float absmin[3];
+	float absmax[3];
+};
+
+struct dmaterial_t
+{
+	char material[64];
+	int surfaceFlags;
+	int contentFlags;
+};
+
+struct cNode_t
+{
+	cplane_s* plane;
+	__int16 children[2];
+};
+
+#pragma pack(push, 4)
+struct cLeaf_t
+{
+	unsigned __int16 firstCollAabbIndex;
+	unsigned __int16 collAabbCount;
+	int brushContents;
+	int terrainContents;
+	float mins[3];
+	float maxs[3];
+	int leafBrushNode;
+	__int16 cluster;
+};
+#pragma pack(pop)
+
+struct cLeafBrushNodeLeaf_t
+{
+	unsigned __int16* brushes;
+};
+
+struct cLeafBrushNodeChildren_t
+{
+	float dist;
+	float range;
+	unsigned __int16 childOffset[2];
+};
+
+union cLeafBrushNodeData_t
+{
+	cLeafBrushNodeLeaf_t leaf;
+	cLeafBrushNodeChildren_t children;
+};
+
+struct cLeafBrushNode_s
+{
+	char axis;
+	__int16 leafBrushCount;
+	int contents;
+	cLeafBrushNodeData_t data;
+};
+
+struct CollisionBorder
+{
+	float distEq[3];
+	float zBase;
+	float zSlope;
+	float start;
+	float length;
+};
+
+struct CollisionPartition
+{
+	char triCount;
+	char borderCount;
+	int firstTri;
+	CollisionBorder* borders;
+};
+
+union CollisionAabbTreeIndex
+{
+	int firstChildIndex;
+	int partitionIndex;
+};
+
+struct CollisionAabbTree
+{
+	float origin[3];
+	float halfSize[3];
+	unsigned __int16 materialIndex;
+	unsigned __int16 childCount;
+	CollisionAabbTreeIndex u;
+};
+
+/* 860 */
+struct cmodel_t
+{
+	float mins[3];
+	float maxs[3];
+	float radius;
+	cLeaf_t leaf;
+};
+
+//		/* 861 */
+//#pragma pack(push, 16)
+//		struct cbrush_t
+//		{
+//			float mins[3];
+//			int contents;
+//			float maxs[3];
+//			unsigned int numsides;
+//			cbrushside_t *sides;
+//			__int16 axialMaterialNum[2][3];
+//			char *baseAdjacentSide;
+//			__int16 firstAdjacentSideOffsets[2][3];
+//			char edgeCount[2][3];
+//			char pad[8];
+//		};
+//#pragma pack(pop)
+
+				/* 861 */
+struct Poly
+{
+	float(*pts)[3];
+	unsigned int ptCount;
+};
+
+#pragma pack(push, 16)
+struct cbrush_t
+{
+	float mins[3];
+	int contents;
+	float maxs[3];
+	unsigned int numsides;
+	cbrushside_t* sides;
+	__int16 axialMaterialNum[2][3];
+	char* baseAdjacentSide;
+	__int16 firstAdjacentSideOffsets[2][3];
+	char edgeCount[2][3];
+	__int16 colorCounter;
+	__int16 cmBrushIndex;
+	//float distFromCam;
+	__int16 cmSubmodelIndex;
+	bool isSubmodel;
+	bool pad;
+};
+#pragma pack(pop)
+//
+//		/* 861 */
+//#pragma pack(push, 16)
+//		struct cbrush_collision_t
+//		{
+//			float mins[3];
+//			int contents;
+//			float maxs[3];
+//			unsigned int numsides;
+//			cbrushside_t *sides;
+//			__int16 axialMaterialNum[2][3];
+//			char *baseAdjacentSide;
+//			__int16 firstAdjacentSideOffsets[2][3];
+//			char edgeCount[2][3];
+//			int colorCounter;
+//			char pad[4];
+//		};
+//#pragma pack(pop)
+
+struct Bounds
+{
+	vec3_t midPoint;
+	vec3_t halfSize;
+};
+
+struct TriggerModel
+{
+	int contents;
+	unsigned __int16 hullCount;
+	unsigned __int16 firstHull;
+};
+
+/* 2376 */
+struct TriggerHull
+{
+	Bounds bounds;
+	int contents;
+	unsigned __int16 slabCount;
+	unsigned __int16 firstSlab;
+};
+
+/* 2377 */
+struct TriggerSlab
+{
+	float dir[3];
+	float midPoint;
+	float halfSize;
+};
+
+/* 2378 */
+struct MapTriggers
+{
+	unsigned int count;
+	TriggerModel* models;
+	unsigned int hullCount;
+	TriggerHull* hulls;
+	unsigned int slabCount;
+	TriggerSlab* slabs;
+};
+
+struct MapEnts
+{
+	const char* name;
+	char* entityString;
+	int numEntityChars;
+	MapTriggers trigger;
+	// this goes on for a while but we don't need any of it
+};
+struct clipMap_t
+{
+	const char* name;
+	int isInUse;
+	int planeCount;
+	cplane_s* planes;
+	unsigned int numStaticModels;
+	cStaticModel_s* staticModelList;
+	unsigned int numMaterials;
+	dmaterial_t* materials;
+	unsigned int numBrushSides;
+	cbrushside_t* brushsides;
+	unsigned int numBrushEdges;
+	char* brushEdges;
+	unsigned int numNodes;
+	cNode_t* nodes;
+	unsigned int numLeafs;
+	cLeaf_t* leafs;
+	unsigned int leafbrushNodesCount;
+	cLeafBrushNode_s* leafbrushNodes;
+	unsigned int numLeafBrushes;
+	unsigned __int16* leafbrushes;
+	unsigned int numLeafSurfaces;
+	unsigned int* leafsurfaces;
+	unsigned int vertCount;
+	float(*verts)[3];
+	int triCount;
+	unsigned __int16* triIndices;
+	char* triEdgeIsWalkable;
+	int borderCount;
+	CollisionBorder* borders;
+	int partitionCount;
+	CollisionPartition* partitions;
+	int aabbTreeCount;
+	CollisionAabbTree* aabbTrees;
+	unsigned int numSubModels;
+	cmodel_t* cmodels;
+	unsigned __int16 numBrushes;
+	cbrush_t* brushes;
+	int numClusters;
+	int clusterBytes;
+	char* visibility;
+	int vised;
+	MapEnts* mapEnts;
+	cbrush_t* box_brush;
+	cmodel_t box_model;
+	unsigned __int16 dynEntCount[2];
+	DynEntityDef* dynEntDefList[2];
+	/*DynEntityPose*/ void* dynEntPoseList[2];
+	/*DynEntityClient*/ void* dynEntClientList[2];
+	/*DynEntityColl*/ void* dynEntCollList[2];
+	unsigned int checksum;
+};
 
 
 #endif

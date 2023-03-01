@@ -25,9 +25,9 @@ struct TAS_FileSystem_Out
 private:
 	
 	template<typename T>
-	void Out_DataBlock(const std::unique_ptr<T>& data);
+	void Out_DataBlock(const T& data);
 
-	void Out_Segment(const std::unique_ptr<segment_s>& segment);
+	void Out_Segment(const segment_s& segment);
 
 	int16_t indentation_depth = 0;
 	std::unique_ptr<std::fstream> f;

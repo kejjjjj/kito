@@ -46,7 +46,7 @@ struct segment_options
 	}fixed_turn;
 
 	struct strafebot_s {
-		float smoothing = 0.f;
+		int smoothing_window = 0;
 		float up = 0.f;
 		bool go_straight = 0;
 	}strafebot;

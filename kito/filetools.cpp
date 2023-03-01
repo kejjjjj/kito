@@ -34,7 +34,7 @@ bool fs::F_FileExists(const std::string& directory, const std::string& file_name
 		if (entry.path().filename() == file_name) {
 			return true;
 		}
-		std::cout << "F_FileExists: " << entry.path().filename() << " = " << file_name << '\n';
+		//std::cout << "F_FileExists: " << entry.path().filename() << " = " << file_name << '\n';
 
 		//Com_Printf(CON_CHANNEL_CONSOLEONLY, "F_FileExists: %s == %s\n", entry.path().filename().c_str(), file_name.c_str());
 
@@ -63,7 +63,7 @@ bool fs::F_FileExists(const std::string& path) {
 		if (entry.path().filename() == file_name) {
 			return true;
 		}
-		std::cout << "F_FileExists: " << entry.path().filename() << " = " << file_name << '\n';
+		//std::cout << "F_FileExists: " << entry.path().filename() << " = " << file_name << '\n';
 
 		//Com_Printf(CON_CHANNEL_CONSOLEONLY, "F_FileExists: %s == %s\n", entry.path().filename().c_str(), file_name.c_str());
 

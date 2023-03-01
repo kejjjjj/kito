@@ -2,7 +2,7 @@
 
 cmd_function_s* Cmd_FindCommand(const char* name)
 {
-    static const DWORD fnc = 0x4F9950;
+    static const DWORD fnc = 0x530EF0;
     __asm
     {
         mov esi, name;
@@ -17,7 +17,7 @@ cmd_function_s* Cmd_AddCommand(char* cmdname, void(__cdecl* function)())
         return cmd;
 
     Com_Printf(CON_CHANNEL_CONSOLEONLY, "adding a new func command: %s\n", cmdname);
-
+    std::cout << "adding new func command: " << cmdname << '\n';
 
     static cmd_function_s _cmd{};
 
@@ -25,7 +25,7 @@ cmd_function_s* Cmd_AddCommand(char* cmdname, void(__cdecl* function)())
         push function;
         mov edi, offset _cmd;
         mov eax, cmdname;
-        mov esi, 0x4F99A0;
+        mov esi, 0x530F40;
         call esi;
         add esp, 4;
     }

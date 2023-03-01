@@ -107,6 +107,8 @@ typedef vec_t vec4_t[4];
 
 #include "cl_keymove.hpp"
 
+#include "cm_triggers.hpp"
+
 #include "com_channel.h"
 
 #include "clipping.hpp"

@@ -91,6 +91,8 @@ void TAS::TAS_AutoSave()
 {
 	tas->cfile->save = new TAS_FileSystem_Out(tas->movement);
 
+
+
 	if (tas->cfile->save->ok) {
 		tas->cfile->save->write();
 		Com_Printf(CON_CHANNEL_SUBTITLE, "saved...\n");

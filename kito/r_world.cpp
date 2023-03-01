@@ -203,11 +203,11 @@ void cg::CG_DrawCoordinates()
 
 	}
 	auto ps = predictedPlayerState;
-
-	if (!ps)
+	auto cmd = input->GetUserCmd(input->cmdNumber - 1);
+	if (!ps || !cmd)
 		return;
 
-	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1]);
+	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f\ntime: %d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], cmd->serverTime);
 	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
 
 

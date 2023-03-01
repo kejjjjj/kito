@@ -74,6 +74,12 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 
 	r_glob->R_BeginFrame();
 
+	if (cg::show_all_triggers) {
+		for (auto& i : cg::brushes) {
+			cg::CM_DrawBrush(i);
+		}
+	}
+
 	//dl->ui_wheel->Draw();
 
 	dl->ui.UI_Draw();
@@ -86,7 +92,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 			
 			if (current && cg::predictedPlayerState) {
 				float dist = current->origin.dist(cg::predictedPlayerState->origin);
-				ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}", dist).c_str());
+				ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}\n{:.6f}", dist, current->camera_yaw).c_str());
 			}
 		}
 	}
@@ -100,6 +106,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	return r_glob->endscene(d);
 }
 using namespace r;
+using namespace cg;
 void R::CG_DrawActive()
 {
 	//R_DrawTextWithEffects("hello", "fonts/objectivefont", 500, 500, 2, 2, 180, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
@@ -112,6 +119,7 @@ void R::CG_DrawActive()
 		tas->TAS_AutoSave();
 
 
+
 	return r_glob->CG_DrawActive_f();
 }
 void CG_CalcViewValues(int a1, void*a2)
@@ -120,22 +128,22 @@ void CG_CalcViewValues(int a1, void*a2)
 
 	CG_CalcViewValues_f(a1, a2);
 
+	if (tas->movement.recorder) {
 
-	//vec3_t viewangles{ (*(float*)0x724110), *(float*)(0x724110+4), *(float*)(0x724110+8)};
-	//viewangles[1] += 5;
-	//AnglesToAxis(viewangles, cg::refdef->viewaxis);
+		if (tas->movement.recorder->IsPlayback()) {
 
-	//cg::refdef->viewaxis[0][0] = 1;
+			auto current = tas->movement.recorder->CurrentCmd();
 
-	//vec3_t old;
-	//if (cg::predictedPlayerState) {
-	//	VectorCopy(cg::predictedPlayerState->viewangles, old);
+			if (current && cg::predictedPlayerState) {
 
-	//	cg::predictedPlayerState->viewangles[YAW] = 90;
-	//}
-	
-	//if(cg::predictedPlayerState)
-	//	VectorCopy(old, cg::predictedPlayerState->viewangles);
+				if (current->camera_yaw != -400) {
+					vec3_t viewangles{ (*(float*)0x724110), *(float*)(0x724110 + 4), *(float*)(0x724110 + 8) };
+					viewangles[1] = current->camera_yaw;
+					AnglesToAxis(viewangles, cg::refdef->viewaxis);
+				}
+			}
+		}
+	}
 
 	return;
 }

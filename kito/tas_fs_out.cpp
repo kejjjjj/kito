@@ -39,20 +39,20 @@ bool TAS_FileSystem_Out::write()
 	if (!ok)
 		return false;
 
-	Out_DataBlock<playerState_s>(std::make_unique<playerState_s>(data->entry.ps));
-	Out_DataBlock<pmove_t>(std::make_unique<pmove_t>(data->entry.pm));
-	Out_DataBlock<pml_t>(std::make_unique<pml_t>(data->entry.pml));
+	Out_DataBlock<playerState_s>(data->entry.ps);
+	Out_DataBlock<pmove_t>(data->entry.pm);
+	Out_DataBlock<pml_t>(data->entry.pml);
 
 
 	for (auto& i : tas->movement.segments) {
 		*f << "{\n";
-		Out_DataBlock<segment_options>(std::make_unique<segment_options>(i.options));
-		Out_DataBlock<int>(std::make_unique<int>(i.frame_count));
+		Out_DataBlock<segment_options>(i.options);
+		Out_DataBlock<int>(i.frame_count);
 
 		*f << "}\n";
 		*f << "{\n";
 
-		Out_Segment(std::make_unique<segment_s>(i));
+		Out_Segment((i));
 
 		*f << "}\n";
 	}
@@ -73,9 +73,9 @@ bool TAS_FileSystem_Out::write()
 	return 1;
 }
 template<typename T>
-void TAS_FileSystem_Out::Out_DataBlock(const std::unique_ptr<T>& data)
+void TAS_FileSystem_Out::Out_DataBlock(const T& data)
 {
-	DWORD base = (DWORD)data.get();
+	DWORD base = (DWORD)&data;
 	*f << '[';
 	for (int i = 0; i < sizeof(T); i += 1) {
 		std::stringstream ss;
@@ -91,9 +91,9 @@ void TAS_FileSystem_Out::Out_DataBlock(const std::unique_ptr<T>& data)
 	*f << "]\n";
 
 }
-void TAS_FileSystem_Out::Out_Segment(const std::unique_ptr<segment_s>& segment)
+void TAS_FileSystem_Out::Out_Segment(const segment_s& segment)
 {
-	for(const auto& i : segment->content)
-		Out_DataBlock<recorder_cmd>(std::make_unique<recorder_cmd>(i));
+	for(const auto& i : segment.content)
+		Out_DataBlock(i);
 
 }

@@ -101,7 +101,7 @@ std::optional<float> cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
 	float g_speed = pm->ps->speed;
 	const float FPS = 125;
 
-	float accel = g_speed / FPS;
+	const float accel = g_speed / FPS;
 
 	WeaponDef* weapon = BG_WeaponNames[pm->ps->weapon];
 
@@ -117,7 +117,7 @@ std::optional<float> cg::CG_GetOptYaw(pmove_t* pm, pml_t* pml)
 
 	const double velocitydirection = atan2(pm->ps->velocity[1], pm->ps->velocity[0]) * 180.f / PI;
 	const double accelerationAng = atan2(-rightmove, forwardmove) * 180.f / PI;
-	double diff = acos((g_speed - accel) / speed) * 180.f / PI;
+	const double diff = acos((g_speed - accel) / speed) * 180.f / PI;
 
 	if (std::isnan(diff))
 		return std::nullopt;

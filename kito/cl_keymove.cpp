@@ -41,6 +41,16 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 	}
 
 	if (tas->movement.recorder) {
+
+		auto& io = ImGui::GetIO();
+
+		if (io.KeysDownDuration['W'] == 0.f || io.KeysDownDuration['A'] == 0.f || io.KeysDownDuration['S'] == 0.f || io.KeysDownDuration['D'] == 0.f) {
+			Com_Printf(CON_CHANNEL_SUBTITLE, "goodbye\n");
+			delete tas->movement.recorder;
+			tas->movement.recorder = 0;
+			return;
+		}
+
 		segment_s* first = tas->movement.get_first_segment();
 
 		if (wait_weapon)
@@ -62,6 +72,8 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 		cmd->angles[1] = first->content.front().angles[1];
 		cmd->angles[2] = first->content.front().angles[2];
 		cmd->weapon = first->content.front().weapon;
+		//cmd->serverTime = first->content.front().serverTime;
+
 		Dvar_FindMalleableVar("com_maxfps")->current.integer = first->content.front().FPS;
 		
 	}

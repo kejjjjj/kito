@@ -17,6 +17,8 @@ namespace cg
 	static Movement* move = (Movement*)(0x815EF8);
 	static playerState_s* ps_loc = (playerState_s*)(0xE0DA00);
 	static playerState_s* predictedPlayerState = (playerState_s*)(0x714BA8);
+	static clipMap_t* cm = (clipMap_t*)(0xF788C8);
+
 
 	static velocity* vel = (velocity*)(0xC8143C);
 	static refdef_s* refdef = (refdef_s*)(0x720080-8);
