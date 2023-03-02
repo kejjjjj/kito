@@ -95,7 +95,7 @@ void TAS_UI::UI_Render()
 
 	//auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
 
-	//ImGui::Text("weapon: %i", (int)frame->weapon);
+	//ImGui::Text("events: %i,%i,%i,%i", frame->events[0], frame->events[1], frame->events[2], frame->events[3]);
 	//ImGui::Text("velocity: %i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()) );
 	TAS_UI::UI_FileSystem();
 

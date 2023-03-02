@@ -205,7 +205,7 @@ struct vec3
 		}
 		else {
 			if (x) {
-				yaw = (atan2(y, x) * 180 / M_PI);
+				yaw = (atan2(y, x) * 180 / 3.14159265358979323846f);
 			}
 			else if (y > 0) {
 				yaw = 90;
@@ -218,13 +218,29 @@ struct vec3
 			}
 
 			forward = sqrt(x * x + y * y);
-			pitch = (atan2(z, forward) * 180 / M_PI);
+			pitch = (atan2(z, forward) * 180 / 3.14159265358979323846f);
 			if (pitch < 0) {
 				pitch += 360;
 			}
 		}
 
 		return vec3(-pitch, yaw, 0);
+	}
+	vec3 toforward() const {
+		float angle;
+		static float sp, sy, cp, cy;
+		// static to help MS compiler fp bugs
+
+		angle = y * (3.14159265358979323846f * 2 / 360);
+		sy = sin(angle);
+		cy = cos(angle);
+
+		angle = x * (3.14159265358979323846f * 2 / 360);
+		sp = sin(angle);
+		cp = cos(angle);
+
+		return vec3( cp * cy, cp * sy,-sp);
+		
 	}
 
 };

@@ -33,6 +33,7 @@ void cg::CG_InitForeverHooks()
 	PM_WalkMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8940);
 	PM_UFOMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8E30);
 	Mantle_Check_f					= (void(*)(pmove_t*, pml_t*))						(0x5B36C0);
+	PM_Weapon_FireWeapon_f			= (void(__cdecl*)(int, playerState_s*))						(0x5C18D0);
 
 	r_glob->R_RecoverLostDevice_f	= (void(*)())										(0x5DA020);
 	r_glob->CL_ShutdownRenderer_f	= (void(*)())										(0x4452E0);
@@ -46,7 +47,7 @@ void cg::CG_InitForeverHooks()
 	hook::install(&(PVOID&)PM_AirMove_f, PM_AirMove);
 	hook::install(&(PVOID&)PM_WalkMove_f, PM_WalkMove);
 	hook::install(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
-	//hook::install(&(PVOID&)Mantle_Check_f, Mantle_Check);
+	//hook::install(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
 
 	hook::install(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
 	hook::install(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
@@ -90,6 +91,7 @@ void cg::CG_RemoveHooks()
 	hook::remove(&(PVOID&)Mantle_Check_f, Mantle_Check);
 	hook::remove(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
 	hook::remove(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
+	//hook::remove(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");
 

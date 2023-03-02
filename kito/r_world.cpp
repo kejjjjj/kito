@@ -188,7 +188,7 @@ std::optional<ivec2> cg::WorldToScreen(const fvec3& location)
 }
 void cg::CG_DrawCoordinates()
 {
-	char buff[128];
+	char buff[256];
 	if (tas->ui.editing) {
 
 		const auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
@@ -207,7 +207,7 @@ void cg::CG_DrawCoordinates()
 	if (!ps || !cmd)
 		return;
 
-	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f\ntime: %d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], cmd->serverTime);
+	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f\ntime: %d\nwtime: %d\ndelay: %d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], cmd->serverTime, ps->weaponTime, ps->weaponDelay);
 	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
 
 

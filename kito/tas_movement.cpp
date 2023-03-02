@@ -39,11 +39,11 @@ void TAS_Movement::add_segment()
 		seg.start_index = segments.back().end_index + 1;
 		seg.end_index = seg.start_index + seg.frame_count;
 	}
-	segments.push_back(seg);
 	if (current_segment)
 		frame_index = current_segment->end_index;
 	else
 		frame_index = 0;
+	segments.push_back(seg);
 
 
 
@@ -65,6 +65,8 @@ void TAS_Movement::add_segment()
 		current_segment->options.iWeapon = 0;
 	}
 	current_segment->options.FPS = 125;
+	current_segment->options.hold_buttons = cmdEnums::sprint;
+	current_segment->options.strafebot.smoothing_window = 5;
 	update_movement_for_each_segment();
 }
 void TAS_Movement::insert_segment()
@@ -87,6 +89,8 @@ void TAS_Movement::insert_segment()
 	current_segment->options.weapon = prev->options.weapon;
 	current_segment->options.iWeapon = prev->options.iWeapon;
 	current_segment->options.FPS = 125;
+	current_segment->options.hold_buttons = cmdEnums::sprint;
+	current_segment->options.strafebot.smoothing_window = 5;
 
 	update_movement_for_each_segment();
 
@@ -193,6 +197,7 @@ recorder_cmd* TAS_Movement::get_frame_data(const int32_t frame)
 }
 void TAS_Movement::update_movement_for_each_segment()
 {
+	called_from_prediction = true;
 	update_all_segment_indices();
 	std::for_each(segments.begin(), segments.end(), [this](segment_s& seg) {
 		TAS_Movement::update_movement_for_segment(seg); });
@@ -203,6 +208,7 @@ void TAS_Movement::update_movement_for_each_segment()
 		return;
 	}
 	tas->autosave = cmd->serverTime;
+	called_from_prediction = false;
 }
 movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 {
@@ -233,7 +239,7 @@ movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 	return &this_segment;
 
 }
-int weapon_change_time = 0;
+int rpg_firetime = 0;
 void TAS_Movement::update_movement_for_segment(segment_s& seg)
 {
 	auto& list = seg.content;
@@ -260,6 +266,7 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 	//ps->weaponstate = WEAPON_RAISING;
 	//ps->weapAnim = ~ps->weapAnim & 0x200;
 	//ps->weaponDelay = 0;
+	rpg_firetime = 0;
 
 	if (pm->ps->weapon != seg.options.weapon) {
 		bool alive; // cc
@@ -280,7 +287,10 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		pm->cmd.forwardmove = 127;
 		pm->cmd.rightmove = 127;
 	}
+	if ((seg.options.hold_buttons & cmdEnums::fire) != 0 && std::string(cg::BG_WeaponNames[seg.options.weapon]->szDisplayName).find("RPG") != std::string::npos) {
+		rpg_firetime = pm->cmd.serverTime + cg::BG_WeaponNames[seg.options.weapon]->iFireTime;
 
+	}
 	int j = 0;
 	for (auto& i : list) {
 
@@ -290,8 +300,6 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		}
 
 		pmovesingle(pm, pml, seg, i);
-
-
 
 		cmd.camera_yaw = i.camera_yaw;
 		cmd.viewangles = ps->viewangles;
@@ -523,7 +531,20 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	//pm->ps->weapon = seg.options.weapon;
 	//pm->cmd.weapon = pm->ps->weapon;
 
+	//if (rpg_firetime && rpg_firetime < pm->cmd.serverTime) {
 
+	//	vec3_t angles, forward;
+	//	angles[2] = ps->viewangles[2];
+	//	angles[0] = ps->viewangles[0];
+	//	angles[1] = ps->viewangles[1];
+
+	//	AngleVectors(angles, forward, NULL, NULL);
+	//	ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
+	//	ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
+	//	ps->velocity[2] = ps->velocity[2] - forward[2]* 64;
+	//	rpg_firetime = 0;
+	//	//Com_Printf(CON_CHANNEL_SUBTITLE, "HELL YEAH!!!\n");
+	//}
 	PM_AdjustAimSpreadScale_(pm, pml);
 	PM_UpdateViewAngles(ps, pml->msec, &pm->cmd, pm->handler);
 
@@ -637,7 +658,7 @@ std::list<recorder_cmd> TAS_Movement::create_a_list_from_segments()
 
 	return list;
 }
-void TAS_Movement::set_player_pov(usercmd_s* cmd)
+void TAS_Movement::set_player_pov()
 {
 	if (!player_pov || !tas->ui.editing)
 		return;
@@ -648,9 +669,12 @@ void TAS_Movement::set_player_pov(usercmd_s* cmd)
 		return;
 
 	VectorClear(ps_loc->velocity);
-	cmd->angles[0] = ok->angles[0];
-	cmd->angles[1] = ok->angles[1];
-	cmd->angles[2] = ok->angles[2];
+	//cmd->angles[0] = ok->angles[0];
+	//cmd->angles[1] = ok->angles[1];
+	//cmd->angles[2] = ok->angles[2];
+
+	cg::CG_SetPlayerAngles(cg::vAngle->angles, ok->viewangles);
+
 
 	ps_loc->origin[0] = ok->origin.x;
 	ps_loc->origin[1] = ok->origin.y;

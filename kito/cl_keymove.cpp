@@ -20,7 +20,7 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 	static DWORD ms = Sys_Milliseconds();
 	static bool wait_weapon = false;
 
-	tas->movement.set_player_pov(cmd);
+	//tas->movement.set_player_pov(cmd);
 
 	if (GetAsyncKeyState(VK_NUMPAD4) & 1 && !tas->movement.recorder) {
 		if (tas->movement.get_segment_count() > 0) {

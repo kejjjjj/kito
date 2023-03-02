@@ -101,6 +101,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	r_glob->R_EndFrame();
 	
 
+	tas->movement.set_player_pov();
 
 
 	return r_glob->endscene(d);

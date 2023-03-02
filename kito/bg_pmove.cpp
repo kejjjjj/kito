@@ -356,3 +356,26 @@ void cg::PM_OverBounce(pmove_t* pm, pml_t* pml)
 	return;
 
 }
+void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps)
+{
+	playerState_s* ps_copy;
+	__asm mov ps_copy, eax;
+
+	PM_Weapon_FireWeapon_f(delay, ps);
+
+	static int firetime = 1;
+
+	if (ps->weaponTime && firetime == 1) {
+		firetime = ps->commandTime + ps->weaponTime;
+	}
+	if (tas->movement.called_from_prediction && ps->commandTime >= firetime && firetime != 1 /* && std::string(BG_WeaponNames[ps_copy->weapon]->szDisplayName).find("RPG") != std::string::npos */) {
+		Com_Printf(CON_CHANNEL_SUBTITLE, "YEAH!\n");
+		//ps_copy->velocity[2] += 1264;
+		tas->movement.rpg_next_frame = true;
+
+		firetime = 1;
+
+	}
+
+	//return PM_Weapon_FireWeapon_f(delay, ps);
+}

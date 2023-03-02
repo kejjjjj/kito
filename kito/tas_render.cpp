@@ -14,6 +14,7 @@ void TAS_Render::R_Render()
 	 }
 
 	R_DrawHitbox();
+	R_AngleArrow();
 
 }
 void TAS_Render::R_ShowSegmentPath(const segment_s* seg, unsigned int color)
@@ -119,6 +120,30 @@ void TAS_Render::R_DrawHitbox()
 	box.R_DrawConstructedBoxEdges(vec4_t{ 255, 0, 0,255 });
 	box.R_DrawConstructedBox(vec4_t{ 255, 0, 0,50 });
 }
+void TAS_Render::R_AngleArrow()
+{
+	if (tas->movement.player_pov)
+		return;
+
+	const auto data = tas->movement.get_frame_data(tas->movement.frame_index);
+
+	if (!data)
+		return;
+
+	auto org = data->origin;
+	org.z += data->maxs.z / 2;
+
+	const auto fwd = org + (data->viewangles.toforward() * 50);
+	
+	if (const auto xy = cg::WorldToScreen(org)) {
+		if (const auto xy2 = cg::WorldToScreen(fwd)) {
+			ImGui::GetBackgroundDrawList()->AddLine(xy.value(), xy2.value(), 0xFFFFFFFF, 1);
+		}
+	}
+
+
+}
+
 void TAS_Render::R_FrameData()
 {
 	auto frame = tas->movement.get_frame_data(tas->movement.frame_index);

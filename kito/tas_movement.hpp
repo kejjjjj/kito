@@ -102,7 +102,7 @@ public:
 	void add_frames_to_current_segment(int32_t& amount);
 	void remove_frames_from_current_segment(int32_t& amount);
 
-	void set_player_pov(usercmd_s* cmd);
+	void set_player_pov();
 
 	Recorder* recorder = 0;
 
@@ -111,7 +111,8 @@ public:
 	entry_point entry;
 
 	bool player_pov = false;
-
+	bool called_from_prediction = false;
+	bool rpg_next_frame = false;
 	movement_data first_segment, this_segment;
 
 	bool waiting_for_creation = false;
