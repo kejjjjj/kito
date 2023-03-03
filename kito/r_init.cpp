@@ -85,17 +85,17 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	dl->ui.UI_Draw();
 	tas->render.R_Render();
 
-	if (tas->movement.recorder) {
-		if (tas->movement.recorder->IsPlayback()) {
+	//if (tas->movement.recorder) {
+	//	if (tas->movement.recorder->IsPlayback()) {
 
-			auto current = tas->movement.recorder->CurrentCmd();
-			
-			if (current && cg::predictedPlayerState) {
-				float dist = current->origin.dist(cg::predictedPlayerState->origin);
-				ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}\n{:.6f}", dist, current->camera_yaw).c_str());
-			}
-		}
-	}
+	//		auto current = tas->movement.recorder->CurrentCmd();
+	//		
+	//		if (current && cg::predictedPlayerState) {
+	//			float dist = current->origin.dist(cg::predictedPlayerState->origin);
+	//			ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}\n{:.6f}", dist, current->camera_yaw).c_str());
+	//		}
+	//	}
+	//}
 
 
 	r_glob->R_EndFrame();
@@ -114,7 +114,7 @@ void R::CG_DrawActive()
 	
 	tas->render.R_FrameData();
 	cg::CG_DrawCoordinates();
-	cg::CG_DrawVelocity();
+	//cg::CG_DrawVelocity();
 
 	if (tas->TAS_CheckAutoSave())
 		tas->TAS_AutoSave();
@@ -123,11 +123,35 @@ void R::CG_DrawActive()
 
 	return r_glob->CG_DrawActive_f();
 }
+vec3_t old_yaw;
 void CG_CalcViewValues(int a1, void*a2)
 {
 	//cg::predictedPlayerState->viewangles[YAW] = 90;
 
 	CG_CalcViewValues_f(a1, a2);
+
+	return;
+	if (tas->movement.recorder) {
+
+		if (tas->movement.recorder->IsPlayback()) {
+
+			auto current = tas->movement.recorder->CurrentCmd();
+
+			if (current && cg::predictedPlayerState) {
+				VectorCopy(old_yaw, cg::predictedPlayerState->viewangles);
+				//if (current->camera_yaw != -400) {
+				//	vec3_t viewangles{ (*(float*)0x724110), *(float*)(0x724110 + 4), *(float*)(0x724110 + 8) };
+				//	viewangles[1] = current->camera_yaw;
+				//	AnglesToAxis(viewangles, cg::refdef->viewaxis);
+				//}
+			}
+		}
+	}
+
+	return;
+}
+void CG_UpdateViewWeaponAnim()
+{
 
 	if (tas->movement.recorder) {
 
@@ -137,16 +161,16 @@ void CG_CalcViewValues(int a1, void*a2)
 
 			if (current && cg::predictedPlayerState) {
 
+
+
 				if (current->camera_yaw != -400) {
-					vec3_t viewangles{ (*(float*)0x724110), *(float*)(0x724110 + 4), *(float*)(0x724110 + 8) };
-					viewangles[1] = current->camera_yaw;
-					AnglesToAxis(viewangles, cg::refdef->viewaxis);
+					VectorCopy(cg::predictedPlayerState->viewangles, old_yaw);
+					cg::predictedPlayerState->viewangles[1] = current->camera_yaw;
 				}
 			}
 		}
 	}
-
-	return;
+	return CG_UpdateViewWeaponAnim_f();
 }
 LRESULT __stdcall R::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

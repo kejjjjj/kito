@@ -81,7 +81,7 @@ bool TAS::TAS_CheckAutoSave()
 	if (!cmd)
 		return false;
 
-	if ((cmd->serverTime - 5000) >= autosave) //5 seconds after each change
+	if ((cmd->serverTime - 10000) >= autosave) //10 seconds after each change
 		return true;
 
 	return false;

@@ -3,6 +3,8 @@
 void cg::Pmove(pmove_t* pm)
 {
 
+
+	return Pmove_f(pm);
 	//if (vars::et_pmove_fixed.enabled)
 	//	pm->cmd.serverTime = ((pm->cmd.serverTime + (vars::et_pmove_msec.intValue < 2 ? 2 : vars::et_pmove_msec.intValue) - 1) / vars::et_pmove_msec.intValue) * vars::et_pmove_msec.intValue;
 
@@ -378,4 +380,9 @@ void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps)
 	}
 
 	//return PM_Weapon_FireWeapon_f(delay, ps);
+}
+void cg::PmoveSingle(pmove_t* pm)
+{
+
+	return PmoveSingle_f(pm);
 }

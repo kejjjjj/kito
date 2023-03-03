@@ -6,15 +6,15 @@ void TAS_Render::R_Render()
 	//for (size_t i = 0; i < tas->movement.get_segment_count(); i++) 
 	//	R_ShowSegmentPath(tas->movement.get_segment_by_index(i), i == tas->movement.segment_index ?  IM_COL32(0, 255, 0, 255) : IM_COL32(255, 255, 0, 255));
 	//
-	auto c = Pixel(130, 130, 0, 255);
-	for (auto& i : tas->movement.segments) {
+	//auto c = Pixel(130, 130, 0, 255);
+	//for (auto& i : tas->movement.segments) {
 
-		R_ShowSegmentPathColored(&i, c);
+	//	R_ShowSegmentPathColored(&i, c);
 
-	 }
+	// }
 
-	R_DrawHitbox();
-	R_AngleArrow();
+	//R_DrawHitbox();
+	//R_AngleArrow();
 
 }
 void TAS_Render::R_ShowSegmentPath(const segment_s* seg, unsigned int color)
@@ -156,7 +156,7 @@ void TAS_Render::R_FrameData()
 	
 
 	if (auto xy = cg::WorldToScreen(frame->origin)) {
-		sprintf_s(buffer, "XY Speed: %.6f\nZ: %.6f\nElapsed time: %.6f", fvec2(frame->velocity.x, frame->velocity.y).mag(), frame->velocity.z, (float)(frame->serverTime - tas->movement.entry.pm.cmd.serverTime) / 1000 );
+		sprintf_s(buffer, "XY Speed: %.6f\nZ: %.6f\nweaponTime: %d\ncYaw: %.6f\nElapsed time: %.6f", fvec2(frame->velocity.x, frame->velocity.y).mag(), frame->velocity.z, frame->weaponTime, frame->camera_yaw,(float)(frame->serverTime - tas->movement.entry.pm.cmd.serverTime) / 1000 );
 		r::R_DrawTextWithEffects(buffer, "fonts/normalfont", xy.value().x, xy.value().y, 1.25f, 1.25f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 0,0,0,1 });
 	}
 

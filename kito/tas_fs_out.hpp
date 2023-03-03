@@ -11,6 +11,8 @@
 #define WRITE_VEC2() (*f << *(float*)base << ',' << *(float*)(base+4) << '\n'), base += 8
 #define WRITE_VEC3() (*f << *(float*)base << ',' << *(float*)(base+4) <<  ',' << *(float*)(base+8) << '\n'), base += 12
 
+#define TAS_FS_FILEVERSION 2
+#define ORIGINAL_RECORDER_CMD_SIZE 96
 
 struct TAS_FileSystem_Out
 {
@@ -24,6 +26,7 @@ struct TAS_FileSystem_Out
 
 private:
 	
+	void Out_WriteVersion();
 	template<typename T>
 	void Out_DataBlock(const T& data);
 

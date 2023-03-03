@@ -152,8 +152,10 @@ namespace cg
 			add esp, 0x4;
 		}
 	}
-	inline void (*PmoveSingle)(pmove_t* pm) = (void(__cdecl*)(pmove_t*))0x5BCBB0;
+	inline void (*PmoveSingle_fnc)(pmove_t* pm) = (void(__cdecl*)(pmove_t*))0x5BCBB0;
 
+	inline void (*PmoveSingle_f)(pmove_t* pm);
+	void PmoveSingle(pmove_t* pm);
 	inline void(__cdecl*PM_Weapon_FireWeapon_f)(int delay, playerState_s* ps);
 	void PM_Weapon_FireWeapon(int delay, playerState_s* ps);
 

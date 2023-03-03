@@ -39,6 +39,8 @@ bool TAS_FileSystem_Out::write()
 	if (!ok)
 		return false;
 
+	Out_WriteVersion();
+
 	Out_DataBlock<playerState_s>(data->entry.ps);
 	Out_DataBlock<pmove_t>(data->entry.pm);
 	Out_DataBlock<pml_t>(data->entry.pml);
@@ -71,6 +73,10 @@ bool TAS_FileSystem_Out::write()
 		Com_Printf(CON_CHANNEL_SUBTITLE, "^1backup failed: %s\n", err.what());
 	}
 	return 1;
+}
+void TAS_FileSystem_Out::Out_WriteVersion()
+{
+	*f << TAS_FS_FILEVERSION << '\n';
 }
 template<typename T>
 void TAS_FileSystem_Out::Out_DataBlock(const T& data)

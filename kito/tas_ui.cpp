@@ -542,6 +542,27 @@ void TAS_UI::UI_FileSystem()
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() / 1.5f);
 	ImGui::InputText("##00111", &file_name);
 
+	if (auto font = tas->FetchFont("font90"))
+		ImGui::SetCurrentFont(font.value());
 
+	ImGui::SameLine();
 
+	if (ImGui::Button("F##01", ImVec2(30, 30))) {
+		tas->movement.frame_index = 0;
+
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("D##01123", ImVec2(30, 30))) {
+		if (auto ps = tas->movement.get_playerstate_from_frame(tas->movement.frame_index)) {
+			std::cout << "origin: " << fvec3(ps.value()->origin) << '\n';
+		}
+		else
+			std::cout << "NO!\n";
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("A##012341", ImVec2(30, 30))) {
+		tas->movement.frame_index = tas->movement.get_last_segment()->end_index-1;
+	}
+	if (auto font = tas->FetchFont("conduit"))
+		ImGui::SetCurrentFont(font.value());
 }

@@ -1,5 +1,9 @@
 #include "pch.h"
 
+int cg::BG_FindWeaponIndexForName(const char* name)
+{
+	return ((int(__cdecl*)(const char*))0x5BEC90)(name);
+}
 
 std::vector<std::pair<WeaponDef*, int>>  cg::G_GetWeaponsList(playerState_s* ps)
 {

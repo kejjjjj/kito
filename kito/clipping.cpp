@@ -6,11 +6,11 @@ void Recorder::StartPlayback()
 {
 	if (Recorder::recorder_sequence.empty())
 		return;
-	Com_Printf(CON_CHANNEL_SUBTITLE, "Begin playback..\n");
+	//Com_Printf(CON_CHANNEL_SUBTITLE, "Begin playback..\n");
 
 	Recorder::playback = true;
 	Recorder::it = Recorder::recorder_sequence.begin();
-	
+	frame = 0;
 }
 //void Recorder::Record(usercmd_s* cmd)
 //{
@@ -54,6 +54,7 @@ void Recorder::Playback(usercmd_s* cmd)
 	cmd->forwardmove = it->forwardmove;
 	cmd->rightmove = it->rightmove;
 	++Recorder::it;
+	++frame;
 	
 	
 }

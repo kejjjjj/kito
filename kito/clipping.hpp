@@ -20,13 +20,10 @@ struct recorder_cmd
 	fvec3 velocity;
 	fvec3 mins, maxs;
 	float camera_yaw = 0;
-	//int events[4];
-	//int eventSequence;
-	//int weaponTime;
-	//int weapAnim;
-	//int weaponstate;
+	
+	//VERSION 2
+	int weaponTime = 0;
 };
-
 struct Recorder
 {
 	explicit Recorder(std::list<recorder_cmd> input) : recorder_sequence(input) { 
@@ -36,10 +33,12 @@ struct Recorder
 
 
 	std::list<recorder_cmd> recorder_sequence;
+	int frame = 0;
 	bool IsPlayback() { return playback; }
 
 	void StartPlayback();
 	void Playback(usercmd_s* cmd);
+	auto getIterator() const { return it; }
 	recorder_cmd* CurrentCmd() { 
 		if (!playback) 
 			return 0; 

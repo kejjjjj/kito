@@ -147,6 +147,7 @@ struct vec3
 	operator vec3<int>() { return { (int)x, (int)y, (int)z }; }
 	operator vec3<float>() { return { (float)x, (float)y, (float)z}; }
 
+
 	float mag() const {
 		return sqrtf(x * x + y * y + z * z);
 	}
@@ -247,7 +248,12 @@ struct vec3
 
 using ivec3 = vec3<int>;
 using fvec3 = vec3<float>;
-
+inline std::ostream& operator<<(std::ostream& os, fvec3 const& v) {
+	return os << "{ " << v.x << ", " << v.y << ", " << v.z << " }";
+}
+inline std::ostream& operator<<(std::ostream& os, ivec3 const& v) {
+	return os << "{ " << v.x << ", " << v.y << ", " << v.z << " }";
+}
 struct Pixel
 {
 	uint8_t r, g, b, a;

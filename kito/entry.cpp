@@ -15,10 +15,10 @@ DWORD WINAPI parent_thread(HMODULE hModule)
     }
     std::this_thread::sleep_for(500ms);
 
-    FILE* _con;
+    FILE* _con = 0;
 
-    AllocConsole();
-    freopen_s(&_con, "CONOUT$", "w", stdout);
+    //AllocConsole();
+    //freopen_s(&_con, "CONOUT$", "w", stdout);
 
     std::cout << "hello, world!\n";
 

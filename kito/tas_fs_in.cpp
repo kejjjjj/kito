@@ -26,6 +26,8 @@ std::optional<std::shared_ptr<TAS_Movement>> TAS_FileSystem_In::read()
 	
 	fs::F_Reset();
 
+	In_ReadVersion();
+
 	std::shared_ptr<TAS_Movement> movement = std::shared_ptr<TAS_Movement>(new TAS_Movement);
 
 	Com_Printf(CON_CHANNEL_SUBTITLE, "TAS_FileSystem_In::read(%s)\n", name.c_str());
@@ -50,15 +52,42 @@ std::optional<std::shared_ptr<TAS_Movement>> TAS_FileSystem_In::read()
 		movement->segments.push_back(read_seg.value());
 	}
 
-	std::cout << "segments loaded: " << movement->segments.size() << '\n';
+	std::cout << "segments loaded: " << movement->segments.size() << " | version: " << version << '\n';
 
 	return movement;
 
 
 }
+void TAS_FileSystem_In::In_ReadVersion()
+{
+	std::string v;
+	char ch{};
+	bool digit = true;
+	while (true) {
+		ch = fs::F_Get(*f);
+		if (!std::isdigit(ch)){
+			break;
+		}
+		v.push_back(ch);
+	}
+
+	if (!IsInteger(v)) {
+		Com_Error(ERR_DROP, "Failed to find file version!\n");
+		return;
+	}
+
+	version = std::stoi(v);
+	
+	if (version > TAS_FS_FILEVERSION) {
+		Com_Error(ERR_DROP, "Unsupported file version!\n");
+		return;
+	}
+
+
+}
 using namespace fs;
 template<typename T>
-std::optional<T> TAS_FileSystem_In::In_ReadBlock()
+std::optional<T> TAS_FileSystem_In::In_ReadBlock(size_t amount_of_bytes)
 {
 	T data{};
 
@@ -68,6 +97,10 @@ std::optional<T> TAS_FileSystem_In::In_ReadBlock()
 		return std::nullopt;
 	}
 	size_t bytes_read = 0;
+
+	if (!amount_of_bytes)
+		amount_of_bytes = sizeof(T);
+
 	DWORD base = (DWORD)(&data);
 	do {
 		std::string hex = "0x";
@@ -81,12 +114,12 @@ std::optional<T> TAS_FileSystem_In::In_ReadBlock()
 
 			ch = F_Get(*f);
 
-			if (bytes_read == sizeof(T) && ch != ']') {
+			if (bytes_read == amount_of_bytes && ch != ']') {
 				F_SyntaxError("bytes_read (%u) == sizeof(T) (%u) && ch != ']' (%c)", bytes_read, sizeof(T), ch);
 				return std::nullopt;
 			}
 
-			else if (bytes_read == sizeof(T) && ch == ']') {
+			else if (bytes_read == amount_of_bytes && ch == ']') {
 				F_Get(*f); //skip the newline
 				return data;
 			}
@@ -139,7 +172,7 @@ std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment()
 
 	data.frame_count = framecount.value();
 
-	std::cout << "framecount: " << data.frame_count << '\n';
+	//std::cout << "framecount: " << data.frame_count << '\n';
 
 	ch = F_Get(*f);
 	if (ch != '}') {
@@ -155,8 +188,18 @@ std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment()
 
 	
 	for (int i = 0; i < data.frame_count; i++) {
-
-		auto cmd = In_ReadBlock<recorder_cmd>();
+		std::optional<recorder_cmd> cmd;
+		switch (version) {
+		case 1:
+			cmd = In_ReadBlock<recorder_cmd>(ORIGINAL_RECORDER_CMD_SIZE);
+			break;
+		case 2:
+			cmd = In_ReadBlock<recorder_cmd>(ORIGINAL_RECORDER_CMD_SIZE+4); //one new variable: weaponTime
+			break;
+		default:
+			Com_Error(ERR_DROP, "Unsupported file version!\n");
+			return std::nullopt;
+		}
 		if (!cmd) {
 			return std::nullopt;
 		}

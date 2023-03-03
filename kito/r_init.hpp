@@ -43,6 +43,9 @@ struct R
 void CG_CalcViewValues(int a1, void* a2);
 inline void (*CG_CalcViewValues_f)(int, void*);
 
+void CG_UpdateViewWeaponAnim();
+inline void (*CG_UpdateViewWeaponAnim_f)();
+
 inline R* r_glob = 0;
 
 #endif

@@ -166,25 +166,40 @@ void TAS_Movement::update_all_segment_indices()
 	}
 
 }
+segment_s* TAS_Movement::get_segment_from_frame(const int32_t frame)
+{
+	if (frame == 0)
+		return &segments.front();
+
+	for (auto& i : segments) {
+
+		if ((frame - i.start_index) <= i.frame_count)
+			return &i;
+	}
+	return 0;
+}
+std::optional<std::shared_ptr<playerState_s>> TAS_Movement::get_playerstate_from_frame(const int32_t frame)
+{
+	auto seg = get_segment_from_frame(frame);
+	
+	if (!seg)
+		return std::nullopt;
+
+	std::cout << std::format("{} -> |{}| -> {}\n", seg->start_index, frame, seg->end_index);
+
+	if (const auto ps = update_movement_for_segment(*seg, frame)) {
+		const auto shared = std::make_shared<playerState_s>(ps.value());
+		return shared;
+	}
+
+	return std::nullopt;
+}
 recorder_cmd* TAS_Movement::get_frame_data(const int32_t frame)
 {
 	if (segments.empty())
 		return 0;
 
-	const auto SegmentFromFrame = [frame](std::vector<segment_s>& seg) -> segment_s*
-	{
-		if (frame == 0)
-			return &seg.front();
-
-		for (auto& i : seg) {
-
-			if((frame - i.start_index) <= i.frame_count)
-				return &i;
-		}
-		return 0;
-	};
-
-	auto seg = SegmentFromFrame(this->segments);
+	auto seg = get_segment_from_frame(frame);
 	if (!seg)
 		return &segments.front().content.front();
 
@@ -240,12 +255,12 @@ movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 
 }
 int rpg_firetime = 0;
-void TAS_Movement::update_movement_for_segment(segment_s& seg)
+std::optional<playerState_s> TAS_Movement::update_movement_for_segment(segment_s& seg, const int get_playerstate)
 {
 	auto& list = seg.content;
 
 	if (list.empty())
-		return;
+		return std::nullopt;
 
 	movement_data* data = initialize_player_data_for_segment(seg);
 
@@ -267,6 +282,7 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 	//ps->weapAnim = ~ps->weapAnim & 0x200;
 	//ps->weaponDelay = 0;
 	rpg_firetime = 0;
+	static int fragtime = 0;
 
 	if (pm->ps->weapon != seg.options.weapon) {
 		bool alive; // cc
@@ -291,7 +307,18 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		rpg_firetime = pm->cmd.serverTime + cg::BG_WeaponNames[seg.options.weapon]->iFireTime;
 
 	}
-	int j = 0;
+	if ((seg.options.hold_buttons & cmdEnums::frag) != 0) {
+		int idx = cg::BG_FindWeaponIndexForName("fraggrenade");
+
+		if (!idx) {
+			Com_Error(ERR_DROP, "fraggrenade is not a weapon name");
+			return std::nullopt;
+		}
+		fragtime = cg::BG_WeaponNames[idx]->fuseTime;
+	}
+	int j = seg.start_index;
+	bool return_playerstate = false;
+	playerState_s _ps;
 	for (auto& i : list) {
 
 		if (!pm || !pml) {
@@ -316,10 +343,13 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		else if (pm->cmd.rightmove < 0)
 			pm->cmd.rightmove = -127;
 
-		if (j == 1) {
-			if (ps->weaponstate == WEAPON_RAISING)
-				ps->weaponstate = WEAPON_DROPPING_QUICK;
-		}
+		//if (j == 1) {
+		//	if (ps->weaponstate == WEAPON_RAISING)
+		//		ps->weaponstate = WEAPON_DROPPING_QUICK;
+		//}
+
+		if (fragtime)
+			fragtime -= pml->msec;
 
 		cmd.forwardmove = pm->cmd.forwardmove;
 		cmd.rightmove = pm->cmd.rightmove;
@@ -333,18 +363,29 @@ void TAS_Movement::update_movement_for_segment(segment_s& seg)
 		cmd.maxs = pm->maxs;
 		cmd.weapon = ps->weapon;
 		cmd.offhand = pm->cmd.offHandIndex;
+		cmd.weaponTime = fragtime;
+
+		
 
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));
 		pm->cmd.buttons = 0;
-
+	
 		i = cmd;
-		j++;
-
+		
+		if (j++ == get_playerstate) {
+			return_playerstate = true;
+			_ps = *ps;
+		}
 	}
 	memcpy_s(&seg.end.pm, sizeof(pmove_t), pm, sizeof(pmove_t));
 	memcpy_s(&seg.end.pml, sizeof(pml_t), pml, sizeof(pml_t));
 	memcpy_s(&seg.end.ps, sizeof(playerState_s), pm->ps, sizeof(playerState_s));
 	seg.end.pm.ps = &seg.end.ps;
+
+	if(!return_playerstate)
+		return std::nullopt;
+
+	return _ps;
 }
 using namespace cg;
 void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd)
@@ -455,7 +496,7 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	fvec3 org, vector;
 	static int last_smoothingTime = ps->commandTime;
 	static std::vector<float> smoothing_ref_angles;
-	static float camera_yaw_offset = ps->viewangles[1];
+	static float camera_yaw_offset = atan2(ps->velocity[1], ps->velocity[0]) * 180.f / PI;
 	rcmd.camera_yaw = -400;
 	switch (seg.options.viewangle_type) 
 	{
@@ -476,27 +517,9 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 					last_smoothingTime = ps->commandTime;
 
 				if (seg.options.strafebot.go_straight) {
-
-					if ((ps->commandTime >= (last_smoothingTime + (pml->msec * seg.options.strafebot.smoothing_window))) && !smoothing_ref_angles.empty()) { //smooth every 5 frames
-
-						float average = 0;
-
-						for (auto& i : smoothing_ref_angles)
-							average += i;
-
-						average /= smoothing_ref_angles.size();
-
-						if (average < 0) {
-							average += 180;
-							average = (average + 180 % 360);
-						}
-
-						camera_yaw_offset = average;
+					if ((ps->commandTime >= (last_smoothingTime + (pml->msec * /*seg.options.strafebot.smoothing_window*/20)))) { //smooth every 5 frames
+						camera_yaw_offset = atan2(ps->velocity[1], ps->velocity[0]) * 180.f / PI;
 						last_smoothingTime = ps->commandTime;
-						smoothing_ref_angles.clear();
-					}
-					else {
-						smoothing_ref_angles.push_back(yaw.value());
 					}
 					rcmd.camera_yaw = camera_yaw_offset;
 				}
@@ -511,6 +534,8 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		case viewangle_type::FIXED_TURNRATE:
 			deltaX = -options->fixed_turn.up;
 			deltaY = -options->fixed_turn.right;
+			if(!smoothing_ref_angles.empty())
+				smoothing_ref_angles.clear();
 			break;
 		case viewangle_type::AIMLOCK:
 			org = ps->origin; org.z += ps->viewHeightCurrent;
@@ -518,6 +543,8 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 			deltaX = vector.x - ps->viewangles[PITCH];
 			deltaY = vector.y - ps->viewangles[YAW];
+			if (!smoothing_ref_angles.empty())
+				smoothing_ref_angles.clear();
 			break;
 		default:
 			break;

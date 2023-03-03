@@ -189,26 +189,28 @@ std::optional<ivec2> cg::WorldToScreen(const fvec3& location)
 void cg::CG_DrawCoordinates()
 {
 	char buff[256];
-	if (tas->ui.editing) {
+	//if (tas->ui.editing) {
 
-		const auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
+	//	const auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
 
-		if (!frame)
-			return;
+	//	if (!frame)
+	//		return;
 
-		sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f", frame->origin.x, frame->origin.y, frame->origin.z, frame->viewangles.y);
+	//	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f", frame->origin.x, frame->origin.y, frame->origin.z, frame->viewangles.y);
 
-		r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
-		return;
+	//	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
+	//	return;
 
-	}
+	//}
 	auto ps = predictedPlayerState;
 	auto cmd = input->GetUserCmd(input->cmdNumber - 1);
 	if (!ps || !cmd)
 		return;
 
-	sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f\ntime: %d\nwtime: %d\ndelay: %d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], cmd->serverTime, ps->weaponTime, ps->weaponDelay);
-	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 400, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
+	//sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f\ntime: %d\nwtime: %d\ndelay: %d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], cmd->serverTime, ps->weaponTime, ps->weaponDelay);
+	sprintf_s(buff, "%.6f\n%.6f\n%.6f\n%.6f\n%d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], (int)(fvec2(ps->velocity[0], ps->velocity[0]).mag()));
+
+	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 50, 1.25f, 1.25f, 0, vec4_t{ 1,1,1,0.7f }, 3, vec4_t{ 1,0,0,0 });
 
 
 }
@@ -224,7 +226,7 @@ void cg::CG_DrawVelocity()
 
 		sprintf_s(buff, "%i", (int)(fvec2(frame->velocity.x, frame->velocity.y).mag()));
 
-		r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width / 2 - strlen(buff)*2, refdef->height / 2, 1.25f, 1.25f, 0, vec4_t{ 0,1,0,1 }, 3, vec4_t{ 0,0,0,1 });
+		r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width / 2 - strlen(buff) * 2, refdef->height / 2, 1.f, 1.f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
 		return;
 
 	}
