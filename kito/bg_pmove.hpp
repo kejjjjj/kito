@@ -158,7 +158,8 @@ namespace cg
 	void PmoveSingle(pmove_t* pm);
 	inline void(__cdecl*PM_Weapon_FireWeapon_f)(int delay, playerState_s* ps);
 	void PM_Weapon_FireWeapon(int delay, playerState_s* ps);
-
+	void PM_HoldBreathFire(playerState_s* ps);
+	void PM_Weapon_StartFiring(playerState_s* ps, int delay);
 }
 
 #endif

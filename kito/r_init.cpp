@@ -114,7 +114,8 @@ void R::CG_DrawActive()
 	
 	tas->render.R_FrameData();
 	cg::CG_DrawCoordinates();
-	//cg::CG_DrawVelocity();
+	cg::CG_DrawVelocity();
+	cg::CG_DrawPlayback();
 
 	if (tas->TAS_CheckAutoSave())
 		tas->TAS_AutoSave();

@@ -50,7 +50,7 @@ void cg::CG_InitForeverHooks()
 	hook::install(&(PVOID&)PM_AirMove_f, PM_AirMove);
 	hook::install(&(PVOID&)PM_WalkMove_f, PM_WalkMove);
 	hook::install(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
-	//hook::install(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
+	hook::install(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
 
 	hook::install(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
 	hook::install(&(PVOID&)CG_UpdateViewWeaponAnim_f, CG_UpdateViewWeaponAnim);
@@ -98,7 +98,7 @@ void cg::CG_RemoveHooks()
 	hook::remove(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
 	hook::remove(&(PVOID&)CG_UpdateViewWeaponAnim_f, CG_UpdateViewWeaponAnim);
 
-	//hook::remove(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
+	hook::remove(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
 	hook::remove(&(PVOID&)Pmove_f, Pmove);
 	hook::remove(&(PVOID&)PmoveSingle_f, PmoveSingle);
 

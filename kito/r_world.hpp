@@ -42,6 +42,7 @@ namespace cg
 	std::optional<ivec2> WorldToScreen(const fvec3& location);
 	void CG_DrawCoordinates();
 	void CG_DrawVelocity();
+	void CG_DrawPlayback();
 }
 
 #endif

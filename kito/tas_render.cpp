@@ -6,15 +6,15 @@ void TAS_Render::R_Render()
 	//for (size_t i = 0; i < tas->movement.get_segment_count(); i++) 
 	//	R_ShowSegmentPath(tas->movement.get_segment_by_index(i), i == tas->movement.segment_index ?  IM_COL32(0, 255, 0, 255) : IM_COL32(255, 255, 0, 255));
 	//
-	//auto c = Pixel(130, 130, 0, 255);
-	//for (auto& i : tas->movement.segments) {
+	auto c = Pixel(130, 130, 0, 255);
+	for (auto& i : tas->movement.segments) {
 
-	//	R_ShowSegmentPathColored(&i, c);
+		R_ShowSegmentPathColored(&i, c);
 
-	// }
+	 }
 
-	//R_DrawHitbox();
-	//R_AngleArrow();
+	R_DrawHitbox();
+	R_AngleArrow();
 
 }
 void TAS_Render::R_ShowSegmentPath(const segment_s* seg, unsigned int color)

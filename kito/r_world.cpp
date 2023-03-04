@@ -208,9 +208,10 @@ void cg::CG_DrawCoordinates()
 		return;
 
 	//sprintf_s(buff, "x:     %.6f\ny:     %.6f\nz:     %.6f\nyaw: %.6f\ntime: %d\nwtime: %d\ndelay: %d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], cmd->serverTime, ps->weaponTime, ps->weaponDelay);
-	sprintf_s(buff, "%.6f\n%.6f\n%.6f\n%.6f\n%d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], (int)(fvec2(ps->velocity[0], ps->velocity[0]).mag()));
+	sprintf_s(buff, "%.6f\n%.6f\n%.6f\n%.6f\n%d", ps->origin[0], ps->origin[1], ps->origin[2], ps->viewangles[1], (int)(fvec2(ps->velocity[0], ps->velocity[1]).mag()));
 
 	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, 50, 1.25f, 1.25f, 0, vec4_t{ 1,1,1,0.7f }, 3, vec4_t{ 1,0,0,0 });
+
 
 
 }
@@ -239,4 +240,26 @@ void cg::CG_DrawVelocity()
 	r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width/2-strlen(buff)*2, refdef->height / 2, 1.f, 1.f, 0, vec4_t{1,1,1,1}, 3, vec4_t{1,0,0,1});
 
 
+}
+void cg::CG_DrawPlayback()
+{
+
+	if (tas->movement.recorder) {
+		if (tas->movement.recorder->IsPlayback()) {
+
+			auto current = tas->movement.recorder->CurrentCmd();
+			
+			if (current && cg::predictedPlayerState) {
+				float dist = current->origin.dist(cg::predictedPlayerState->origin);
+
+				char buff[64];
+
+				sprintf_s(buff, "%.6f",dist);
+				r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width / 1.5f - strlen(buff) * 2, refdef->height / 1.5f, 1.f, 1.f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
+
+
+				//ImGui::GetBackgroundDrawList()->AddText(ImVec2(1600, 800), 0xFFFFFFFF, std::format("sync: {:.6f}\n{:.6f}", dist, current->camera_yaw).c_str());
+			}
+		}
+	}
 }

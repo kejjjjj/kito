@@ -30,7 +30,8 @@ enum class viewangle_type : int
 {
 	FIXED_TURNRATE,
 	STRAFEBOT,
-	AIMLOCK
+	AIMLOCK,
+	FIXED_ANGLES
 };
 struct segment_options
 {
@@ -54,7 +55,10 @@ struct segment_options
 	struct aimlock_s {
 		fvec3 target;
 	}aimlock;
-
+	struct fixed_point_s
+	{
+		fvec3 viewangles;
+	}fixed_angle;
 	int32_t hold_buttons = 0;
 	viewangle_type viewangle_type = viewangle_type::FIXED_TURNRATE;
 
@@ -114,6 +118,7 @@ public:
 
 	bool player_pov = false;
 	bool called_from_prediction = false;
+	playerState_s* current_frame_prediction_state = 0;
 	bool rpg_next_frame = false;
 	movement_data first_segment, this_segment;
 

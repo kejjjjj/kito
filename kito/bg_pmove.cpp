@@ -358,28 +358,237 @@ void cg::PM_OverBounce(pmove_t* pm, pml_t* pml)
 	return;
 
 }
-void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps)
+void cg::PM_HoldBreathFire(playerState_s* ps)
 {
-	playerState_s* ps_copy;
-	__asm mov ps_copy, eax;
+	int v1; // ebx
+	unsigned int v2; // eax
+	WeaponDef* v3; // ecx
+	int v4; // ebp
+	int v5; // edi
+	int v6; // eax
 
-	PM_Weapon_FireWeapon_f(delay, ps);
-
-	static int firetime = 1;
-
-	if (ps->weaponTime && firetime == 1) {
-		firetime = ps->commandTime + ps->weaponTime;
+	v1 = ps->weapFlags;
+	if ((v1 & 2) != 0)
+		v2 = ps->offHandIndex;
+	else
+		v2 = ps->weapon;
+	v3 = BG_WeaponNames[v2];
+	if (1.0 == ps->fWeaponPosFrac && v3->overlayReticle && v3->weapClass != WEAPCLASS_ITEM)
+	{
+		v4 = ps->holdBreathTimer;
+		v5 = (((dvar_s*)0x1420578)->current.value * 1000.0);
+		if (v4 < v5)
+		{
+			v6 = (((dvar_s*)0x14204F8)->current.value * -1000.0);
+			ps->holdBreathTimer = v4 - v6;
+			if (v4 - v6 > v5)
+				ps->holdBreathTimer = v5;
+		}
+		ps->weapFlags = v1 & 0xFFFFFFFB;
 	}
-	if (tas->movement.called_from_prediction && ps->commandTime >= firetime && firetime != 1 /* && std::string(BG_WeaponNames[ps_copy->weapon]->szDisplayName).find("RPG") != std::string::npos */) {
-		Com_Printf(CON_CHANNEL_SUBTITLE, "YEAH!\n");
-		//ps_copy->velocity[2] += 1264;
-		tas->movement.rpg_next_frame = true;
+}
+void cg::PM_Weapon_StartFiring(playerState_s* ps, int delay)
+{
+	signed int weapon; // ebp
+	WeaponDef* weap; // edi
+	bool not_dead; // cc
+	int result; // eax
+	unsigned int v6; // eax
 
-		firetime = 1;
+	weapon = ps->weapon;
+	weap = BG_WeaponNames[weapon];
+	if (weap->weapType == WEAPTYPE_GRENADE)
+	{
+		if (!delay)
+		{
+			if (ps->ammoclip[weap->iClipIndex])
+			{
+				not_dead = ps->pm_type < PM_DEAD;
+				ps->grenadeTimeLeft = weap->fuseTime;
+				if (not_dead)
+					ps->weapAnim = ~ps->weapAnim & 0x200 | 0x1A;
+				ps->events[ps->eventSequence & 3] = 25;
+				ps->eventParms[ps->eventSequence++ & 3] = weapon;
+			}
+			ps->weaponDelay = weap->iHoldFireTime;
+			ps->weaponTime = 0;
+		}
+	}
+	else
+	{
+		ps->weaponDelay = weap->iFireDelay;
+		ps->weaponTime = weap->iFireTime;
+		if (weap->adsFireOnly)
+			ps->weaponDelay = (1.0 / weap->fOOPosAnimLength[0] * (1.0 - ps->fWeaponPosFrac));
+		if (weap->bBoltAction)
+			ps->weaponchamber[weapon >> 5] |= 1 << (weapon & 0x1F);
+		if (ps->weaponstate != WEAPON_FIRING)
+		{
+			if (ps->fWeaponPosFrac < 1.0)
+				ps->weaponRestrictKickTime = weap->iFireDelay + weap->iFireTime * weap->hipGunKickReducedKickBullets;
+			else
+				ps->weaponRestrictKickTime = weap->iFireDelay + weap->iFireTime * weap->adsGunKickReducedKickBullets;
+
+		}
 
 	}
+	result = ps->pm_flags;
+	ps->weaponstate = WEAPON_FIRING;
+	if ((result & 1) != 0)
+	{
+		result |= 0x200u;
+		ps->pm_flags = result;
 
-	//return PM_Weapon_FireWeapon_f(delay, ps);
+	}
+	if (weap->fireType)
+	{
+		v6 = ps->weaponShotCount;
+		if (!v6) {
+			ps->weapFlags &= 0xFFFFFEFF;
+		}
+		result = v6 + 1;
+		ps->weaponShotCount = result;
+		if (result > PMF_MANTLE)
+			ps->weaponShotCount = 4;
+
+	}
+	return;
+}
+void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps_copy)
+{
+
+	WeaponDef* wdef; // ecx
+	WeaponDef* _wdef; // ebx
+	int perk; // eax
+	int weaponIndex; // eax
+	//constexpr DWORD PM_Weapon_StartFiring = 0x05C1570;
+	constexpr DWORD PM_WeaponUseAmmo = 0x5BFC80;
+	constexpr DWORD PM_Weapon_CheckFiringAmmo = 0x05C1700;
+	playerState_s* ps = 0;
+
+	__asm mov ps, eax;
+	static int last_time_shot = ps->commandTime;
+
+	_wdef = BG_WeaponNames[ps->weapon];
+	
+	__asm
+	{
+		mov eax, ps;
+		call PM_Weapon_CheckFiringAmmo;
+		mov perk, eax;
+	}
+
+	if (perk) {
+
+		//__asm
+		//{
+		//	push delay;
+		//	mov esi, ps;
+		//	call PM_Weapon_StartFiring;
+		//	add esp, 0x4;
+		//	mov perk, eax;
+		//}
+
+		PM_Weapon_StartFiring(ps, delay);
+
+		if (!ps->weaponDelay)
+		{
+
+
+			if (_wdef->requireLockonToFire)
+			{
+				perk = ps->perks;
+				if ((perk & 2) == 0)
+				{
+					ps->events[ps->eventSequence & 3] = EV_FOOTSTEP_WALK;
+					perk = ps->eventSequence & 3;
+					ps->eventParms[perk] = 0;
+					++ps->eventSequence;
+					return;
+				}
+				if ((perk & 0x10) != 0)
+				{
+					ps->events[ps->eventSequence & 3] = 72;
+					ps->eventParms[ps->eventSequence++ & 3] = 0;
+					return;
+				}
+				if ((perk & 0x20) != 0)
+				{
+					perk = ps->eventSequence & 3;
+					ps->events[perk] = 73;
+					ps->eventParms[ps->eventSequence++ & 3] = 0;
+					return;
+				}
+			}
+			weaponIndex = ps->weapon;
+			if (ps->ammoclip[BG_WeaponNames[weaponIndex]->iClipIndex] != -1 && (ps->eFlags & 0x300) == 0) {
+
+				__asm
+				{
+					push weaponIndex;
+					mov edi, ps;
+					mov esi, 1;
+					call PM_WeaponUseAmmo;
+					add esp, 0x4;
+
+				}
+
+			}
+			if (_wdef->weapType == WEAPTYPE_GRENADE)
+				ps->weaponTime = _wdef->iFireTime;
+
+			((void(*)(playerState_s * ps))0x5C17F0)(ps); //PM_Weapon_SetFPSFireAnim
+
+			if (ps->ammoclip[BG_WeaponNames[ps->weapon]->iClipIndex]) {
+				ps->events[ps->eventSequence & 3] = EV_FIRE_WEAPON;
+			}
+			else
+				ps->events[ps->eventSequence & 3] = EV_FIRE_WEAPON_LASTSHOT;
+
+			ps->eventParms[ps->eventSequence++ & 3] = 0;
+
+			PM_HoldBreathFire(ps);
+			((void(*)(playerState_s * ps))0x05C1870)(ps); //PM_Weapon_AddFiringAimSpreadScale
+
+			wdef = BG_WeaponNames[ps->weapon];
+
+			if (last_time_shot > ps->commandTime)
+				last_time_shot = 0;
+
+			if (last_time_shot + 5000 < ps->commandTime)
+				last_time_shot = 0;
+
+			if (/*!ps->ammo[wdef->iAmmoIndex-4] && !ps->weaponDelay && */ ps->weapon == BG_FindWeaponIndexForName("rpg_player") && last_time_shot + wdef->iFireTime < ps->commandTime) {
+				vec3_t angles, forward;
+				angles[2] = ps->viewangles[2];
+				angles[0] = ps->viewangles[0];
+				angles[1] = ps->viewangles[1];
+
+				AngleVectors(angles, forward, NULL, NULL);
+				if (!tas->movement.called_from_prediction) {
+					ps_loc->velocity[0] = ps->velocity[0] - forward[0] * 64;
+					ps_loc->velocity[1] = ps->velocity[1] - forward[1] * 64;
+					ps_loc->velocity[2] = ps->velocity[2] - forward[2] * 64;
+				}
+				else {
+					ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
+					ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
+					ps->velocity[2] = ps->velocity[2] - forward[2] * 64;
+				}
+				Com_Printf(CON_CHANNEL_SUBTITLE, "bang\n", ps->weaponstate);
+				last_time_shot = ps->commandTime;
+
+			}
+			//Com_Printf(CON_CHANNEL_SUBTITLE, "%s == %s\n", BG_WeaponNames[ps->weapon]->szInternalName, BG_WeaponNames[BG_FindWeaponIndexForName("rpg")]->szInternalName);
+
+			if (!ps->ammoclip[wdef->iClipIndex] && !ps->ammo[wdef->iAmmoIndex] && !wdef->hasDetonator)
+			{
+				ps->events[ps->eventSequence & 3] = EV_NOAMMO;
+				ps->eventParms[ps->eventSequence++ & 3] = 0;
+			}
+		}
+	}
+	return;
 }
 void cg::PmoveSingle(pmove_t* pm)
 {

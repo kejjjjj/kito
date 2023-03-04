@@ -391,6 +391,7 @@ using namespace cg;
 void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd)
 {
 	playerState_s* ps = pm->ps;
+	current_frame_prediction_state = ps;
 	auto options = &seg.options;
 	static dvar_s* mantle_enable = Dvar_FindMalleableVar("mantle_enable");
 
@@ -493,9 +494,9 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 	float deltaX = 0;
 	float deltaY = 0;
+	float deltaZ = 0;
 	fvec3 org, vector;
 	static int last_smoothingTime = ps->commandTime;
-	static std::vector<float> smoothing_ref_angles;
 	static float camera_yaw_offset = atan2(ps->velocity[1], ps->velocity[0]) * 180.f / PI;
 	rcmd.camera_yaw = -400;
 	switch (seg.options.viewangle_type) 
@@ -534,8 +535,6 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		case viewangle_type::FIXED_TURNRATE:
 			deltaX = -options->fixed_turn.up;
 			deltaY = -options->fixed_turn.right;
-			if(!smoothing_ref_angles.empty())
-				smoothing_ref_angles.clear();
 			break;
 		case viewangle_type::AIMLOCK:
 			org = ps->origin; org.z += ps->viewHeightCurrent;
@@ -543,17 +542,25 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 			deltaX = vector.x - ps->viewangles[PITCH];
 			deltaY = vector.y - ps->viewangles[YAW];
-			if (!smoothing_ref_angles.empty())
-				smoothing_ref_angles.clear();
+			break;
+		case viewangle_type::FIXED_ANGLES:
+
+
+			deltaX = seg.options.fixed_angle.viewangles.x - ps->viewangles[PITCH];
+			deltaY = seg.options.fixed_angle.viewangles.y - ps->viewangles[YAW];
+			deltaZ = seg.options.fixed_angle.viewangles.z - ps->viewangles[ROLL];
+
 			break;
 		default:
 			break;
 	}
 	pm->ps->viewangles[PITCH] += deltaX;
 	pm->ps->viewangles[YAW] += deltaY;
+	pm->ps->viewangles[ROLL] += deltaZ;
 
 	pm->cmd.angles[PITCH] += ANGLE2SHORT(deltaX);
 	pm->cmd.angles[YAW] += ANGLE2SHORT(deltaY);
+	pm->cmd.angles[ROLL] += ANGLE2SHORT(deltaZ);
 
 	//pm->ps->weapon = seg.options.weapon;
 	//pm->cmd.weapon = pm->ps->weapon;

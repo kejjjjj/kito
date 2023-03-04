@@ -259,7 +259,7 @@ void TAS_UI::UI_OtherControls()
 {
 	ImGui::BeginGroup();
 	auto options = &tas->movement.request_current_segment()->options;
-	constexpr const char* viewangle_options[] = {"Fixed turn", "Strafebot", "Aimlock"};
+	constexpr const char* viewangle_options[] = {"Fixed turn", "Strafebot", "Aimlock", "Fixed angle"};
 
 	ImGui::PushItemWidth(150);
 	if (ImGui::Combo("Angles", &(int&)options->viewangle_type, viewangle_options, IM_ARRAYSIZE(viewangle_options)))
@@ -268,6 +268,7 @@ void TAS_UI::UI_OtherControls()
 	UI_AngleControls_Fixed(options);
 	UI_AngleControls_Strafebot(options);
 	UI_AngleControls_Aimlock(options);
+	UI_AngleControls_FixedAngles(options);
 
 
 	//if (ImGui::Checkbox2("strafebot", &options->strafebot))
@@ -419,7 +420,22 @@ void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 	}
 
 }
+void TAS_UI::UI_AngleControls_FixedAngles(segment_options* options)
+{
+	if (options->viewangle_type != viewangle_type::FIXED_ANGLES)
+		return;
 
+	ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("X##03", &options->fixed_angle.viewangles.x, 0.f, 0.f, "%.3f")) {
+		tas->movement.update_movement_for_each_segment();
+	}ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("Y##03", &options->fixed_angle.viewangles.y, 0.f, 0.f, "%.3f")) {
+		tas->movement.update_movement_for_each_segment();
+	}ImGui::PushItemWidth(150);
+	if (ImGui::InputFloat("Z##03", &options->fixed_angle.viewangles.z, 0.f, 0.f, "%.3f")) {
+		tas->movement.update_movement_for_each_segment();
+	}
+}
 void TAS_UI::UI_SelectWeapon()
 {
 

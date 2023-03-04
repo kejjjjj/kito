@@ -75,6 +75,7 @@ public:
 	void UI_AngleControls_Fixed(segment_options* options);
 	void UI_AngleControls_Strafebot(segment_options* options);
 	void UI_AngleControls_Aimlock(segment_options* options);
+	void UI_AngleControls_FixedAngles(segment_options* options);
 
 	void UI_SelectWeapon();
 	int32_t iWeapon = 0;
