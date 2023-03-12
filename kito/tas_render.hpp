@@ -8,6 +8,9 @@
 class TAS_Render
 {
 public:
+
+	bool cinematic_mode = false;
+
 	void R_Render();
 	void R_ShowSegmentPath(const segment_s* seg, unsigned int color);
 

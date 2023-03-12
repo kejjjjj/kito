@@ -558,27 +558,25 @@ void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps_copy)
 			if (last_time_shot + 5000 < ps->commandTime)
 				last_time_shot = 0;
 
-			if (/*!ps->ammo[wdef->iAmmoIndex-4] && !ps->weaponDelay && */ ps->weapon == BG_FindWeaponIndexForName("rpg_player") && last_time_shot + wdef->iFireTime < ps->commandTime) {
-				vec3_t angles, forward;
-				angles[2] = ps->viewangles[2];
-				angles[0] = ps->viewangles[0];
-				angles[1] = ps->viewangles[1];
+			//if (/*!ps->ammo[wdef->iAmmoIndex-4] && !ps->weaponDelay && */ ps->weapon == BG_FindWeaponIndexForName("rpg_player") && last_time_shot + 50 < ps->commandTime) {
+			//	vec3_t angles, forward;
+			//	angles[2] = ps->viewangles[2];
+			//	angles[0] = ps->viewangles[0];
+			//	angles[1] = ps->viewangles[1];
 
-				AngleVectors(angles, forward, NULL, NULL);
-				if (!tas->movement.called_from_prediction) {
-					ps_loc->velocity[0] = ps->velocity[0] - forward[0] * 64;
-					ps_loc->velocity[1] = ps->velocity[1] - forward[1] * 64;
-					ps_loc->velocity[2] = ps->velocity[2] - forward[2] * 64;
-				}
-				else {
-					ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
-					ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
-					ps->velocity[2] = ps->velocity[2] - forward[2] * 64;
-				}
-				Com_Printf(CON_CHANNEL_SUBTITLE, "bang\n", ps->weaponstate);
-				last_time_shot = ps->commandTime;
+			//	AngleVectors(angles, forward, NULL, NULL);
+			//	if (!tas->movement.called_from_prediction) {
+			//		UPDATE_THE_FUCKING_RPG = true;
+			//	}
+			//	else {
+			//		ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
+			//		ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
+			//		ps->velocity[2] = ps->velocity[2] - forward[2] * 64;
+			//	}
+			//	//Com_Printf(CON_CHANNEL_SUBTITLE, "bang\n", ps->weaponstate);
+			//	last_time_shot = ps->commandTime;
 
-			}
+			//}
 			//Com_Printf(CON_CHANNEL_SUBTITLE, "%s == %s\n", BG_WeaponNames[ps->weapon]->szInternalName, BG_WeaponNames[BG_FindWeaponIndexForName("rpg")]->szInternalName);
 
 			if (!ps->ammoclip[wdef->iClipIndex] && !ps->ammo[wdef->iAmmoIndex] && !wdef->hasDetonator)
@@ -592,6 +590,29 @@ void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps_copy)
 }
 void cg::PmoveSingle(pmove_t* pm)
 {
+	auto ps = pm->ps;
 
-	return PmoveSingle_f(pm);
+
+	PmoveSingle_f(pm);
+
+	//if (UPDATE_THE_FUCKING_RPG) {
+	//	vec3_t angles, forward;
+	//	angles[2] = ps->viewangles[2];
+	//	angles[0] = ps->viewangles[0];
+	//	angles[1] = ps->viewangles[1];
+
+	//	AngleVectors(angles, forward, NULL, NULL);
+	//	ps->velocity[0] = ps->velocity[0] - forward[0] * 2000;
+	//	ps->velocity[1] = ps->velocity[1] - forward[1] * 2000;
+	//	ps->velocity[2] = ps->velocity[2] - forward[2] * 2000;
+	//	//ps->oldVelocity[0] = ps->velocity[0];
+	//	//ps->oldVelocity[1] = ps->velocity[1];
+
+	//	Com_Printf(CON_CHANNEL_SUBTITLE, "bang\n", ps->weaponstate);
+
+	//	UPDATE_THE_FUCKING_RPG = false;
+
+
+	//}
+	return;
 }

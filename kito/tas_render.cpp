@@ -2,6 +2,8 @@
 
 void TAS_Render::R_Render()
 {
+	if (cinematic_mode)
+		return;
 
 	//for (size_t i = 0; i < tas->movement.get_segment_count(); i++) 
 	//	R_ShowSegmentPath(tas->movement.get_segment_by_index(i), i == tas->movement.segment_index ?  IM_COL32(0, 255, 0, 255) : IM_COL32(255, 255, 0, 255));
@@ -146,6 +148,9 @@ void TAS_Render::R_AngleArrow()
 
 void TAS_Render::R_FrameData()
 {
+	if (cinematic_mode)
+		return;
+
 	auto frame = tas->movement.get_frame_data(tas->movement.frame_index);
 
 	if (!frame)

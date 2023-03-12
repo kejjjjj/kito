@@ -112,10 +112,17 @@ void R::CG_DrawActive()
 {
 	//R_DrawTextWithEffects("hello", "fonts/objectivefont", 500, 500, 2, 2, 180, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
 	
-	tas->render.R_FrameData();
+	if (GetAsyncKeyState(VK_NUMPAD6) & 1) {
+		tas->render.cinematic_mode = !tas->render.cinematic_mode;
+		Com_Printf(CON_CHANNEL_SUBTITLE, "cinematic mode: %s\n", tas->render.cinematic_mode ? "^2enabled" : "^1disabled");
+	}
+
+	if (!tas->render.cinematic_mode) {
+		tas->render.R_FrameData();
+		cg::CG_DrawVelocity();
+		cg::CG_DrawPlayback();
+	}
 	cg::CG_DrawCoordinates();
-	cg::CG_DrawVelocity();
-	cg::CG_DrawPlayback();
 
 	if (tas->TAS_CheckAutoSave())
 		tas->TAS_AutoSave();

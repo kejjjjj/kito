@@ -10,6 +10,7 @@ namespace cg
 	inline pml_t* pml_ptr;
 	inline vec3_t temp_velocity;
 	inline int temp_delta;
+	inline bool UPDATE_THE_FUCKING_RPG = false;
 	inline void(*Pmove_f)(pmove_t*);
 	inline void(*PM_FoliageSnd_f)(pmove_t*);
 	inline void(*PM_AirMove_f)(pmove_t* pm, pml_t* pml);
