@@ -43,6 +43,8 @@ namespace cg
 	void CG_DrawCoordinates();
 	void CG_DrawVelocity();
 	void CG_DrawPlayback();
+	void CG_DrawSnapshot();
+
 }
 
 #endif

@@ -263,3 +263,13 @@ void cg::CG_DrawPlayback()
 		}
 	}
 }
+void cg::CG_DrawSnapshot()
+{
+	auto ps = predictedPlayerState;
+	char buff[128];
+	if (!ps)
+		return;
+
+	sprintf_s(buff, "cmdTime: %i\npTime: %i", input->GetUserCmd(input->cmdNumber-1)->serverTime, predictedPlayerState->commandTime);
+	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, float(refdef->height) / 1.2f, 1.25f, 1.25f, 0, vec4_t{1,1,1,0.7f}, 3, vec4_t{1,0,0,0});
+}

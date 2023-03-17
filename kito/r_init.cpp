@@ -121,6 +121,7 @@ void R::CG_DrawActive()
 		tas->render.R_FrameData();
 		cg::CG_DrawVelocity();
 		cg::CG_DrawPlayback();
+		cg::CG_DrawSnapshot();
 	}
 	cg::CG_DrawCoordinates();
 

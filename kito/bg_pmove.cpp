@@ -3,7 +3,7 @@
 void cg::Pmove(pmove_t* pm)
 {
 
-	if (tas->movement.overwrite_pmove.first) {
+	if (tas->movement.overwrite_pmove.first && pm->ps->commandTime != predictedPlayerState->commandTime) {
 
 		int oCmdTime = pm->ps->commandTime;
 		int oServertime = pm->cmd.serverTime;
@@ -23,17 +23,27 @@ void cg::Pmove(pmove_t* pm)
 		VectorCopy(o_pm.maxs, pm->maxs);
 		tas->movement.overwrite_pmove.first = false;
 
-		if (pm->ps->commandTime == (predictedPlayerState->commandTime)) {
-			//launch will NOT happen if this is true
-		}
+		//if (pm->ps->commandTime == (predictedPlayerState->commandTime)) {
+		//	//launch will NOT happen if this is true
+		//}
 
-		//pm->ps->commandTime = (predictedPlayerState->commandTime);
-		pm->ps->commandTime = oServertime;
-		
+		pm->ps->commandTime = (predictedPlayerState->commandTime);
+		//pm->ps->commandTime = oServertime;
+		//
+		//*(int*)0x714B9C = oServertime;
+		//*(int*)0x714BA0 = ooServertime;
 
 		pm->cmd.serverTime = oServertime;
+		pm->oldcmd.serverTime = ooServertime;
 
-		Com_Printf(CON_CHANNEL_SUBTITLE, "commandTime: ^2%i\npredicted: ^2%i\n", pm->ps->commandTime, predictedPlayerState->commandTime);
+		if (tas->movement.recorder) {
+			delete tas->movement.recorder;
+			tas->movement.recorder = 0;
+		}
+		tas->movement.recorder = new Recorder(tas->movement.create_a_list_from_segments());
+		tas->movement.recorder->iterateIterator(tas->movement.frame_index);
+
+		//CG_CheckPlayerstateEventsCom_Printf(CON_CHANNEL_SUBTITLE, "commandTime: ^2%i\npredicted: ^2%i\n", pm->ps->commandTime, predictedPlayerState->commandTime);
 				//*predictedPlayerState = *pm->ps;
 		//pm->oldcmd.serverTime = ooServertime;
 		return;

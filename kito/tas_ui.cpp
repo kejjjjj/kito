@@ -573,12 +573,7 @@ void TAS_UI::UI_FileSystem()
 			std::cout << "origin: " << fvec3(ps.value()->ps.origin) << '\n';
 			tas->movement.overwrite_pmove.first = true;
 			tas->movement.overwrite_pmove.second = *ps.value();
-			if (tas->movement.recorder) {
-				delete tas->movement.recorder;
-				tas->movement.recorder = 0;
-			}
-			tas->movement.recorder = new Recorder(tas->movement.create_a_list_from_segments());
-			tas->movement.recorder->iterateIterator(tas->movement.frame_index);
+
 		}
 		else
 			std::cout << "NO!\n";
