@@ -178,7 +178,7 @@ segment_s* TAS_Movement::get_segment_from_frame(const int32_t frame)
 	}
 	return 0;
 }
-std::optional<std::shared_ptr<playerState_s>> TAS_Movement::get_playerstate_from_frame(const int32_t frame)
+std::optional<std::shared_ptr<pmove_ptr_t>> TAS_Movement::get_pmove_from_frame(const int32_t frame)
 {
 	auto seg = get_segment_from_frame(frame);
 	
@@ -188,7 +188,7 @@ std::optional<std::shared_ptr<playerState_s>> TAS_Movement::get_playerstate_from
 	std::cout << std::format("{} -> |{}| -> {}\n", seg->start_index, frame, seg->end_index);
 
 	if (const auto ps = update_movement_for_segment(*seg, frame)) {
-		const auto shared = std::make_shared<playerState_s>(ps.value());
+		const auto shared = std::make_shared<pmove_ptr_t>(ps.value());
 		return shared;
 	}
 
@@ -255,7 +255,7 @@ movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 
 }
 int rpg_firetime = 0;
-std::optional<playerState_s> TAS_Movement::update_movement_for_segment(segment_s& seg, const int get_playerstate)
+std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& seg, const int get_playerstate)
 {
 	auto& list = seg.content;
 
@@ -318,12 +318,28 @@ std::optional<playerState_s> TAS_Movement::update_movement_for_segment(segment_s
 	}
 	int j = seg.start_index;
 	bool return_playerstate = false;
-	playerState_s _ps;
+	pmove_ptr_t pmove;
 	for (auto& i : list) {
 
 		if (!pm || !pml) {
 			Com_Error(ERR_DISCONNECT, "update_movement_for_segment(): (!pm || !pml)\n");
 			break;
+		}
+
+		if (j++ == get_playerstate) {
+			return_playerstate = true;
+			pmove.ps = *ps;
+			pmove.cmd = pm->cmd;
+			pmove.oldcmd = pm->oldcmd;
+			pmove.xyspeed = pm->xyspeed;
+			pmove.viewChange = pm->viewChange;
+			pmove.viewChangeTime = pm->viewChangeTime;
+			pmove.handler = pm->handler;
+			pmove.tracemask = pm->tracemask;
+			memcpy(&pmove.touchents, &pm->touchents, sizeof(pm->touchents));
+			VectorCopy(pm->mins, pmove.mins);
+			VectorCopy(pm->maxs, pmove.maxs);
+
 		}
 
 		pmovesingle(pm, pml, seg, i);
@@ -372,10 +388,6 @@ std::optional<playerState_s> TAS_Movement::update_movement_for_segment(segment_s
 	
 		i = cmd;
 		
-		if (j++ == get_playerstate) {
-			return_playerstate = true;
-			_ps = *ps;
-		}
 	}
 	memcpy_s(&seg.end.pm, sizeof(pmove_t), pm, sizeof(pmove_t));
 	memcpy_s(&seg.end.pml, sizeof(pml_t), pml, sizeof(pml_t));
@@ -385,7 +397,7 @@ std::optional<playerState_s> TAS_Movement::update_movement_for_segment(segment_s
 	if(!return_playerstate)
 		return std::nullopt;
 
-	return _ps;
+	return pmove;
 }
 using namespace cg;
 void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd)
@@ -511,7 +523,7 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 					pm->cmd.rightmove = 127;
 			}
 			
-			if (auto yaw = CG_GetOptYaw(pm, pml)) {
+			if (const auto yaw = CG_GetOptYaw(pm, pml)) {
 				deltaY = yaw.value() - pm->ps->viewangles[YAW];
 
 				if (ps->commandTime < last_smoothingTime)

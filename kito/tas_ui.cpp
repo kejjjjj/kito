@@ -569,8 +569,16 @@ void TAS_UI::UI_FileSystem()
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("D##01123", ImVec2(30, 30))) {
-		if (auto ps = tas->movement.get_playerstate_from_frame(tas->movement.frame_index)) {
-			std::cout << "origin: " << fvec3(ps.value()->origin) << '\n';
+		if (auto ps = tas->movement.get_pmove_from_frame(tas->movement.frame_index)) {
+			std::cout << "origin: " << fvec3(ps.value()->ps.origin) << '\n';
+			tas->movement.overwrite_pmove.first = true;
+			tas->movement.overwrite_pmove.second = *ps.value();
+			if (tas->movement.recorder) {
+				delete tas->movement.recorder;
+				tas->movement.recorder = 0;
+			}
+			tas->movement.recorder = new Recorder(tas->movement.create_a_list_from_segments());
+			tas->movement.recorder->iterateIterator(tas->movement.frame_index);
 		}
 		else
 			std::cout << "NO!\n";

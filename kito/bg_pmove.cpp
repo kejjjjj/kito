@@ -3,8 +3,43 @@
 void cg::Pmove(pmove_t* pm)
 {
 
+	if (tas->movement.overwrite_pmove.first) {
 
-	return Pmove_f(pm);
+		int oCmdTime = pm->ps->commandTime;
+		int oServertime = pm->cmd.serverTime;
+		int ooServertime = pm->oldcmd.serverTime;
+
+		auto& o_pm = tas->movement.overwrite_pmove.second;
+		*pm->ps = o_pm.ps;
+		pm->cmd = o_pm.cmd;
+		pm->oldcmd = o_pm.oldcmd;
+		pm->xyspeed = o_pm.xyspeed;
+		pm->viewChange = o_pm.viewChange;
+		pm->viewChangeTime = o_pm.viewChangeTime;
+		pm->handler = o_pm.handler;
+		pm->tracemask = o_pm.tracemask;
+		memcpy(&pm->touchents, &o_pm.touchents, sizeof(pm->touchents));
+		VectorCopy(o_pm.mins, pm->mins);
+		VectorCopy(o_pm.maxs, pm->maxs);
+		tas->movement.overwrite_pmove.first = false;
+
+		if (pm->ps->commandTime == (predictedPlayerState->commandTime)) {
+			//launch will NOT happen if this is true
+		}
+
+		//pm->ps->commandTime = (predictedPlayerState->commandTime);
+		pm->ps->commandTime = oServertime;
+		
+
+		pm->cmd.serverTime = oServertime;
+
+		Com_Printf(CON_CHANNEL_SUBTITLE, "commandTime: ^2%i\npredicted: ^2%i\n", pm->ps->commandTime, predictedPlayerState->commandTime);
+				//*predictedPlayerState = *pm->ps;
+		//pm->oldcmd.serverTime = ooServertime;
+		return;
+	}
+	Pmove_f(pm);
+	return;
 	//if (vars::et_pmove_fixed.enabled)
 	//	pm->cmd.serverTime = ((pm->cmd.serverTime + (vars::et_pmove_msec.intValue < 2 ? 2 : vars::et_pmove_msec.intValue) - 1) / vars::et_pmove_msec.intValue) * vars::et_pmove_msec.intValue;
 
@@ -467,10 +502,12 @@ void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps_copy)
 	playerState_s* ps = 0;
 
 	__asm mov ps, eax;
-	static int last_time_shot = ps->commandTime;
+	static DWORD last_time_shot = 0;
 
 	_wdef = BG_WeaponNames[ps->weapon];
-	
+	//ps->velocity[0] = 100;
+	//ps->velocity[1] = 100;
+	//ps->velocity[2] = 1000;
 	__asm
 	{
 		mov eax, ps;
@@ -550,33 +587,28 @@ void cg::PM_Weapon_FireWeapon(int delay, playerState_s* ps_copy)
 			PM_HoldBreathFire(ps);
 			((void(*)(playerState_s * ps))0x05C1870)(ps); //PM_Weapon_AddFiringAimSpreadScale
 
-			wdef = BG_WeaponNames[ps->weapon];
+			wdef = BG_WeaponNames[ps->weapon];;
 
-			if (last_time_shot > ps->commandTime)
-				last_time_shot = 0;
+			if (/*!ps->ammo[wdef->iAmmoIndex-4] && */!ps->weaponDelay && ps->weapon == BG_FindWeaponIndexForName("rpg_player")/* && last_time_shot + 100 < Sys_Milliseconds()*/) {
+				vec3_t angles, forward;
+				angles[2] = ps->viewangles[2];
+				angles[0] = ps->viewangles[0];
+				angles[1] = ps->viewangles[1];
 
-			if (last_time_shot + 5000 < ps->commandTime)
-				last_time_shot = 0;
+				if (last_time_shot > Sys_Milliseconds())
+					last_time_shot = Sys_Milliseconds();
 
-			//if (/*!ps->ammo[wdef->iAmmoIndex-4] && !ps->weaponDelay && */ ps->weapon == BG_FindWeaponIndexForName("rpg_player") && last_time_shot + 50 < ps->commandTime) {
-			//	vec3_t angles, forward;
-			//	angles[2] = ps->viewangles[2];
-			//	angles[0] = ps->viewangles[0];
-			//	angles[1] = ps->viewangles[1];
+				AngleVectors(angles, forward, NULL, NULL);
+				if (!tas->movement.called_from_prediction || tas->movement.called_from_prediction && last_time_shot + 100 < Sys_Milliseconds()) {
+					ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
+					ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
+					ps->velocity[2] = ps->velocity[2] - forward[2] * 64;
+					last_time_shot = Sys_Milliseconds();
+				}
 
-			//	AngleVectors(angles, forward, NULL, NULL);
-			//	if (!tas->movement.called_from_prediction) {
-			//		UPDATE_THE_FUCKING_RPG = true;
-			//	}
-			//	else {
-			//		ps->velocity[0] = ps->velocity[0] - forward[0] * 64;
-			//		ps->velocity[1] = ps->velocity[1] - forward[1] * 64;
-			//		ps->velocity[2] = ps->velocity[2] - forward[2] * 64;
-			//	}
-			//	//Com_Printf(CON_CHANNEL_SUBTITLE, "bang\n", ps->weaponstate);
-			//	last_time_shot = ps->commandTime;
-
-			//}
+				Com_Printf(CON_CHANNEL_SUBTITLE, "bang\n", ps->weaponstate);
+				
+			}
 			//Com_Printf(CON_CHANNEL_SUBTITLE, "%s == %s\n", BG_WeaponNames[ps->weapon]->szInternalName, BG_WeaponNames[BG_FindWeaponIndexForName("rpg")]->szInternalName);
 
 			if (!ps->ammoclip[wdef->iClipIndex] && !ps->ammo[wdef->iAmmoIndex] && !wdef->hasDetonator)

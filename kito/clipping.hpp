@@ -34,11 +34,13 @@ struct Recorder
 
 	std::list<recorder_cmd> recorder_sequence;
 	int frame = 0;
+	bool refresh_start_time = true;
 	bool IsPlayback() { return playback; }
 
 	void StartPlayback();
 	void Playback(usercmd_s* cmd);
 	auto getIterator() const { return it; }
+	void iterateIterator(const size_t amount) {return refresh_start_time = true, std::advance(it, amount); }
 	recorder_cmd* CurrentCmd() { 
 		if (!playback) 
 			return 0; 

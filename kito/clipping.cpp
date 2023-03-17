@@ -38,9 +38,10 @@ void Recorder::Playback(usercmd_s* cmd)
 		Com_Printf(CON_CHANNEL_SUBTITLE, "End playback..\n");
 		return;
 	}
-	else if (Recorder::it == Recorder::recorder_sequence.begin())
+	else if (refresh_start_time) {
 		Recorder::refTime = cmd->serverTime;
-
+		refresh_start_time = false;
+	}
 	cmd->angles[0] = it->angles[0];
 	cmd->angles[1] = it->angles[1];
 	cmd->angles[2] = it->angles[2];

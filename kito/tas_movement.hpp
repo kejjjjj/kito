@@ -89,11 +89,11 @@ public:
 	size_t get_frame_count() { return segments.back().end_index-1; }
 	void set_current_segment(size_t i) {  if(i < segments.size()) current_segment = &segments[i]; }
 	segment_s* get_segment_by_index(const size_t i) { if (i < segments.size()) return &segments[i]; }
-	std::optional<playerState_s> update_movement_for_segment(segment_s& seg, const int get_playerstate = -1);
+	std::optional<pmove_ptr_t> update_movement_for_segment(segment_s& seg, const int get_playerstate = -1);
 	void update_movement_for_each_segment();
 	void update_all_segment_indices();
 	segment_s* get_segment_from_frame(const int32_t frame);
-	std::optional<std::shared_ptr<playerState_s>> get_playerstate_from_frame(const int32_t frame);
+	std::optional<std::shared_ptr<pmove_ptr_t>> get_pmove_from_frame(const int32_t frame);
 	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
 	void pmove(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
 
@@ -118,6 +118,7 @@ public:
 
 	bool player_pov = false;
 	bool called_from_prediction = false;
+	std::pair<bool, pmove_ptr_t> overwrite_pmove;
 	playerState_s* current_frame_prediction_state = 0;
 	bool rpg_next_frame = false;
 	movement_data first_segment, this_segment;

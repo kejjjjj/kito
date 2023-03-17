@@ -63,6 +63,8 @@ void cg::CG_InitForeverHooks()
 	hook::install(&(PVOID&)Pmove_f, Pmove);
 	hook::install(&(PVOID&)PmoveSingle_f, PmoveSingle);
 
+	hook::write_addr(0x04F1305, "\xEB\x2E\x8B\x8B\x00", 5); //je -> jne (ent->client -> !ent->client)
+
 }
 void cg::CG_InitHooks()
 {

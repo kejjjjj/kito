@@ -735,6 +735,22 @@ struct __declspec(align(4)) pmove_t
 	float viewChange;
 	char handler;
 };
+struct __declspec(align(4)) pmove_ptr_t
+{
+	playerState_s ps;
+	usercmd_s cmd;
+	usercmd_s oldcmd;
+	int tracemask;
+	int numtouch;
+	int touchents[32];
+	float mins[3];
+	float maxs[3];
+	float xyspeed;
+	int viewChangeTime;
+	float viewChange;
+	char handler;
+
+};
 struct pml_t
 {
 	float forward[3];
