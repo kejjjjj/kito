@@ -8,7 +8,7 @@
 
 namespace cg
 {
-	void ShowTriggers_f();
+	void ShowBrush_f();
 
 	void CM_GetBrushOriginFromBounds(const cbrush_t* brush, vec3_t out);
 	void CM_DrawBrush(const cbrush_t* b);

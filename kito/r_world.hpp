@@ -44,6 +44,8 @@ namespace cg
 	void CG_DrawVelocity();
 	void CG_DrawPlayback();
 	void CG_DrawSnapshot();
+	void CG_StaminaBar();
+	void CG_CalibrationRequired();
 
 }
 

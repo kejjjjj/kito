@@ -79,3 +79,41 @@ void r::R_DrawText(const std::string& text, const char* fontname, float x, float
 	R_AddCmdDrawText(text.c_str(), text.size(), font, x, y, xScale, yScale, rotation, color, style);
 
 }
+void r::R_AddCmdDrawStretchPic(Material* material, float x, float y, float w, float h, float s0, float t0, float s1, float t1, const float* color)
+{
+	const static uint32_t R_AddCmdDrawStretchPic_func = 0x5DB2A0;
+	__asm
+	{
+		pushad;
+		push	color;
+		mov		eax, [material];
+		sub		esp, 20h;
+		fld		t1;
+		fstp[esp + 1Ch];
+		fld		s1;
+		fstp[esp + 18h];
+		fld		t0;
+		fstp[esp + 14h];
+		fld		s0;
+		fstp[esp + 10h];
+		fld		h;
+		fstp[esp + 0Ch];
+		fld		w;
+		fstp[esp + 8h];
+		fld		y;
+		fstp[esp + 4h];
+		fld		x;
+		fstp[esp];
+		call	R_AddCmdDrawStretchPic_func;
+		add		esp, 24h;
+		popad;
+	}
+}
+void r::R_DrawRect(const char* material, float x, float y, float w, float h, const float* color)
+{
+	//CG_AdjustFrom640(x, y, w, h);
+	Material* mat = R_RegisterMaterial(material);
+	R_AddCmdDrawStretchPic(mat, (x), (y), (w), (h), 0, 0, 0, 0, color);
+
+
+}

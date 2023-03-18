@@ -2411,6 +2411,15 @@ struct MapEnts
 	MapTriggers trigger;
 	// this goes on for a while but we don't need any of it
 };
+struct CmdArgs
+{
+	int nesting;
+	int localClientNum[8];
+	int controllerIndex[8];
+	int argc[8];
+	const char** argv[8];
+};
+
 struct clipMap_t
 {
 	const char* name;

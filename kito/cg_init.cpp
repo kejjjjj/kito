@@ -13,7 +13,7 @@ void cg::CG_Init()
 
 	tas->Init();
 
-	Cmd_AddCommand((char*)"showtriggers", ShowTriggers_f);
+	Cmd_AddCommand((char*)"showbrush", ShowBrush_f);
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "^2project extension has been loaded!\n");
 

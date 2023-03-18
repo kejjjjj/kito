@@ -122,13 +122,13 @@ void R::CG_DrawActive()
 		cg::CG_DrawVelocity();
 		cg::CG_DrawPlayback();
 		cg::CG_DrawSnapshot();
+		cg::CG_StaminaBar();
+		cg::CG_CalibrationRequired();
 	}
 	cg::CG_DrawCoordinates();
 
 	if (tas->TAS_CheckAutoSave())
 		tas->TAS_AutoSave();
-
-
 
 	return r_glob->CG_DrawActive_f();
 }

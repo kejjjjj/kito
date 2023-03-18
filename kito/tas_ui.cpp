@@ -179,6 +179,7 @@ void TAS_UI::UI_SegmentEditor()
 	ImGui::SameLine(); 
 	if (ImGui::Button("Insert")) {
 		tas->movement.insert_segment();
+		
 		cur_seg = tas->movement.request_current_segment();
 
 	}
@@ -189,6 +190,20 @@ void TAS_UI::UI_SegmentEditor()
 		tas->movement.delete_segment();
 	if (cur_seg->segment_index == 0)
 		ImGui::EndDisabled();
+
+	ImGui::SameLine();
+	if (ImGui::Checkbox2("Recorded state", &cur_seg->options.recorded_state)) {
+		if (!cur_seg->options.recorded_state) {
+			auto it = tas->movement.calibration_required.find(cur_seg->segment_index);
+
+			if (it != tas->movement.calibration_required.end()) {
+				tas->movement.calibration_required.erase(it);
+			}
+			
+		}
+		tas->movement.on_ui_update();
+	}
+
 	ImGui::NewLine();
 	//ImGui::Separator();
 
@@ -263,7 +278,7 @@ void TAS_UI::UI_OtherControls()
 
 	ImGui::PushItemWidth(150);
 	if (ImGui::Combo("Angles", &(int&)options->viewangle_type, viewangle_options, IM_ARRAYSIZE(viewangle_options)))
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 
 	UI_AngleControls_Fixed(options);
 	UI_AngleControls_Strafebot(options);
@@ -306,7 +321,7 @@ void TAS_UI::UI_ControlsDPAD()
 			else
 				dir = value;
 
-			tas->movement.update_movement_for_each_segment();
+			tas->movement.on_ui_update();
 		}
 
 		ImGui::GetStyle().Colors[ImGuiCol_Button] = ImVec4(30.f / 255, 30.f / 255, 41.f / 255, 1.f);
@@ -369,13 +384,13 @@ void TAS_UI::UI_AngleControls_Fixed(segment_options* options)
 	ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("Right##01", &options->fixed_turn.right, 0.f, 0.f, "%.3f")) {
 		options->fixed_turn.right = std::clamp(options->fixed_turn.right, -180.f, 180.f);
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}
 
 	ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("Up##01", &options->fixed_turn.up, 0.f, 0.f, "%.3f")) {
 		options->fixed_turn.up = std::clamp(options->fixed_turn.up, -85.f, 85.f);
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}
 
 
@@ -389,19 +404,17 @@ void TAS_UI::UI_AngleControls_Strafebot(segment_options* options)
 	ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("Up##02", &options->strafebot.up, 0.f, 0.f, "%.3f")) {
 		options->strafebot.up = std::clamp(options->strafebot.up, -85.f, 85.f);
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}
 	if (options->strafebot.go_straight) {
 		ImGui::PushItemWidth(150);
 		if (ImGui::InputInt("Smooth", &options->strafebot.smoothing_window, 1.f, 100.f)) {
 			options->strafebot.smoothing_window = std::clamp(options->strafebot.smoothing_window, 0, INT_MAX);
-			tas->movement.update_movement_for_each_segment();
-
+			tas->movement.on_ui_update();
 		}
 	}
 	if(ImGui::Checkbox2("Spam##01", &options->strafebot.go_straight))
-		tas->movement.update_movement_for_each_segment();
-
+		tas->movement.on_ui_update();
 }
 void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 {
@@ -410,13 +423,13 @@ void TAS_UI::UI_AngleControls_Aimlock(segment_options* options)
 
 	ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("X##02", &options->aimlock.target.x, 0.f, 0.f, "%.3f")) {
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}ImGui::PushItemWidth(150); 
 	if (ImGui::InputFloat("Y##02", &options->aimlock.target.y, 0.f, 0.f, "%.3f")) {
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}ImGui::PushItemWidth(150); 
 	if (ImGui::InputFloat("Z##02", &options->aimlock.target.z, 0.f, 0.f, "%.3f")) {
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}
 
 }
@@ -427,13 +440,13 @@ void TAS_UI::UI_AngleControls_FixedAngles(segment_options* options)
 
 	ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("X##03", &options->fixed_angle.viewangles.x, 0.f, 0.f, "%.3f")) {
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("Y##03", &options->fixed_angle.viewangles.y, 0.f, 0.f, "%.3f")) {
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}ImGui::PushItemWidth(150);
 	if (ImGui::InputFloat("Z##03", &options->fixed_angle.viewangles.z, 0.f, 0.f, "%.3f")) {
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}
 }
 void TAS_UI::UI_SelectWeapon()
@@ -450,12 +463,11 @@ void TAS_UI::UI_SelectWeapon()
 	if (ImGui::Combo("Weapon##01", &cur_seg->options.iWeapon, weapons.data(), weapons.size())) {
 		Com_Printf(CON_CHANNEL_SUBTITLE, "index: %i\n", weaplist[cur_seg->options.iWeapon].second);
 		cur_seg->options.weapon = weaplist[cur_seg->options.iWeapon].second;
-		tas->movement.update_movement_for_each_segment();
+		tas->movement.on_ui_update();
 	}
 	ImGui::PushItemWidth(150);
 	if(ImGui::InputInt("FPS##02", &cur_seg->options.FPS))
-		tas->movement.update_movement_for_each_segment();
-
+		tas->movement.on_ui_update();
 
 }
 
@@ -508,7 +520,7 @@ int32_t TAS_UI::UI_HoldButtons()
 
 					show_actions = false;
 
-					tas->movement.update_movement_for_each_segment();
+					tas->movement.on_ui_update();
 				}
 			}
 
@@ -538,6 +550,7 @@ int32_t TAS_UI::UI_SpamButtons()
 void TAS_UI::UI_FileSystem()
 {
 	static std::string file_name;
+	auto cur_seg = tas->movement.request_current_segment();
 
 	ImGui::Separator();
 
@@ -568,16 +581,33 @@ void TAS_UI::UI_FileSystem()
 
 	}
 	ImGui::SameLine();
+	if (!tas->movement.calibration_required.empty()) {
+		ImGui::BeginDisabled();
+	}
+
 	if (ImGui::Button("D##01123", ImVec2(30, 30))) {
 		if (auto ps = tas->movement.get_pmove_from_frame(tas->movement.frame_index)) {
-			std::cout << "origin: " << fvec3(ps.value()->ps.origin) << '\n';
 			tas->movement.overwrite_pmove.first = true;
 			tas->movement.overwrite_pmove.second = *ps.value();
 
 		}
-		else
-			std::cout << "NO!\n";
+
 	}
+	if (!tas->movement.calibration_required.empty()) {
+		if (ImGui::IsHovered(ImGui::GetItemRectMin(), ImGui::GetItemRectMax())) {
+			if (auto font = tas->FetchFont("conduit"))
+				ImGui::SetCurrentFont(font.value());
+
+			ImGui::BeginTooltip();
+			ImGui::SetTooltip("the run has not been calibrated yet");
+			ImGui::EndTooltip();
+
+			if (auto font = tas->FetchFont("font90"))
+				ImGui::SetCurrentFont(font.value());
+		}
+	}
+	if (!tas->movement.calibration_required.empty())
+		ImGui::EndDisabled();
 	ImGui::SameLine();
 	if (ImGui::Button("A##012341", ImVec2(30, 30))) {
 		tas->movement.frame_index = tas->movement.get_last_segment()->end_index-1;

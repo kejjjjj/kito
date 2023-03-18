@@ -153,6 +153,20 @@ namespace cg
 			add esp, 0x4;
 		}
 	}
+	static int PM_GetSprintLeft(playerState_s* ps, int time)
+	{
+		int timeleft = 0;
+		constexpr DWORD f = 0x5B7750;
+		__asm
+		{
+			push time;
+			mov esi, ps;
+			call f;
+			add esp, 0x4;
+			mov timeleft, eax;
+		}
+		return timeleft;
+	}
 	inline void (*PmoveSingle_fnc)(pmove_t* pm) = (void(__cdecl*)(pmove_t*))0x5BCBB0;
 
 	inline void (*PmoveSingle_f)(pmove_t* pm);

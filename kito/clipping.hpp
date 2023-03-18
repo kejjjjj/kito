@@ -20,9 +20,8 @@ struct recorder_cmd
 	fvec3 velocity;
 	fvec3 mins, maxs;
 	float camera_yaw = 0;
-	
-	//VERSION 2
 	int weaponTime = 0;
+	int sprintStamina = 0;
 };
 struct Recorder
 {
@@ -49,6 +48,8 @@ struct Recorder
 	}
 
 private:
+	int SegmentIndexFromIt();
+	void CalibrateSegment(usercmd_s* cmd);
 	bool playback = 0;
 	std::list<recorder_cmd>::iterator it;
 	int refTime = 0;

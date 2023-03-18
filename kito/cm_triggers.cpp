@@ -1,9 +1,18 @@
 #include "pch.h"
 
 
-void cg::ShowTriggers_f()
+void cg::ShowBrush_f()
 {
-	show_all_triggers = !show_all_triggers;
+
+	if (cmd_args->argc[cmd_args->nesting] != 2) {
+		if(!show_all_triggers)
+			Com_Printf(CON_CHANNEL_CONSOLEONLY, "usage: showbrush <material>");
+		show_all_triggers = false;
+
+		return;
+	}
+	auto name = *(cmd_args->argv[cmd_args->nesting] + 1);
+	show_all_triggers = true;
 
 	if (show_all_triggers) {
 		brushes.clear();
@@ -12,7 +21,7 @@ void cg::ShowTriggers_f()
 
 			for (int x = 0; x < 1; x++) {
 				for (int y = 0; y < 3; y++) {
-					if (std::string(cm->materials[b->axialMaterialNum[x][y]].material).find("clip") != std::string::npos) {
+					if (std::string(cm->materials[b->axialMaterialNum[x][y]].material).find(name) != std::string::npos) {
 						brushes.push_back(b);
 						//std::cout << "yep! [" << j << "]\n";
 						goto end;
@@ -20,7 +29,7 @@ void cg::ShowTriggers_f()
 				}
 			}
 			if (b->numsides) {
-				if (std::string(cm->materials[b->sides[0].materialNum].material).find("clip") != std::string::npos) {
+				if (std::string(cm->materials[b->sides[0].materialNum].material).find(name) != std::string::npos) {
 					brushes.push_back(b);
 					//std::cout << "yep! [" << j << "]\n";
 				}

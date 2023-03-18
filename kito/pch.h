@@ -53,6 +53,7 @@ typedef vec_t vec4_t[4];
 #include <optional>
 #include <map>
 #include <unordered_map>
+#include <set>
 
 // add headers that you want to pre-compile here
 #include "framework.h"

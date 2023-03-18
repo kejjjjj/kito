@@ -161,7 +161,7 @@ void TAS_Render::R_FrameData()
 	
 
 	if (auto xy = cg::WorldToScreen(frame->origin)) {
-		sprintf_s(buffer, "XY Speed: %.6f\nZ: %.6f\nweaponTime: %d\ncYaw: %.6f\nElapsed time: %.6f", fvec2(frame->velocity.x, frame->velocity.y).mag(), frame->velocity.z, frame->weaponTime, frame->camera_yaw,(float)(frame->serverTime - tas->movement.entry.pm.cmd.serverTime) / 1000 );
+		sprintf_s(buffer, "XY Speed: %.6f\nZ: %.6f\nweaponTime: %d\nstamina: %d\nElapsed time: %.6f", fvec2(frame->velocity.x, frame->velocity.y).mag(), frame->velocity.z, frame->weaponTime, frame->sprintStamina,(float)(frame->serverTime - tas->movement.entry.pm.cmd.serverTime) / 1000 );
 		r::R_DrawTextWithEffects(buffer, "fonts/normalfont", xy.value().x, xy.value().y, 1.25f, 1.25f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 0,0,0,1 });
 	}
 

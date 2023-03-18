@@ -193,9 +193,6 @@ std::optional<segment_s> TAS_FileSystem_In::In_ReadSegment()
 		case 1:
 			cmd = In_ReadBlock<recorder_cmd>(ORIGINAL_RECORDER_CMD_SIZE);
 			break;
-		case 2:
-			cmd = In_ReadBlock<recorder_cmd>(ORIGINAL_RECORDER_CMD_SIZE+4); //one new variable: weaponTime
-			break;
 		default:
 			Com_Error(ERR_DROP, "Unsupported file version!\n");
 			return std::nullopt;

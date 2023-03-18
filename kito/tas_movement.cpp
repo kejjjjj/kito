@@ -166,6 +166,22 @@ void TAS_Movement::update_all_segment_indices()
 	}
 
 }
+void TAS_Movement::on_ui_update()
+{
+	auto cur_seg = request_current_segment();
+
+	if (!cur_seg)
+		return;
+
+	if (cur_seg->options.recorded_state) {
+		calibration_required.insert(cur_seg->segment_index);
+		return;
+	}
+	if (!calibration_required.empty())
+		return;
+
+	update_movement_for_each_segment();
+}
 segment_s* TAS_Movement::get_segment_from_frame(const int32_t frame)
 {
 	if (frame == 0)
@@ -177,6 +193,18 @@ segment_s* TAS_Movement::get_segment_from_frame(const int32_t frame)
 			return &i;
 	}
 	return 0;
+}
+std::optional<int> TAS_Movement::get_segmentindex_from_frame(const int32_t frame)
+{
+	if (frame == 0)
+		return segments.front().segment_index;
+
+	for (const auto& i : segments) {
+
+		if ((frame - i.start_index) <= i.frame_count)
+			return i.segment_index;
+	}
+	return std::nullopt;
 }
 std::optional<std::shared_ptr<pmove_ptr_t>> TAS_Movement::get_pmove_from_frame(const int32_t frame)
 {
@@ -215,6 +243,8 @@ void TAS_Movement::update_movement_for_each_segment()
 	called_from_prediction = true;
 	update_all_segment_indices();
 	std::for_each(segments.begin(), segments.end(), [this](segment_s& seg) {
+		//if (seg.options.recorded_state)
+		//	return;
 		TAS_Movement::update_movement_for_segment(seg); });
 
 	auto cmd = cg::input->GetUserCmd(cg::input->cmdNumber - 1);
@@ -269,18 +299,6 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 	playerState_s* ps = pm->ps;
 	recorder_cmd cmd;
 
-	
-
-	//if (seg.segment_index) {
-
-
-	//}
-	//ps->weapon = seg.options.weapon;
-	//ps->weaponTime = 0;
-	//ps->weapFlags &= 0xFFFFFBFF;
-	//ps->weaponstate = WEAPON_RAISING;
-	//ps->weapAnim = ~ps->weapAnim & 0x200;
-	//ps->weaponDelay = 0;
 	rpg_firetime = 0;
 	static int fragtime = 0;
 
@@ -380,7 +398,7 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 		cmd.weapon = ps->weapon;
 		cmd.offhand = pm->cmd.offHandIndex;
 		cmd.weaponTime = fragtime;
-
+		cmd.sprintStamina = cg::PM_GetSprintLeft(ps, pm->cmd.serverTime);
 		
 
 		memcpy(&pm->oldcmd, &pm->cmd, sizeof(usercmd_s));

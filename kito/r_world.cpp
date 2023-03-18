@@ -270,6 +270,35 @@ void cg::CG_DrawSnapshot()
 	if (!ps)
 		return;
 
-	sprintf_s(buff, "cmdTime: %i\npTime: %i", input->GetUserCmd(input->cmdNumber-1)->serverTime, predictedPlayerState->commandTime);
+	sprintf_s(buff, "cmdTime: %i\npTime: %i\n%i", input->GetUserCmd(input->cmdNumber-1)->serverTime, predictedPlayerState->commandTime, cg::PM_GetSprintLeft(ps, input->GetUserCmd(input->cmdNumber)->serverTime));
 	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, float(refdef->height) / 1.2f, 1.25f, 1.25f, 0, vec4_t{1,1,1,0.7f}, 3, vec4_t{1,0,0,0});
+}
+void cg::CG_StaminaBar()
+{
+	const auto ps = predictedPlayerState;
+	if (!ps)
+		return;
+
+	const int max_time = std::clamp(int(Dvar_FindMalleableVar("player_sprintTime")->current.value * 1000.0f * BG_WeaponNames[ps->weapon]->sprintDurationScale), 0, 0x3fff);
+	const int time_left = PM_GetSprintLeft(ps, input->GetUserCmd(input->cmdNumber)->serverTime);
+
+	const float remaining = float(time_left) / float(max_time);
+	const float width = (200.f * remaining);
+
+	r::R_DrawRect("white", refdef->width/2-100, refdef->height - 10, width, 10, vec4_t{1.f - remaining, 0.f + remaining,0,1});
+	r::R_DrawRect("white", refdef->width / 2-100 +width, refdef->height-10, 200.f - width, 10, vec4_t{ 0,0,0,1 });
+
+}
+void cg::CG_CalibrationRequired()
+{
+	if (tas->movement.calibration_required.empty())
+		return;
+
+	const char* str = "Calibration required";
+	const int center_x = refdef->width / 2 - (strlen(str)*5);
+	const int y = refdef->height - 90;
+
+
+	r::R_DrawTextWithEffects(str, "fonts/normalfont", center_x, y, 2.f, 2.f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,0 });
+
 }
