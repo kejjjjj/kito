@@ -25,13 +25,13 @@ struct recorder_cmd
 };
 struct Recorder
 {
-	explicit Recorder(std::list<recorder_cmd> input) : recorder_sequence(input) { 
+	explicit Recorder(std::list<recorder_cmd*> input) : recorder_sequence(input) { 
 		Recorder::StartPlayback();
 	}
 	~Recorder() = default;
 
 
-	std::list<recorder_cmd> recorder_sequence;
+	std::list<recorder_cmd*> recorder_sequence;
 	int frame = 0;
 	bool refresh_start_time = true;
 	bool IsPlayback() { return playback; }
@@ -44,14 +44,16 @@ struct Recorder
 		if (!playback) 
 			return 0; 
 
-		return &*(it); 
+		if (!(*it))
+			return nullptr;
+
+		return *(it); 
 	}
 
 private:
 	int SegmentIndexFromIt();
-	void CalibrateSegment(usercmd_s* cmd);
 	bool playback = 0;
-	std::list<recorder_cmd>::iterator it;
+	std::list<recorder_cmd*>::iterator it;
 	int refTime = 0;
 };
 #endif

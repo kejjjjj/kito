@@ -636,6 +636,7 @@ void cg::PmoveSingle(pmove_t* pm)
 
 
 	PmoveSingle_f(pm);
+	tas->movement.CalibrateSegment(pm);
 
 	//if (UPDATE_THE_FUCKING_RPG) {
 	//	vec3_t angles, forward;

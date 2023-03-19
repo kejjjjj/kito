@@ -254,7 +254,7 @@ void cg::CG_DrawPlayback()
 
 				char buff[64];
 
-				sprintf_s(buff, "%.6f",dist);
+				sprintf_s(buff, "%.6f\ntime: %d",dist, current->serverTime);
 				r::R_DrawTextWithEffects(buff, "fonts/objectivefont", refdef->width / 1.5f - strlen(buff) * 2, refdef->height / 1.5f, 1.f, 1.f, 0, vec4_t{ 1,1,1,1 }, 3, vec4_t{ 1,0,0,1 });
 
 

@@ -206,6 +206,67 @@ std::optional<int> TAS_Movement::get_segmentindex_from_frame(const int32_t frame
 	}
 	return std::nullopt;
 }
+void TAS_Movement::CalibrateSegment(pmove_t* pm)
+{
+	static int last_calibrated = -1;
+	static int processed_frame = -1;
+	const auto ps = pm->ps;
+	const auto cmd = &pm->cmd;
+	std::optional<int> s_index_o;
+
+
+	if (calibration_required.empty() || !recorder || processed_frame == recorder->frame)
+		return;
+
+
+
+	if (!(s_index_o = get_segmentindex_from_frame(recorder->frame)))
+		return;
+
+	const int s_index = s_index_o.value();
+
+	if (last_calibrated > -1 && last_calibrated != s_index) {
+
+		memcpy(&segments[last_calibrated].end.pm, pm, sizeof(pmove_t));
+		memcpy(&segments[last_calibrated].end.ps, ps, sizeof(playerState_s));
+		*segments[last_calibrated].end.pm.ps = segments[last_calibrated].end.ps;
+
+		Com_Printf(CON_CHANNEL_SUBTITLE, "calibrated: ^1%i\n", last_calibrated);
+		last_calibrated = -1;
+		calibration_required.erase(calibration_required.begin());
+	}
+
+	//std::cout << "index: " << s_index << '\n';
+	if (calibration_required.find(s_index) == calibration_required.end())
+		return;
+
+	auto& seg = segments[s_index];
+
+	auto begin = seg.content.begin();
+	std::advance(begin, recorder->frame);
+
+	recorder_cmd rcmd;
+
+	rcmd.serverTime = begin->serverTime;
+	VectorCopy(cmd->angles, rcmd.angles);
+	rcmd.buttons = seg.options.hold_buttons;
+	rcmd.forwardmove = seg.options.forwardmove;
+	rcmd.rightmove = seg.options.rightmove;
+	rcmd.FPS = seg.options.FPS;
+	rcmd.weapon = cmd->weapon;
+	rcmd.offhand = cmd->offHandIndex;
+	rcmd.viewangles = ps->viewangles;
+	rcmd.origin = ps->origin;
+	rcmd.velocity = ps->velocity;
+	rcmd.maxs = pm->maxs;
+	rcmd.mins = pm->mins;
+	rcmd.weaponTime = ps->weaponTime;
+	rcmd.sprintStamina = cg::PM_GetSprintLeft(ps, pm->cmd.serverTime);
+
+	*begin = rcmd;
+	last_calibrated = s_index;
+	processed_frame = recorder->frame;
+}
 std::optional<std::shared_ptr<pmove_ptr_t>> TAS_Movement::get_pmove_from_frame(const int32_t frame)
 {
 	auto seg = get_segment_from_frame(frame);
@@ -243,9 +304,11 @@ void TAS_Movement::update_movement_for_each_segment()
 	called_from_prediction = true;
 	update_all_segment_indices();
 	std::for_each(segments.begin(), segments.end(), [this](segment_s& seg) {
-		//if (seg.options.recorded_state)
-		//	return;
+		if (seg.options.recorded_state) {
+			return update_movement_for_recorded_state(seg);
+		}
 		TAS_Movement::update_movement_for_segment(seg); });
+
 
 	auto cmd = cg::input->GetUserCmd(cg::input->cmdNumber - 1);
 	if (!cmd) {
@@ -284,6 +347,17 @@ movement_data* TAS_Movement::initialize_player_data_for_segment(segment_s& seg)
 	return &this_segment;
 
 }
+void TAS_Movement::update_movement_for_recorded_state(segment_s& seg) //fixes servertime
+{
+	int reftime = seg.segment_index == 0 ? 0 : segments[seg.segment_index - 1].content.back().serverTime;
+	int previous = reftime;
+	int offs = 0;
+	for (auto& i : seg.content) {
+		offs = (1000 / (i.FPS != 0 ? i.FPS : 1));
+		i.serverTime = previous + offs;
+		previous = i.serverTime;
+	}
+}
 int rpg_firetime = 0;
 std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& seg, const int get_playerstate)
 {
@@ -298,6 +372,16 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 	pml_t* pml = &data->pml;
 	playerState_s* ps = pm->ps;
 	recorder_cmd cmd;
+
+	int offs = pm->cmd.serverTime - pm->oldcmd.serverTime;
+
+	if (seg.segment_index == 0) {
+		//pm->cmd.serverTime = 0, pm->oldcmd.serverTime = 0;
+	}
+	else {
+		pm->cmd.serverTime = segments[seg.segment_index - 1].content.back().serverTime;
+		pm->oldcmd.serverTime = pm->cmd.serverTime - offs;
+	}
 
 	rpg_firetime = 0;
 	static int fragtime = 0;
@@ -710,13 +794,13 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 
 	//}
 }
-std::list<recorder_cmd> TAS_Movement::create_a_list_from_segments()
+std::list<recorder_cmd*> TAS_Movement::create_a_list_from_segments()
 {
-	std::list<recorder_cmd> list;
+	std::list<recorder_cmd*> list;
 
 	for (auto& i : segments) {
 		for (auto& content : i.content) {
-			list.push_back(content);
+			list.push_back(&content);
 		}
 	}
 

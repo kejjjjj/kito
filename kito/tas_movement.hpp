@@ -35,7 +35,7 @@ enum class viewangle_type : int
 };
 struct segment_options
 {
-	bool recorded_state; //this segment is not made using prediction - needs to be calibrated 
+	bool recorded_state = 0; //this segment is not made using prediction - needs to be calibrated 
 	char forwardmove = 0;
 	char rightmove = 0;
 	int weapon = 0;
@@ -73,7 +73,6 @@ struct segment_s
 	movement_data end;
 	segment_options options;
 	segment_list content;
-	std::vector<playerState_s> recorded_states;
 };
 
 class TAS_Movement
@@ -92,17 +91,19 @@ public:
 	void set_current_segment(size_t i) {  if(i < segments.size()) current_segment = &segments[i]; }
 	segment_s* get_segment_by_index(const size_t i) { if (i < segments.size()) return &segments[i]; }
 	std::optional<pmove_ptr_t> update_movement_for_segment(segment_s& seg, const int get_playerstate = -1);
+	void update_movement_for_recorded_state(segment_s& seg);
 	void update_movement_for_each_segment();
 	void update_all_segment_indices();
 	void on_ui_update();
 	segment_s* get_segment_from_frame(const int32_t frame);
 	std::optional<int> get_segmentindex_from_frame(const int32_t frame);
+	void CalibrateSegment(pmove_t* cmd);
 
 	std::optional<std::shared_ptr<pmove_ptr_t>> get_pmove_from_frame(const int32_t frame);
 	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
 	//void pmove(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
 
-	std::list<recorder_cmd> create_a_list_from_segments();
+	std::list<recorder_cmd*> create_a_list_from_segments();
 	movement_data* initialize_player_data_for_segment(segment_s& seg);
 
 	void create_first_segment(pmove_t* pm, pml_t* pml);
