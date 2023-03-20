@@ -64,6 +64,7 @@ void cg::CG_InitForeverHooks()
 	hook::install(&(PVOID&)PmoveSingle_f, PmoveSingle);
 
 	hook::write_addr(0x04F1305, "\xEB\x2E\x8B\x8B\x00", 5); //je -> jne (ent->client -> !ent->client)
+	hook::nop(0x04F146D); // BG_GetSpreadForWeapon
 
 }
 void cg::CG_InitHooks()

@@ -48,6 +48,9 @@ std::optional<std::shared_ptr<TAS_Movement>> TAS_FileSystem_In::read()
 	while (true) {
 		if (!(read_seg = In_ReadSegment()))
 			break;
+		if (read_seg.value().options.recorded_state) {
+			movement->calibration_required.insert(movement->segments.size());
+		}
 
 		movement->segments.push_back(read_seg.value());
 	}

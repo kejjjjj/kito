@@ -100,7 +100,7 @@ public:
 	void CalibrateSegment(pmove_t* cmd);
 
 	std::optional<std::shared_ptr<pmove_ptr_t>> get_pmove_from_frame(const int32_t frame);
-	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
+	void pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd, const int frameIndex);
 	//void pmove(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd);
 
 	std::list<recorder_cmd*> create_a_list_from_segments();

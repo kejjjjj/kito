@@ -234,6 +234,9 @@ void TAS_Movement::CalibrateSegment(pmove_t* pm)
 		Com_Printf(CON_CHANNEL_SUBTITLE, "calibrated: ^1%i\n", last_calibrated);
 		last_calibrated = -1;
 		calibration_required.erase(calibration_required.begin());
+
+		if (calibration_required.empty())
+			update_movement_for_each_segment();
 	}
 
 	//std::cout << "index: " << s_index << '\n';
@@ -416,10 +419,22 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 			Com_Error(ERR_DROP, "fraggrenade is not a weapon name");
 			return std::nullopt;
 		}
+
+		fragtime = cg::BG_WeaponNames[idx]->fuseTime;
+	}
+	if ((seg.options.hold_buttons & cmdEnums::special_grenade) != 0) {
+		int idx = cg::BG_FindWeaponIndexForName("flash_grenade");
+
+		if (!idx) {
+			Com_Error(ERR_DROP, "flash_grenade is not a weapon name");
+			return std::nullopt;
+		}
+
 		fragtime = cg::BG_WeaponNames[idx]->fuseTime;
 	}
 	int j = seg.start_index;
 	bool return_playerstate = false;
+	int frameIndex = 0;
 	pmove_ptr_t pmove;
 	for (auto& i : list) {
 
@@ -444,7 +459,7 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 
 		}
 
-		pmovesingle(pm, pml, seg, i);
+		pmovesingle(pm, pml, seg, i, frameIndex);
 
 		cmd.camera_yaw = i.camera_yaw;
 		cmd.viewangles = ps->viewangles;
@@ -489,7 +504,7 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 		pm->cmd.buttons = 0;
 	
 		i = cmd;
-		
+		frameIndex++;
 	}
 	memcpy_s(&seg.end.pm, sizeof(pmove_t), pm, sizeof(pmove_t));
 	memcpy_s(&seg.end.pml, sizeof(pml_t), pml, sizeof(pml_t));
@@ -502,7 +517,7 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 	return pmove;
 }
 using namespace cg;
-void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd)
+void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder_cmd& rcmd, const int frameIndex)
 {
 	playerState_s* ps = pm->ps;
 	current_frame_prediction_state = ps;
@@ -596,8 +611,10 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 	pm->ps->commandTime += pml->msec;
 	pm->cmd.buttons = options->hold_buttons;
 
-	if ((pm->cmd.buttons & cmdEnums::fire) != 0 && ps->weaponstate != WEAPON_READY)
-		pm->cmd.buttons -= cmdEnums::fire;
+	if ((pm->cmd.buttons & cmdEnums::fire) != 0) {
+		if (ps->weaponstate != WEAPON_READY || frameIndex < pml->msec)
+			pm->cmd.buttons -= cmdEnums::fire;
+	}
 
 
 	//if (seg.options.bhop)
