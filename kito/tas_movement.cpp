@@ -423,14 +423,16 @@ std::optional<pmove_ptr_t> TAS_Movement::update_movement_for_segment(segment_s& 
 		fragtime = cg::BG_WeaponNames[idx]->fuseTime;
 	}
 	if ((seg.options.hold_buttons & cmdEnums::special_grenade) != 0) {
-		int idx = cg::BG_FindWeaponIndexForName("flash_grenade");
+		//int idx = cg::BG_FindWeaponIndexForName("flash_grenade");
 
-		if (!idx) {
-			Com_Error(ERR_DROP, "flash_grenade is not a weapon name");
-			return std::nullopt;
-		}
+		//if (!idx) {
+		//	Com_Error(ERR_DROP, "flash_grenade is not a weapon name");
+		//	return std::nullopt;
+		//}
+		constexpr int ok = 246 + 600 + 700 + 242;
+		fragtime = ok;
 
-		fragtime = cg::BG_WeaponNames[idx]->fuseTime;
+		//fragtime = cg::BG_WeaponNames[idx]->fuseTime;
 	}
 	int j = seg.start_index;
 	bool return_playerstate = false;

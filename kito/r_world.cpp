@@ -270,7 +270,7 @@ void cg::CG_DrawSnapshot()
 	if (!ps)
 		return;
 
-	sprintf_s(buff, "cmdTime: %i\npTime: %i\n%i", input->GetUserCmd(input->cmdNumber-1)->serverTime, predictedPlayerState->commandTime, cg::PM_GetSprintLeft(ps, input->GetUserCmd(input->cmdNumber)->serverTime));
+	sprintf_s(buff, "cmdTime: %i\npTime: %i\n%i", input->GetUserCmd(input->cmdNumber-1)->serverTime, predictedPlayerState->commandTime, ps->weaponTime);
 	r::R_DrawTextWithEffects(buff, "fonts/normalfont", 0, float(refdef->height) / 1.2f, 1.25f, 1.25f, 0, vec4_t{1,1,1,0.7f}, 3, vec4_t{1,0,0,0});
 }
 void cg::CG_StaminaBar()
