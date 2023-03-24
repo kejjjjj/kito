@@ -4,6 +4,8 @@ void TAS::Init()
 {
 	TAS::TAS_CreateEssentialDirectories();
 	TAS::TAS_SetupHardcodedFont();
+
+	fonts_loaded = true;
 }
 std::optional<ImFont*> TAS::FetchFont(const char* name)
 {
@@ -26,6 +28,10 @@ void TAS::TAS_LoadFont(const char* _name, const std::string& name, float scale)
 		Com_Error(ERR_DISCONNECT, "unable to find font: '%s'\n", c_str.c_str());
 		return;
 	}
+	if (!io->Fonts) {
+		Com_Error(ERR_DROP, "!io->Fonts!");
+		return;
+	}
 	auto font = io->Fonts->AddFontFromFileTTF(c_str.c_str(), scale);
 
 	if (!font) {
@@ -35,6 +41,9 @@ void TAS::TAS_LoadFont(const char* _name, const std::string& name, float scale)
 	}
 
 	fonts.push_back(std::make_pair(font, _name));
+
+	std::cout << "font: " << std::quoted(_name) << " added!\n";
+
 }
 void TAS::TAS_SetupHardcodedFont()
 {

@@ -48,7 +48,7 @@ void cg::Pmove(pmove_t* pm)
 		//pm->oldcmd.serverTime = ooServertime;
 		return;
 	}
-	Pmove_f(pm);
+	Pmove_f.call(pm);
 	return;
 	//if (vars::et_pmove_fixed.enabled)
 	//	pm->cmd.serverTime = ((pm->cmd.serverTime + (vars::et_pmove_msec.intValue < 2 ? 2 : vars::et_pmove_msec.intValue) - 1) / vars::et_pmove_msec.intValue) * vars::et_pmove_msec.intValue;
@@ -110,7 +110,7 @@ void cg::PM_AirMove(pmove_t* pm, pml_t* pml)
 
 	//}
 
-	PM_AirMove_f(pm, pml);
+	PM_AirMove_f.call(pm, pml);
 	VectorCopy(pm->ps->velocity, temp_velocity);
 
 }
@@ -131,7 +131,7 @@ void cg::PM_WalkMove(pmove_t* pm, pml_t* pml)
 	//	AngleVectors(pm->ps->viewangles, pml->forward, pml->right, pml->up); //set viewangles
 
 	//}
-	PM_WalkMove_f(pm, pml);
+	PM_WalkMove_f.call(pm, pml);
 	VectorCopy(pm->ps->velocity, temp_velocity);
 
 }
@@ -145,7 +145,7 @@ void cg::PM_UFOMove(pmove_t* pm, pml_t* pml)
 	pm_ptr = pm;
 	pml_ptr = pml;
 	//VectorCopy(pm->ps->velocity, temp_velocity);
-	return PM_UFOMove_f(pm, pml);
+	return PM_UFOMove_f.call(pm, pml);
 	
 
 }
@@ -635,7 +635,7 @@ void cg::PmoveSingle(pmove_t* pm)
 	auto ps = pm->ps;
 
 
-	PmoveSingle_f(pm);
+	PmoveSingle_f.call(pm);
 	tas->movement.CalibrateSegment(pm);
 
 	//if (UPDATE_THE_FUCKING_RPG) {

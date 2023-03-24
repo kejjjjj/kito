@@ -31,6 +31,8 @@ DWORD WINAPI parent_thread(HMODULE hModule)
 		Sleep(300);
 	}
 
+
+
     cg::CG_Cleanup();
 
     std::cout << "Goodbye!\n";

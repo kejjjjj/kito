@@ -3,14 +3,15 @@
 void R_Init()
 {
 	r_glob = new R;
-
+	if (!r_glob->ok)
+		Com_Error(ERR_FATAL, "R_Init(): !r_glob->ok\n");
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "R_Init(): Creating graphics...\n");
 
 	if (!r_glob)
 		Com_Error(ERR_FATAL, "R_Init(): this will never occur\n");
 
-	if (!r_glob->Init())
-		Com_Error(ERR_FATAL, "R_Init(): cannot create graphics..\n");
+	//if (!r_glob->Init())
+	//	Com_Error(ERR_FATAL, "R_Init(): cannot create graphics..\n");
 	
 }
 bool R::Init()
@@ -25,9 +26,7 @@ bool R::Init()
 		Com_Error(ERR_FATAL, "!*reinterpret_cast<PVOID**>(device = cg::dx->device)");
 		return false; 
 	}
-
-	endscene = (HRESULT(__stdcall *)(IDirect3DDevice9*))vTable[42];
-	hook::install(&(PVOID&)endscene, draw_func);
+	endscene.init((DWORD)vTable[42], r_glob->draw_func);
 
 	//ALLOCATE DRAWLIST -- CLEARED IN CG_CLEANUP
 	dl = new DrawList;
@@ -67,12 +66,13 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 
 	if (!r_glob->R_ImGui(d)) {
 		Com_Error(ERR_DROP, "R::draw_func(IDirect3DDevice9* d): !r_glob->R_ImGui() || !r_glob->R_BeginFrame()");
-		return r_glob->endscene(d);
+		return r_glob->endscene.call(d);
 	}
 	
 	DrawList* dl = r_glob->dl;
 
-	r_glob->R_BeginFrame();
+	if (!tas->fonts_loaded || !r_glob->R_BeginFrame())
+		return r_glob->endscene.call(d);
 
 	if (cg::show_all_triggers) {
 		for (auto& i : cg::brushes) {
@@ -104,7 +104,7 @@ HRESULT __stdcall R::draw_func(IDirect3DDevice9* d)
 	tas->movement.set_player_pov();
 
 
-	return r_glob->endscene(d);
+	return r_glob->endscene.call(d);
 }
 using namespace r;
 using namespace cg;
@@ -130,14 +130,14 @@ void R::CG_DrawActive()
 	if (tas->TAS_CheckAutoSave())
 		tas->TAS_AutoSave();
 
-	return r_glob->CG_DrawActive_f();
+	return r_glob->CG_DrawActive_f.call();
 }
 vec3_t old_yaw;
 void CG_CalcViewValues(int a1, void*a2)
 {
 	//cg::predictedPlayerState->viewangles[YAW] = 90;
 
-	CG_CalcViewValues_f(a1, a2);
+	CG_CalcViewValues_f.call(a1, a2);
 
 	return;
 	if (tas->movement.recorder) {
@@ -179,7 +179,7 @@ void CG_UpdateViewWeaponAnim()
 			}
 		}
 	}
-	return CG_UpdateViewWeaponAnim_f();
+	return CG_UpdateViewWeaponAnim_f.call();
 }
 LRESULT __stdcall R::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -196,7 +196,7 @@ LRESULT __stdcall R::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		break;
 
 	}
-	return r_glob->oWndProc(hWnd, uMsg, wParam, lParam);
+	return r_glob->oWndProc.call(hWnd, uMsg, wParam, lParam);
 
 }
 void R::R_RecoverLostDevice()
@@ -211,7 +211,7 @@ void R::R_RecoverLostDevice()
 		r_glob->device_needs_reset = true;
 	}
 
-	return r_glob->R_RecoverLostDevice_f();
+	return r_glob->R_RecoverLostDevice_f.call();
 }
 void R::CL_ShutdownRenderer()
 {
@@ -228,7 +228,7 @@ void R::CL_ShutdownRenderer()
 		ImGui::DestroyContext();
 	}
 
-	return r_glob->CL_ShutdownRenderer_f();
+	return r_glob->CL_ShutdownRenderer_f.call();
 }
 bool R::R_BeginFrame()
 {

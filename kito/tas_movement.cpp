@@ -781,10 +781,10 @@ void TAS_Movement::pmovesingle(pmove_t* pm, pml_t* pml, segment_s& seg, recorder
 		else if (pml->walking) {
 			//if (seg.options.bhop)
 			//	pm->cmd.buttons |= cmdEnums::jump;
-			PM_WalkMove_f(pm, pml);
+			PM_WalkMove_f.call(pm, pml);
 		}
 		else {
-			PM_AirMove_f(pm, pml);
+			PM_AirMove_f.call(pm, pml);
 		}
 		PM_GroundTrace_(pm, pml); //call groundtrace after 
 		PM_Footsteps_(pm, pml);

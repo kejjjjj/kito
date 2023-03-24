@@ -9,8 +9,8 @@ void cg::CL_FinishMove(usercmd_s* cmd)
 	}
 
 	//*(int*)(0x85BD98 + 11454) -= 1000 / Dvar_FindMalleableVar("com_maxfps")->current.integer;
-	CL_FinishMove_f(cmd);
-
+	//CL_FinishMove_f.orgFnc(cmd);
+	CL_FinishMove_f.call(cmd);
 	if (tas->ui.editing) {
 		cmd->buttons = 0;
 		cmd->forwardmove = 0;

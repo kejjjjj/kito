@@ -10,7 +10,7 @@ class TAS
 {
 public:
 	TAS() = default;
-	//~TAS() = default;
+	~TAS() = default;
 
 	void Init();
 
@@ -25,7 +25,7 @@ public:
 	std::optional<ImFont*> FetchFont(const char* name);
 
 	int autosave = 0;
-
+	bool fonts_loaded = false;
 	bool TAS_CheckAutoSave();
 	void TAS_AutoSave();
 

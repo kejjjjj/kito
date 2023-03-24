@@ -11,13 +11,13 @@ namespace cg
 	inline vec3_t temp_velocity;
 	inline int temp_delta;
 	inline bool UPDATE_THE_FUCKING_RPG = false;
-	inline void(*Pmove_f)(pmove_t*);
 	inline void(*PM_FoliageSnd_f)(pmove_t*);
-	inline void(*PM_AirMove_f)(pmove_t* pm, pml_t* pml);
-	inline void(*PM_WalkMove_f)(pmove_t* pm, pml_t* pml);
-	inline void(*PM_UFOMove_f)(pmove_t* pm, pml_t* pml);
 	inline void(*Mantle_Check_f)(pmove_t* pm, pml_t* pml);
 
+	inline hook::hookobj<void(pmove_t*)> Pmove_f;
+	inline hook::hookobj<void(pmove_t*, pml_t*)> PM_AirMove_f;
+	inline hook::hookobj<void(pmove_t*, pml_t*)> PM_WalkMove_f;
+	inline hook::hookobj<void(pmove_t*, pml_t*)> PM_UFOMove_f;
 
 	void Pmove(pmove_t* pmove);
 	void PM_FoliageSnd(pmove_t* pm);
@@ -169,7 +169,7 @@ namespace cg
 	}
 	inline void (*PmoveSingle_fnc)(pmove_t* pm) = (void(__cdecl*)(pmove_t*))0x5BCBB0;
 
-	inline void (*PmoveSingle_f)(pmove_t* pm);
+	inline hook::hookobj<void(pmove_t*)> PmoveSingle_f;
 	void PmoveSingle(pmove_t* pm);
 	inline void(__cdecl*PM_Weapon_FireWeapon_f)(int delay, playerState_s* ps);
 	void PM_Weapon_FireWeapon(int delay, playerState_s* ps);

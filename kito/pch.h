@@ -54,6 +54,7 @@ typedef vec_t vec4_t[4];
 #include <map>
 #include <unordered_map>
 #include <set>
+#include <any>
 
 // add headers that you want to pre-compile here
 #include "framework.h"
@@ -76,6 +77,10 @@ typedef vec_t vec4_t[4];
 #include "imGui/imgui_impl_win32.h"
 #include "imGui/imgui_internal.h"
 #include "imGui/imgui_stdlib.h"
+
+#include "mh/MinHook.h"
+
+
 #include "koukku.hpp"
 
 #include "typedefs.hpp"

@@ -4,12 +4,19 @@
 
 void cg::CG_Init()
 {
+	MH_STATUS state = MH_STATUS::MH_OK;
+
+	if (state = MH_Initialize(), state != MH_STATUS::MH_OK) {
+		return hook::hook_error((state));
+	}
+
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "CG_Init() loading..\n");
+
+	tas = new TAS;
 
 	R_Init();
 	CG_InitForeverHooks();
 	
-	tas = new TAS;
 
 	tas->Init();
 
@@ -26,42 +33,23 @@ void cg::CG_InitForeverHooks()
 {
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "preparing to load perma hooks\n");
 
-	r_glob->oWndProc				= (HRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM))	(0x596810);
-	CL_FinishMove_f					= (void(*)(usercmd_s*))								(0x440040);
-	Pmove_f							= (void(*)(pmove_t*))								(0x5BD440);
-	PmoveSingle_f					= (void(*)(pmove_t*))								(0x5BCBB0);
-
-	PM_AirMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8820);
-	PM_WalkMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8940);
-	PM_UFOMove_f					= (void(*)(pmove_t*, pml_t*))						(0x5B8E30);
 	Mantle_Check_f					= (void(*)(pmove_t*, pml_t*))						(0x5B36C0);
 	PM_Weapon_FireWeapon_f			= (void(__cdecl*)(int, playerState_s*))				(0x5C18D0);
 
-	r_glob->R_RecoverLostDevice_f	= (void(*)())										(0x5DA020);
-	r_glob->CL_ShutdownRenderer_f	= (void(*)())										(0x4452E0);
-	r_glob->CG_DrawActive_f			= (void(*)())										(0x4111D0);
-
-	CG_CalcViewValues_f				= (void(*)(int, void*))								(0x42EA30);
-	CG_UpdateViewWeaponAnim_f		= (void(*)())										(0x433BB0);
-
-
-	hook::install(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
-	hook::install(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
-	hook::install(&(PVOID&)PM_AirMove_f, PM_AirMove);
-	hook::install(&(PVOID&)PM_WalkMove_f, PM_WalkMove);
-	hook::install(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
-	hook::install(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
-
-	hook::install(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
-	hook::install(&(PVOID&)CG_UpdateViewWeaponAnim_f, CG_UpdateViewWeaponAnim);
-
-	hook::install(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
-	hook::install(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
-	hook::install(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
+	CL_FinishMove_f.init				(0x440040ul, CL_FinishMove);
+	r_glob->oWndProc.init				(0x596810ul, r_glob->WndProc);
 	
+	r_glob->R_RecoverLostDevice_f.init	(0x5DA020ul, r_glob->R_RecoverLostDevice);
+	r_glob->CL_ShutdownRenderer_f.init	(0x4452E0ul, r_glob->CL_ShutdownRenderer);
+	r_glob->CG_DrawActive_f.init		(0x4111D0ul, r_glob->CG_DrawActive);
 
-	hook::install(&(PVOID&)Pmove_f, Pmove);
-	hook::install(&(PVOID&)PmoveSingle_f, PmoveSingle);
+	CG_CalcViewValues_f.init			(0x42EA30ul, CG_CalcViewValues);
+	CG_UpdateViewWeaponAnim_f.init		(0x433BB0ul, CG_UpdateViewWeaponAnim);
+
+	PM_AirMove_f.init(0x5B8820ul, PM_AirMove);
+	PM_WalkMove_f.init(0x5B8940ul, PM_WalkMove);
+	PM_UFOMove_f.init(0x5B8E30ul, PM_UFOMove);
+	PmoveSingle_f.init(0x5BCBB0ul, PmoveSingle);
 
 	hook::write_addr(0x04F1305, "\xEB\x2E\x8B\x8B\x00", 5); //je -> jne (ent->client -> !ent->client)
 	hook::nop(0x04F146D); // BG_GetSpreadForWeapon
@@ -89,21 +77,22 @@ void cg::CG_RemoveHooks()
 	if (!mglobs.initialized)
 		return;
 
-	hook::remove(&(PVOID&)r_glob->oWndProc, r_glob->WndProc);
-	hook::remove(&(PVOID&)CL_FinishMove_f, CL_FinishMove);
-	hook::remove(&(PVOID&)r_glob->R_RecoverLostDevice_f, r_glob->R_RecoverLostDevice);
-	hook::remove(&(PVOID&)r_glob->CL_ShutdownRenderer_f, r_glob->CL_ShutdownRenderer);
-	hook::remove(&(PVOID&)PM_AirMove_f, PM_AirMove);
-	hook::remove(&(PVOID&)PM_WalkMove_f, PM_WalkMove);
-	hook::remove(&(PVOID&)PM_UFOMove_f, PM_UFOMove);
-	hook::remove(&(PVOID&)Mantle_Check_f, Mantle_Check);
-	hook::remove(&(PVOID&)r_glob->CG_DrawActive_f, r_glob->CG_DrawActive);
-	hook::remove(&(PVOID&)CG_CalcViewValues_f, CG_CalcViewValues);
-	hook::remove(&(PVOID&)CG_UpdateViewWeaponAnim_f, CG_UpdateViewWeaponAnim);
 
-	hook::remove(&(PVOID&)PM_Weapon_FireWeapon_f, PM_Weapon_FireWeapon);
-	hook::remove(&(PVOID&)Pmove_f, Pmove);
-	hook::remove(&(PVOID&)PmoveSingle_f, PmoveSingle);
+	CL_FinishMove_f.release();;
+	r_glob->oWndProc.release();;
+
+	r_glob->R_RecoverLostDevice_f.release();
+	r_glob->CL_ShutdownRenderer_f.release();
+	r_glob->CG_DrawActive_f.release();
+
+	CG_CalcViewValues_f.release();
+	CG_UpdateViewWeaponAnim_f.release();
+
+	PM_AirMove_f.release();
+	PM_WalkMove_f.release();
+	PM_UFOMove_f.release();
+	PmoveSingle_f.release();
+
 
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, " done!\n");
 
@@ -112,6 +101,12 @@ void cg::CG_RemoveHooks()
 }
 void cg::CG_Cleanup()
 {
+	MH_STATUS state = MH_STATUS::MH_OK;
+
+	if (state = MH_Uninitialize(), state != MH_STATUS::MH_OK) {
+		return hook::hook_error((state));
+	}
+
 	Com_Printf(CON_CHANNEL_CONSOLEONLY, "CG_Cleanup(): clearing data..\n");
 
 	CG_RemoveHooks();

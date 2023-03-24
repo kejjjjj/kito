@@ -2,18 +2,7 @@
 
 //#ifdef _WIN64
 
-LONG hook::install(void** ppPointer, void* pDetour)
-{
-	DetourTransactionBegin();
-	DetourAttach(ppPointer, pDetour);
-	return DetourTransactionCommit();
-}
-LONG hook::remove(PVOID* ppPointer, PVOID pDetour)
-{
-	DetourTransactionBegin();
-	DetourDetach(ppPointer, pDetour);
-	return DetourTransactionCommit();
-}
+
 void hook::nop(std::uintptr_t address)
 {
 	write_addr(address, "\x90\x90\x90\x90\x90", 5);
